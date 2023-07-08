@@ -461,13 +461,13 @@ const Customers = () => {
                           </div>
                           <div>
                             <div className="font-bold">
-                              {customer.customer_details.name}
+                              {customer?.customer_details?.name}
                             </div>
                             <div className="text-sm opacity-50">
-                              {customer.customer_details.location}
+                              {customer?.customer_details?.location}
                             </div>
                             <div className="text-sm opacity-50">
-                              {customer.customer_details.address}
+                              {customer?.customer_details?.address}
                             </div>
                           </div>
                         </div>
@@ -496,11 +496,11 @@ const Customers = () => {
                         </div>
                       </td>
                       <td>
-                        <div>Total: {customer.purchase.total}</div>
+                        <div>Total: {customer?.purchase?.total}</div>
                         {customer?.purchase?.last_purchase ? (
                           <div>
                             Last purchase:{" "}
-                            {customer?.purchase?.last_purchase.name}
+                            {customer?.purchase?.last_purchase?.name}
                           </div>
                         ) : (
                           <></>
@@ -508,20 +508,20 @@ const Customers = () => {
                       </td>
                       <td>
                         <div>
-                          <p>Processing: {customer.orders.processing}</p>
-                          {customer.orders.ready ? (
-                            <p>Ready: {customer.orders.ready}</p>
+                          <p>Processing: {customer?.orders?.processing}</p>
+                          {customer?.orders?.ready ? (
+                            <p>Ready: {customer?.orders?.ready}</p>
                           ) : (
                             <p>Ready: 0</p>
                           )}
 
                           {customer.orders.completed ? (
-                            <p>Completed: {customer.orders.completed}</p>
+                            <p>Completed: {customer?.orders?.completed}</p>
                           ) : (
                             <p>Completed: 0</p>
                           )}
-                          {customer.orders.returned ? (
-                            <p>Returned: {customer.orders.returned}</p>
+                          {customer?.orders?.returned ? (
+                            <p>Returned: {customer?.orders?.returned}</p>
                           ) : (
                             <p>Returned: 0</p>
                           )}

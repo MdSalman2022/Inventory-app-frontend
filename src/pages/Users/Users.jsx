@@ -72,9 +72,9 @@ const Users = () => {
               </tr>
             </thead>
             <tbody>
-              {users?.map((user) => (
-                <tr key={user._id}>
-                  <th className="w-5">1</th>
+              {users?.map((user, index) => (
+                <tr key={index}>
+                  <th className="w-5">{index + 1}</th>
                   <td>{user?.username}</td>
                   <td>{user?.email}</td>
                   <td>
