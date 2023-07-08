@@ -1,7 +1,10 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Link } from "react-router-dom";
+import { AuthContext } from "../../../../contexts/AuthProvider/AuthProvider";
 
 const Header = () => {
+  const { user, logOut } = useContext(AuthContext);
+
   const menus = [
     {
       name: "Settings",
@@ -66,6 +69,13 @@ const Header = () => {
                   </Link>
                 </li>
               ))}
+              {user?.uid && (
+                <li>
+                  <div onClick={logOut} className="hover:bg-base-200">
+                    Logout
+                  </div>
+                </li>
+              )}
             </ul>
           </div>
         </div>

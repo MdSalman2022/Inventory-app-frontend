@@ -50,7 +50,7 @@ const Customers = () => {
   console.log(customers);
 
   const handleExportClick = () => {
-    fetch(`${import.meta.env.VITE_SERVER_URL}/api/customer-export`, {
+    fetch(`${import.meta.env.VITE_SERVER_URL}/customer/customer-export`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -451,7 +451,8 @@ const Customers = () => {
                             <div className="mask mask-squircle h-12 w-12">
                               <img
                                 src={
-                                  customer.customer_details.image || avatarIcon
+                                  customer?.customer_details?.image ||
+                                  avatarIcon
                                 }
                                 alt="image"
                                 className="rounded-full border-2 border-primary p-1"

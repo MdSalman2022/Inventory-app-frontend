@@ -23,7 +23,7 @@ const Products = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleExportClick = () => {
-    fetch(`${import.meta.env.VITE_SERVER_URL}/api/product-export`, {
+    fetch(`${import.meta.env.VITE_SERVER_URL}/product/product-export`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",

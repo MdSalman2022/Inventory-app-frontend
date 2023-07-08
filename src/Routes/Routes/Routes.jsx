@@ -15,6 +15,10 @@ import Transaction from "../../pages/Transaction/Transaction";
 import Settings from "../../pages/Settings/Settings";
 import Users from "../../pages/Users/Users";
 import Couriers from "../../pages/Couriers/Couriers";
+import CourierPage from "../../pages/CourierPage/CourierPage";
+import Register from "../../pages/Authentication/Register/Register";
+import Login from "../../pages/Authentication/Login/Login";
+import PrivateRoute from "../PrivateRoutes/PrivateRoutes";
 
 export const router = createBrowserRouter([
   {
@@ -23,64 +27,140 @@ export const router = createBrowserRouter([
     // errorElement: <ErrorPage />,
     children: [
       {
+        path: "/register",
+        element: <Register />,
+      },
+      {
+        path: "/login",
+        element: <Login />,
+      },
+      {
         path: "/",
-        element: <Dashboard></Dashboard>,
+        element: (
+          <PrivateRoute>
+            <Dashboard></Dashboard>
+          </PrivateRoute>
+        ),
       },
       {
         path: "/customers",
-        element: <Customers />,
+        element: (
+          <PrivateRoute>
+            <Customers />
+          </PrivateRoute>
+        ),
       },
       {
         path: "/start-order",
-        element: <StartOrder />,
+        element: (
+          <PrivateRoute>
+            <StartOrder />
+          </PrivateRoute>
+        ),
       },
       {
         path: "/products",
-        element: <Products />,
+        element: (
+          <PrivateRoute>
+            <Products />
+          </PrivateRoute>
+        ),
       },
       {
         path: "/orders-processing",
-        element: <OrderProcessing />,
+        element: (
+          <PrivateRoute>
+            <OrderProcessing />
+          </PrivateRoute>
+        ),
       },
       {
         path: "/orders-processing/import-csv",
-        element: <ImportBulkOrders />,
+        element: (
+          <PrivateRoute>
+            <ImportBulkOrders />
+          </PrivateRoute>
+        ),
       },
       {
         path: "/all-ready-orders",
-        element: <AllReadyOrders />,
+        element: (
+          <PrivateRoute>
+            <AllReadyOrders />
+          </PrivateRoute>
+        ),
       },
       {
         path: "/completed-orders",
-        element: <CompletedOrders />,
+        element: (
+          <PrivateRoute>
+            <CompletedOrders />
+          </PrivateRoute>
+        ),
       },
       {
         path: "/returned-orders",
-        element: <ReturnedOrders />,
+        element: (
+          <PrivateRoute>
+            <ReturnedOrders />
+          </PrivateRoute>
+        ),
       },
       {
         path: "/cancelled-orders",
-        element: <CancelledOrders />,
+        element: (
+          <PrivateRoute>
+            <CancelledOrders />
+          </PrivateRoute>
+        ),
       },
       {
         path: "/loss-profit",
-        element: <LossProfitPage />,
+        element: (
+          <PrivateRoute>
+            <LossProfitPage />
+          </PrivateRoute>
+        ),
       },
       {
         path: "/transactions",
-        element: <Transaction />,
+        element: (
+          <PrivateRoute>
+            <Transaction />
+          </PrivateRoute>
+        ),
       },
       {
         path: "/profile",
-        element: <Settings />,
+        element: (
+          <PrivateRoute>
+            <Settings />
+          </PrivateRoute>
+        ),
       },
       {
         path: "/users",
-        element: <Users />,
+        element: (
+          <PrivateRoute>
+            <Users />
+          </PrivateRoute>
+        ),
       },
       {
         path: "/couriers",
-        element: <Couriers />,
+        element: (
+          <PrivateRoute>
+            <Couriers />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "/couriers/:name",
+        element: (
+          <PrivateRoute>
+            <CourierPage />
+          </PrivateRoute>
+        ),
       },
     ],
   },

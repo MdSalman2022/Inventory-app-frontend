@@ -15,7 +15,7 @@ const Dashboard = () => {
     refetch,
   } = useQuery("orders", async () => {
     const response = await fetch(
-      `${import.meta.env.VITE_SERVER_URL}/api/get-orders/all`,
+      `${import.meta.env.VITE_SERVER_URL}/order/get-orders?filter=all`,
       {
         method: "GET",
         headers: {

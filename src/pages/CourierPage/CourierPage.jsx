@@ -1,27 +1,24 @@
-import React, { useEffect, useState } from "react";
-import { AiOutlineEdit, AiOutlineShoppingCart } from "react-icons/ai";
-import { RiArrowGoBackLine, RiDeleteBin6Line } from "react-icons/ri";
-import ModalBox from "../../components/Main/shared/Modals/ModalBox";
-import { toast } from "react-hot-toast";
-import EditCustomerModal from "../../components/Main/Customers/EditCustomerModal";
-import avatarIcon from "../../assets/shared/avatar.png";
-import DeleteCustomerModal from "../../components/Main/Customers/DeleteCustomerModal";
-import { useQuery } from "react-query";
-import { Link } from "react-router-dom";
-import { TbFileInvoice } from "react-icons/tb";
+import React, { useState } from "react";
 import { FaCheck } from "react-icons/fa";
-import DeleteOrderModal from "../../components/Main/Orders/DeleteOrderModal";
+import { RiArrowGoBackLine, RiDeleteBin6Line } from "react-icons/ri";
+import { Link, useParams } from "react-router-dom";
 import InvoiceGenerator from "../../components/Main/shared/InvoiceGenerator/InvoiceGenerator";
+import ModalBox from "../../components/Main/shared/Modals/ModalBox";
+import { useQuery } from "react-query";
+import { TbFileInvoice } from "react-icons/tb";
+import { toast } from "react-hot-toast";
+import avatarIcon from "../../assets/shared/avatar.png";
 
-const OrderProcessing = () => {
+const CourierPage = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState({});
 
-  console.log(isEditModalOpen);
   console.log(selectedOrder);
 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const { name } = useParams();
 
   const {
     data: orders,
@@ -29,9 +26,12 @@ const OrderProcessing = () => {
     isError,
     error,
     refetch,
-  } = useQuery("orders", async () => {
+  } = useQuery(["orders", name], async () => {
+    // Fetch data based on the updated name
     const response = await fetch(
-      `${import.meta.env.VITE_SERVER_URL}/order/get-orders?filter=processing`,
+      `${
+        import.meta.env.VITE_SERVER_URL
+      }/order/get-orders?courier=${name}&filter=ready`,
       {
         method: "GET",
         headers: {
@@ -41,14 +41,29 @@ const OrderProcessing = () => {
     );
 
     if (!response.ok) {
-      throw new Error("Failed to fetch customers");
+      throw new Error("Failed to fetch orders");
     }
 
     return response.json().then((data) => data.orders);
   });
 
-  console.log(orders);
+  console.log("orders for courier ", orders, name);
 
+  const SumOfTotalPrice = orders?.reduce((acc, order) => acc + order.total, 0);
+
+  const SumOfTotalDC = orders?.reduce(
+    (acc, order) => acc + order.deliveryCharge,
+    0
+  );
+
+  const SumOfTotalAdvance = orders?.reduce(
+    (acc, order) => acc + order.advance,
+    0
+  );
+
+  const SumOfTotalCOD = orders?.reduce((acc, order) => acc + order.cash, 0);
+
+  console.log(orders);
   const handleExportClick = () => {
     fetch(`${import.meta.env.VITE_SERVER_URL}/order/order-export`, {
       method: "GET",
@@ -84,7 +99,7 @@ const OrderProcessing = () => {
       });
   };
 
-  const handleOrderStatus = (id) => {
+  const handleOrderStatus = (id, status) => {
     fetch(
       `${import.meta.env.VITE_SERVER_URL}/order/edit-order-status?id=${id}`,
       {
@@ -93,7 +108,7 @@ const OrderProcessing = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          orderStatus: "ready",
+          orderStatus: status,
         }),
       }
     )
@@ -109,24 +124,24 @@ const OrderProcessing = () => {
       });
   };
 
+  function formatDate(timestamp) {
+    const date = new Date(timestamp);
+    const formattedDate = date.toLocaleDateString("en-GB");
+    return formattedDate;
+  }
+
   console.log(selectedOrder);
 
   return (
     <div className="space-y-4">
-      <DeleteOrderModal
-        setIsDeleteModalOpen={setIsDeleteModalOpen}
-        isDeleteModalOpen={isDeleteModalOpen}
-        selectedOrder={selectedOrder}
-        refetch={refetch}
-      />
       <div className="flex items-start justify-between border-b py-3">
         <div>
-          <p className="text-xl font-semibold">Order Processing</p>
-          <p>Total Parcels: 0</p>
-          <p>Total Sales: ৳0.00</p>
-          <p>Total DC: ৳0.00</p>
-          <p>Total COD: ৳0.00</p>
-          <p>Total Advance: ৳0.00</p>
+          <p className="text-xl font-semibold">{name} Ready Orders</p>
+          <p>Total Parcels: {orders?.length || 0.0}</p>
+          <p>Total Sales: ৳{SumOfTotalPrice || 0.0}</p>
+          <p>Total DC: ৳{SumOfTotalDC || 0.0}</p>
+          <p>Total COD: ৳{SumOfTotalCOD || 0.0}</p>
+          <p>Total Advance: ৳{SumOfTotalAdvance || 0.0}</p>
         </div>
         <div className="flex items-center gap-4">
           <button className="btn-primary btn-outline btn">
@@ -162,7 +177,6 @@ const OrderProcessing = () => {
           <input type="text" className="input-bordered input" />
         </div>
       </div>
-
       <div>
         <div className="overflow-x-auto">
           <table className="table">
@@ -194,7 +208,10 @@ const OrderProcessing = () => {
                       >
                         <InvoiceGenerator order={selectedOrder} />
                       </ModalBox>
-                      <TbFileInvoice />
+                      <p className="text-sm text-blue-500">
+                        {formatDate(order?.timestamp)}
+                      </p>
+                      <p className="text-xs text-blue-500">Created By Admin</p>
                     </span>
                   </td>
                   <td className="flex flex-col gap-1">
@@ -210,21 +227,34 @@ const OrderProcessing = () => {
                       </div>
                       <div>
                         <div className="font-bold">{order.name}</div>
+                        <div className="text-sm opacity-50">{order?.phone}</div>
                         <div className="text-sm opacity-50">
-                          {order.address}
+                          {order?.address}
+                        </div>
+                        <div className="text-sm opacity-50">
+                          {order?.district}
                         </div>
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
-                      <div
+                      <span
                         onClick={() => {
-                          handleOrderStatus(order._id);
+                          setIsModalOpen(!isModalOpen);
+                          setSelectedOrder(order);
                         }}
-                        className="tooltip rounded-full border border-gray-500 p-1 text-2xl text-info"
-                        data-tip="Ready"
+                        className="rounded-full border border-gray-500 p-1 text-2xl text-success"
                       >
-                        <FaCheck className="text-lg" />
-                      </div>
+                        <TbFileInvoice />
+                      </span>
+                      <span
+                        onClick={() => {
+                          handleOrderStatus(order._id, "processing");
+                        }}
+                        className="tooltip rounded-full border border-gray-500 p-1 text-2xl text-error"
+                        data-tip="Back to Processing"
+                      >
+                        <RiArrowGoBackLine className="text-lg" />
+                      </span>
                       <div
                         onClick={() => {
                           setIsDeleteModalOpen(true);
@@ -289,4 +319,4 @@ const OrderProcessing = () => {
   );
 };
 
-export default OrderProcessing;
+export default CourierPage;

@@ -1,52 +1,79 @@
-import { createContext } from "react";
-
+import { createContext, useEffect, useState } from "react";
+import {
+  createUserWithEmailAndPassword,
+  onAuthStateChanged,
+  getAuth,
+  signInWithEmailAndPassword,
+  signInWithPopup,
+  signOut,
+  updateProfile,
+  sendEmailVerification,
+} from "firebase/auth";
+import app from "../../config/firebase-config";
 export const AuthContext = createContext();
 
+const auth = getAuth(app);
 const AuthProvider = ({ children }) => {
-  // const [user, setUser] = useState(null);
+  const [user, setUser] = useState(null);
 
-  // const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
 
-  // // const user = await
+  const createUser = (name, email, password) => {
+    setLoading(true);
+    return createUserWithEmailAndPassword(auth, name, email, password);
+  };
 
-  // // console.log('state user', user);
-  // // console.log(user);
-  // const providerLogin = (provider) => {
-  //   setLoading(true);
-  //   return signInWithPopup(auth, provider);
-  // };
+  const emailVerification = () => {
+    return sendEmailVerification(auth.currentUser);
+  };
 
-  // const updateUser = (userInfo) => {
-  //   setLoading(true);
-  //   console.log(userInfo);
-  //   return updateProfile(auth.currentUser, userInfo);
-  // };
+  const updateUser = (userInfo) => {
+    setLoading(true);
 
-  // const logOut = () => {
-  //   setLoading(true);
-  //   return signOut(auth);
-  // };
+    return updateProfile(auth.currentUser, userInfo);
+  };
 
-  //   useEffect(() => {
-  //     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-  //       setUser(currentUser);
-  //       // console.log(currentUser);
-  //       setLoading(false);
-  //     });
+  const signIn = (email, password) => {
+    setLoading(true);
+    return signInWithEmailAndPassword(auth, email, password);
+  };
+  const logOut = () => {
+    setLoading(true);
+    return signOut(auth);
+  };
+  if (loading) {
+    <progress className="progress w-56"></progress>;
+  }
 
-  //     return () => {
-  //       unsubscribe();
-  //     };
-  //   }, []);
+  const providerLogin = (provider) => {
+    setLoading(true);
+    return signInWithPopup(auth, provider);
+  };
+
+  console.log("user info ", user);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+      // console.log(currentUser);
+      setLoading(false);
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, []);
 
   const authInfo = {
-    // user,
-    // loading,
-    // providerLogin,
-    // updateUser,
-    // logOut,
-    // setLoading,
-    // handleMobileLogin,
+    user,
+    loading,
+    signIn,
+    providerLogin,
+    updateUser,
+    emailVerification,
+    logOut,
+    setLoading,
+    createUser,
   };
 
   return (

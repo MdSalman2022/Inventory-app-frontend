@@ -1,6 +1,36 @@
 import React from "react";
+import { useQuery } from "react-query";
 
 const Users = () => {
+  const {
+    data: users,
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useQuery(
+    "customers",
+    async () => {
+      const response = await fetch(
+        `${import.meta.env.VITE_SERVER_URL}/user/get-users`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      if (!response.ok) {
+        throw new Error("Failed to fetch customers");
+      }
+      return response.json().then((data) => data?.users);
+    },
+    {
+      cacheTime: 30 * 60 * 1000, // Cache data for 30 minutes
+      staleTime: 10 * 60 * 1000, // Consider data fresh for 10 minutes
+    }
+  );
+
   return (
     <div className="space-y-5">
       <p>Users</p>
@@ -42,15 +72,16 @@ const Users = () => {
               </tr>
             </thead>
             <tbody>
-              {/* row 1 */}
-              <tr>
-                <th className="w-5">1</th>
-                <td>Cy Ganderton</td>
-                <td>Quality Control Specialist</td>
-                <td>
-                  <button className="badge badge-success">Active</button>
-                </td>
-              </tr>
+              {users?.map((user) => (
+                <tr key={user._id}>
+                  <th className="w-5">1</th>
+                  <td>{user?.username}</td>
+                  <td>{user?.email}</td>
+                  <td>
+                    <button className="badge badge-success">Active</button>
+                  </td>
+                </tr>
+              ))}
             </tbody>
             <tfoot className="bg-white">
               <tr>

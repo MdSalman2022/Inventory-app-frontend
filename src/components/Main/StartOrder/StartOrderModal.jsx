@@ -358,21 +358,21 @@ const StartOrderModal = ({
           note: order.instruction,
         };
 
-        //create order to steadfast
-        // fetch(`${import.meta.env.VITE_STEADFAST_BASE_URL}/create_order`, {
-        //   method: "POST",
-        //   headers: {
-        //     "Api-Key": `${import.meta.env.VITE_STEADFAST_API_KEY}`,
-        //     "Secret-Key": `${import.meta.env.VITE_STEADFAST_SECRET_KEY}`,
-        //     "content-type": "application/json",
-        //   },
-        //   body: JSON.stringify(courier_info),
-        // })
-        //   .then((res) => res.json())
-        //   .then((result) => {
-        //     console.log("courier info", result);
-        //     toast.success("Order sent to courier successfully");
-        //   });
+        // create order to steadfast
+        fetch(`${import.meta.env.VITE_STEADFAST_BASE_URL}/create_order`, {
+          method: "POST",
+          headers: {
+            "Api-Key": `${import.meta.env.VITE_STEADFAST_API_KEY}`,
+            "Secret-Key": `${import.meta.env.VITE_STEADFAST_SECRET_KEY}`,
+            "content-type": "application/json",
+          },
+          body: JSON.stringify(courier_info),
+        })
+          .then((res) => res.json())
+          .then((result) => {
+            console.log("courier info", result);
+            toast.success("Order sent to courier successfully");
+          });
 
         if (result.success) {
           const allProducts = order.products;
@@ -635,7 +635,7 @@ const StartOrderModal = ({
               onChange={(e) => {
                 setDeliveryCharge(e.target.value);
               }}
-              defaultValue={deliveryCharge}
+              value={deliveryCharge || 0}
             />
             <input
               type="number"
