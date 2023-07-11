@@ -9,12 +9,13 @@ import { GiReturnArrow } from "react-icons/gi";
 import { RiDeleteBin5Line } from "react-icons/ri";
 import { CgDatabase } from "react-icons/cg";
 import { BiLogOut } from "react-icons/bi";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { FaExchangeAlt } from "react-icons/fa";
 import { StateContext } from "../../../contexts/StateProvider/StateProvider";
+import { AuthContext } from "../../../contexts/AuthProvider/AuthProvider";
 
 const SideBar = ({ children }) => {
-  const { couriers } = useContext(StateContext);
+  const { couriers, userInfo } = useContext(StateContext);
 
   const activeCouriers =
     couriers?.filter((courier) => courier?.status === true) ?? [];
@@ -81,11 +82,6 @@ const SideBar = ({ children }) => {
       icon: <FaExchangeAlt />,
       route: "/transactions",
     },
-    {
-      name: "logout",
-      icon: <BiLogOut />,
-      route: "/logout",
-    },
   ];
 
   let activeClassName = `bg-primary text-white rounded-lg`;
@@ -99,9 +95,18 @@ const SideBar = ({ children }) => {
               <NavLink
                 key={index}
                 to={page.route}
-                className={({ isActive }) =>
-                  isActive ? activeClassName : "text-gray-600"
-                }
+                className={`${({ isActive }) =>
+                  isActive ? activeClassName : "text-gray-600"}
+                
+              ${
+                userInfo?.role !== "Admin" &&
+                (page.name === "dashboard" ||
+                  page.name === "customers" ||
+                  page.name === "loss-profit")
+                  ? "hidden"
+                  : ""
+              }
+              `}
               >
                 <p className="flex cursor-pointer items-center  justify-start gap-4 rounded-lg p-2 text-sm capitalize hover:bg-primary hover:text-white">
                   {page.icon}

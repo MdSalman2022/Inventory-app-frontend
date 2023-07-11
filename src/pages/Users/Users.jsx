@@ -1,35 +1,46 @@
-import React from "react";
+import React, { useContext, useState } from "react";
 import { useQuery } from "react-query";
+import EditUserModal from "../../components/Main/Users/EditUserModal";
+import { AiOutlineEdit } from "react-icons/ai";
+import { StateContext } from "../../contexts/StateProvider/StateProvider";
+import { toast } from "react-hot-toast";
+import DeleteUserModal from "../../components/Main/Users/DeleteUserModal";
+import { RiDeleteBin6Line } from "react-icons/ri";
 
 const Users = () => {
+  const { userInfo } = useContext(StateContext);
+  console.log(userInfo);
   const {
     data: users,
     isLoading,
     isError,
     error,
     refetch,
-  } = useQuery(
-    "customers",
-    async () => {
-      const response = await fetch(
-        `${import.meta.env.VITE_SERVER_URL}/user/get-users`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      if (!response.ok) {
-        throw new Error("Failed to fetch customers");
+  } = useQuery("customers", async () => {
+    const response = await fetch(
+      `${import.meta.env.VITE_SERVER_URL}/user/get-users`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
       }
-      return response.json().then((data) => data?.users);
-    },
-    {
-      cacheTime: 30 * 60 * 1000, // Cache data for 30 minutes
-      staleTime: 10 * 60 * 1000, // Consider data fresh for 10 minutes
+    );
+    if (!response.ok) {
+      throw new Error("Failed to fetch customers");
     }
-  );
+    return response.json().then((data) => data?.users);
+  });
+  const [selectedUser, setSelectedUser] = useState(null);
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+
+  const formatTimestamp = (timestamp) => {
+    // i want the time stamp to output in this format
+    const date = new Date(timestamp);
+    return date.toLocaleString();
+  };
 
   return (
     <div className="space-y-5">
@@ -37,6 +48,19 @@ const Users = () => {
       <hr />
 
       <div className="space-y-5">
+        <EditUserModal
+          setIsModalOpen={setIsModalOpen}
+          isModalOpen={isModalOpen}
+          selectedUser={selectedUser}
+          refetch={refetch}
+        />
+        <DeleteUserModal
+          isDeleteModalOpen={isDeleteModalOpen}
+          setIsDeleteModalOpen={setIsDeleteModalOpen}
+          selectedUser={selectedUser}
+          refetch={refetch}
+        />
+
         <div className="flex justify-between">
           <div className="flex items-center gap-2">
             <p>Show</p>
@@ -66,19 +90,65 @@ const Users = () => {
             <thead>
               <tr>
                 <th className="w-5"></th>
+                <th className="w-5"></th>
                 <th>Name</th>
                 <th>Email</th>
-                <th>Status</th>
+                <th>Role</th>
+                <th>Verified</th>
+                <th>Last Login</th>
               </tr>
             </thead>
             <tbody>
               {users?.map((user, index) => (
                 <tr key={index}>
                   <th className="w-5">{index + 1}</th>
+                  <th
+                    className="w-10 text-xl"
+                    onClick={() => {
+                      const isAdmin = userInfo?.role === "Admin";
+                      if (isAdmin) {
+                        setSelectedUser(user);
+                        setIsModalOpen(!isModalOpen);
+                      } else {
+                        toast.error("You are not authorized to edit user");
+                      }
+                    }}
+                  >
+                    <AiOutlineEdit />
+                  </th>
                   <td>{user?.username}</td>
                   <td>{user?.email}</td>
                   <td>
-                    <button className="badge badge-success">Active</button>
+                    <button className="badge badge-success">
+                      {user?.role}
+                    </button>
+                  </td>
+                  <td>
+                    {user?.verified ? (
+                      <button className="badge badge-success"></button>
+                    ) : (
+                      <button className="badge badge-error"></button>
+                    )}
+                  </td>
+                  <td>{formatTimestamp(user?.timestamp)}</td>
+                  <td>
+                    <button
+                      className="btn-ghost btn"
+                      onClick={() => {
+                        const isAdmin = userInfo?.role === "Admin";
+                        const isItYou = userInfo?.authUid === user?.authUid;
+                        if (isAdmin && !isItYou) {
+                          setIsDeleteModalOpen(!isDeleteModalOpen);
+                          setSelectedUser(user);
+                        } else if (isItYou) {
+                          toast.error("You can't delete yourself");
+                        } else {
+                          toast.error("You are not authorized to edit user");
+                        }
+                      }}
+                    >
+                      <RiDeleteBin6Line className="text-2xl text-error" />
+                    </button>
                   </td>
                 </tr>
               ))}

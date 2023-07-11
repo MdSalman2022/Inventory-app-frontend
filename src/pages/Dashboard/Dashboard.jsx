@@ -1,12 +1,24 @@
-import React from "react";
+import React, { useContext } from "react";
 import StatCard from "../../components/Main/Dashboard/StatCard";
 import { AiOutlineOrderedList, AiOutlineShoppingCart } from "react-icons/ai";
 import { LiaFileInvoiceSolid } from "react-icons/lia";
 import { BsFillBarChartFill, BsPeopleFill } from "react-icons/bs";
 import { useQuery } from "react-query";
 import { TbCurrencyTaka } from "react-icons/tb";
+import { StateContext } from "../../contexts/StateProvider/StateProvider";
+import { useNavigate } from "react-router-dom";
 
 const Dashboard = () => {
+  const { userInfo } = useContext(StateContext);
+
+  // console.log("userinfo", userInfo);
+
+  const navigate = useNavigate();
+
+  if (userInfo?.role !== "Admin") {
+    navigate("/start-order");
+  }
+
   const {
     data: orders,
     isLoading,
@@ -159,6 +171,44 @@ const Dashboard = () => {
       icon: <AiOutlineShoppingCart />,
     },
   ];
+
+  const { data: allCustomers } = useQuery("allCustomers", async () => {
+    const response = await fetch(
+      `${import.meta.env.VITE_SERVER_URL}/customer/get-customers`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    if (!response.ok) {
+      throw new Error("Failed to fetch customers");
+    }
+    return response.json().then((data) => data.customers);
+  });
+
+  const customerAddedToday = allCustomers?.filter((customer) => {
+    const customerDate = new Date(customer.timestamp);
+    const today = new Date();
+    return (
+      customerDate.getDate() === today.getDate() &&
+      customerDate.getMonth() === today.getMonth() &&
+      customerDate.getFullYear() === today.getFullYear()
+    );
+  });
+
+  console.log("customer added today", customerAddedToday);
+
+  const customerAddedThisMonth = allCustomers?.filter((customer) => {
+    const customerDate = new Date(customer.timestamp);
+    const today = new Date();
+    return (
+      customerDate.getMonth() === today.getMonth() &&
+      customerDate.getFullYear() === today.getFullYear()
+    );
+  });
+  console.log("customer added this month", customerAddedThisMonth);
 
   const customers = [
     {

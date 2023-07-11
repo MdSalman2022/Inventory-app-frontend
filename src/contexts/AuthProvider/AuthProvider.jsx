@@ -41,6 +41,7 @@ const AuthProvider = ({ children }) => {
     setLoading(true);
     return signOut(auth);
   };
+
   if (loading) {
     <progress className="progress w-56"></progress>;
   }
@@ -50,7 +51,7 @@ const AuthProvider = ({ children }) => {
     return signInWithPopup(auth, provider);
   };
 
-  console.log("user info ", user);
+  // console.log("user ", user);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {

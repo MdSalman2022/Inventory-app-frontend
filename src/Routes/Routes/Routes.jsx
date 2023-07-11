@@ -19,6 +19,9 @@ import CourierPage from "../../pages/CourierPage/CourierPage";
 import Register from "../../pages/Authentication/Register/Register";
 import Login from "../../pages/Authentication/Login/Login";
 import PrivateRoute from "../PrivateRoutes/PrivateRoutes";
+import EmailVerificationSentPage from "../../pages/EmailVerificationSentPage/EmailVerificationSentPage";
+import FullScreenPage from "../../layout/Main/FullScreenPage/FullScreenPage";
+import { StateContext } from "../../contexts/StateProvider/StateProvider";
 
 export const router = createBrowserRouter([
   {
@@ -161,6 +164,17 @@ export const router = createBrowserRouter([
             <CourierPage />
           </PrivateRoute>
         ),
+      },
+    ],
+  },
+  {
+    path: "/",
+    element: <FullScreenPage />,
+    // errorElement: <ErrorPage />,
+    children: [
+      {
+        path: "/email-verification-sent",
+        element: <EmailVerificationSentPage />,
       },
     ],
   },

@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import ModalBox from "../shared/Modals/ModalBox";
 import { toast } from "react-hot-toast";
 import { StateContext } from "../../../contexts/StateProvider/StateProvider";
@@ -9,6 +9,7 @@ const StartOrderModal = ({
   isStartNewOrderOpen,
   setIsStartNewOrderOpen,
   selectedCustomer,
+  setSelectedCustomer,
 }) => {
   const { products, refetchProducts, couriers } = useContext(StateContext);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -19,11 +20,15 @@ const StartOrderModal = ({
   const [discount, setDiscount] = useState(0);
   const [deliveryCharge, setDeliveryCharge] = useState(0);
   const [newCustomerId, setNewCustomerId] = useState("");
-  const [district, setDistrict] = useState("");
+  const [district, setDistrict] = useState(
+    selectedCustomer?.customer_details?.location ?? ""
+  );
   const [courier, setCourier] = useState("");
   console.log("courier ", courier);
 
   console.log("district ", district);
+
+  const formRef = useRef(null);
 
   const activeCouriers =
     couriers?.filter((courier) => courier?.status === true) ?? [];
@@ -498,12 +503,25 @@ const StartOrderModal = ({
 
   console.log(selectedCustomer);
 
+  const handleFormReset = () => {
+    setSelectedCustomer(null);
+    setProductList([]);
+    formRef?.current?.reset();
+  };
+
+  useEffect(() => {
+    if (!isModalOpen) {
+      handleFormReset();
+    }
+  }, [isModalOpen]);
+
   return (
     <div>
       <ModalBox isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen}>
         <div className="flex flex-col ">
           <p className="border-b p-5">Order Information</p>
           <form
+            ref={formRef}
             onSubmit={handleOrder}
             className="grid h-[800px] grid-cols-2 gap-5  overflow-y-scroll p-5"
           >
@@ -513,6 +531,7 @@ const StartOrderModal = ({
               placeholder="Facebook Name"
               name="name"
               defaultValue={selectedCustomer?.customer_details?.name || ""}
+              required
             />
             <input
               type="text"
@@ -520,6 +539,7 @@ const StartOrderModal = ({
               placeholder="Phone"
               name="phone"
               defaultValue={selectedCustomer?.customer_details?.phone || ""}
+              required
             />
             <input
               type="text"
@@ -527,6 +547,7 @@ const StartOrderModal = ({
               placeholder="Address"
               name="address"
               defaultValue={selectedCustomer?.customer_details?.address || ""}
+              required
             />
             <select
               name="district"
@@ -534,8 +555,9 @@ const StartOrderModal = ({
               className="input-bordered input col-span-2"
               defaultValue={selectedCustomer?.customer_details?.location || ""}
               onChange={(e) => setDistrict(e.target.value)}
+              required
             >
-              <option value="" disabled>
+              <option value="" disabled selected>
                 Select Location
               </option>
               <option value="Dhaka">Dhaka</option>
@@ -620,7 +642,12 @@ const StartOrderModal = ({
               className="select-bordered select col-span-1 w-full"
               name="courier"
               onChange={(e) => setCourier(e.target.value)}
+              required
             >
+              <option value="" disabled selected>
+                Select Courier
+              </option>
+
               {activeCouriers?.map((courier) => (
                 <option key={courier._id} value={courier.name}>
                   {courier.name}
@@ -636,6 +663,7 @@ const StartOrderModal = ({
                 setDeliveryCharge(e.target.value);
               }}
               value={deliveryCharge || 0}
+              readOnly
             />
             <input
               type="number"
@@ -643,6 +671,7 @@ const StartOrderModal = ({
               placeholder="Discount %"
               name="discount"
               onChange={(e) => setDiscount(e.target.value)}
+              required
             />
             <input
               type="number"
@@ -658,6 +687,7 @@ const StartOrderModal = ({
               name="advance"
               min={0}
               onChange={(e) => setAdvance(e.target.value)}
+              required
             />
             <input
               type="number"
@@ -681,7 +711,10 @@ const StartOrderModal = ({
               />
             </div>
             <button
-              onClick={() => setIsModalOpen(false)}
+              onClick={() => {
+                setIsModalOpen(false);
+                handleFormReset();
+              }}
               type="button"
               className="btn-error btn-outline btn"
             >

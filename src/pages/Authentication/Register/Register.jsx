@@ -5,7 +5,8 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { sendEmailVerification } from "firebase/auth";
 
 const Register = () => {
-  const { createUser, updateUser, providerLogin } = useContext(AuthContext);
+  const { createUser, updateUser, providerLogin, logOut } =
+    useContext(AuthContext);
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -31,14 +32,13 @@ const Register = () => {
             sendEmailVerification(user)
               .then(() => {
                 toast.success("Verification email sent");
+                logOut();
+                navigate("/login", { replace: true });
+                saveUser(user.displayName, user.email, authUid);
               })
               .catch((error) => {
                 console.log("Error sending verification email:", error);
               });
-
-            toast.success(`Welcome ${user.displayName}`);
-            saveUser(user.displayName, user.email, authUid);
-            navigate(from, { replace: true });
           })
           .catch((err) => console.log(err));
       })
@@ -96,7 +96,7 @@ const Register = () => {
             <input
               type="password"
               name="password"
-              placeholder="example@gmail.com"
+              placeholder="********"
               className="input-bordered input w-80 md:w-96"
             />
           </label>

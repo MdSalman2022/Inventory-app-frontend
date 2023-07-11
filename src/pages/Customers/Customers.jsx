@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { AiOutlineEdit, AiOutlineShoppingCart } from "react-icons/ai";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import ModalBox from "../../components/Main/shared/Modals/ModalBox";
@@ -7,6 +7,8 @@ import EditCustomerModal from "../../components/Main/Customers/EditCustomerModal
 import avatarIcon from "../../assets/shared/avatar.png";
 import DeleteCustomerModal from "../../components/Main/Customers/DeleteCustomerModal";
 import { useQuery } from "react-query";
+import { StateContext } from "../../contexts/StateProvider/StateProvider";
+import { useNavigate } from "react-router-dom";
 
 const Customers = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -17,6 +19,14 @@ const Customers = () => {
 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const { userInfo } = useContext(StateContext);
+
+  const navigate = useNavigate();
+
+  if (userInfo?.role !== "Admin") {
+    navigate("/start-order");
+  }
 
   const {
     data: customers,
@@ -515,7 +525,7 @@ const Customers = () => {
                             <p>Ready: 0</p>
                           )}
 
-                          {customer.orders.completed ? (
+                          {customer.orders?.completed ? (
                             <p>Completed: {customer?.orders?.completed}</p>
                           ) : (
                             <p>Completed: 0</p>

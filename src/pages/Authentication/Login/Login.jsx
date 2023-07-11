@@ -1,80 +1,108 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { AuthContext } from "../../../contexts/AuthProvider/AuthProvider";
 import { toast } from "react-hot-toast";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { sendEmailVerification } from "firebase/auth";
+import { StateContext } from "../../../contexts/StateProvider/StateProvider";
 
 const Login = () => {
-  const { createUser, updateUser, providerLogin, signIn } =
+  const { createUser, updateUser, providerLogin, signIn, logOut } =
     useContext(AuthContext);
+
+  const { userInfo, userInfoIsLoading } = useContext(StateContext);
+
+  console.log("userinfo from state", userInfo);
 
   const navigate = useNavigate();
   const location = useLocation();
 
   const from = location?.state?.from.pathname || "/";
 
-  const getUser = (user) => {
-    fetch(`${import.meta.env.VITE_SERVER_URL}/user/get-user/${user.uid}`)
-      .then((res) => res.json())
-      .then((data) => {
-        console.log("get user", data);
-        if (data.success === false) {
-          toast.error("User not found");
-        } else {
-          const dbuser = data.user;
-          console.log("user", dbuser);
-          navigate(from, { replace: true });
-          toast.success("Successfully Logged In");
+  const EditUserVerification = async (user, status) => {
+    try {
+      console.log("edit user", user);
+      console.log("edit user status", status);
+      const response = await fetch(
+        `${import.meta.env.VITE_SERVER_URL}/user/edit-user?id=${user.uid}`,
+        {
+          method: "PUT",
+          headers: {
+            "content-type": "application/json",
+          },
+          body: JSON.stringify({ verified: status }),
         }
-      })
-      .catch((err) => console.log(err));
+      );
+      const data = await response.json();
+
+      console.log("edit user data", data);
+      if (data?.success === true) {
+        console.log("edit user", data);
+        toast.success("Successfully Verified");
+      } else {
+        toast.error("Something went wrong");
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
 
-  const handleSignUp = (e) => {
+  console.log("user info state", userInfo);
+
+  const handleSendVerification = (user) => {
+    sendEmailVerification(user)
+      .then(() => {
+        toast.success("Verification email sent");
+      })
+      .catch((error) => {
+        console.log("Error sending verification email:", error);
+      });
+  };
+
+  const handleSignUp = async (e) => {
     e.preventDefault();
 
     const form = e.target;
     const email = form.email.value;
     const password = form.password.value;
 
-    signIn(email, password)
-      .then((result) => {
-        const user = result.user;
-        getUser(user);
+    try {
+      const result = await signIn(email, password);
+      const user = result.user;
 
-        navigate(from, { replace: true });
-        user.emailVerified && toast.success("Successfully Logged In");
-      })
-      .catch((error) => {
-        if (error.message === "Firebase: Error (auth/user-not-found).") {
-          toast.error("User not found");
-        } else if (error.message === "Firebase: Error (auth/wrong-password).") {
-          toast.error("Wrong Password");
-        } else if (error.message === "Firebase: Error (auth/invalid-email).") {
-          toast.error("Invalid Email");
+      console.log("firebase user ", user);
+      console.log("user info ", userInfo);
+
+      if (userInfoIsLoading) {
+        // Display loading state
+        return <progress className="progress w-56"></progress>;
+      } else if (user?.emailVerified) {
+        console.log("user info in login", userInfo);
+        if (userInfo?.verified) {
+          toast.success(`Welcome ${user.displayName}`);
+          navigate(from, { replace: true });
         } else {
-          toast.error("Something went wrong");
+          await EditUserVerification(user, true);
+          toast.success(`Welcome ${user.displayName}`);
+          navigate(from, { replace: true });
         }
-        console.log(error.message);
-      });
-  };
-
-  const saveUser = (name, email, authUid) => {
-    const user = {
-      username: name,
-      email: email,
-      authUid: authUid,
-    };
-    fetch(`${import.meta.env.VITE_SERVER_URL}/user/create-user`, {
-      method: "POST",
-      headers: {
-        "content-type": "application/json",
-      },
-      body: JSON.stringify(user),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        console.log("save user", data);
-      });
+      } else {
+        toast.error("Please verify your email");
+        handleSendVerification(user);
+        toast.error("Verification email sent");
+        logOut();
+        navigate("/login", { replace: true });
+      }
+      user.emailVerified && toast.success("Successfully Logged In");
+    } catch (error) {
+      if (error.message === "Firebase: Error (auth/user-not-found).") {
+        toast.error("User not found");
+      } else if (error.message === "Firebase: Error (auth/wrong-password).") {
+        toast.error("Wrong Password");
+      } else if (error.message === "Firebase: Error (auth/invalid-email).") {
+        toast.error("Invalid Email");
+      }
+      console.log(error.message);
+    }
   };
 
   return (
@@ -98,7 +126,7 @@ const Login = () => {
             <input
               type="password"
               name="password"
-              placeholder="example@gmail.com"
+              placeholder="********"
               className="input-bordered input w-80 md:w-96"
             />
           </label>

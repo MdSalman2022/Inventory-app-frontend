@@ -31,6 +31,7 @@ const Header = () => {
       path: "/suppliers",
     },
   ];
+  console.log(user);
 
   return (
     <div className="relative z-10">
@@ -55,7 +56,12 @@ const Header = () => {
           <div className="dropdown-end dropdown">
             <label tabIndex={0} className="btn-ghost btn-circle avatar btn">
               <div className="w-10 rounded-full">
-                <img src="https://i.ibb.co/LpsnbCC/Rectangle-182.png" />
+                <img
+                  src={
+                    user?.photoURL ||
+                    "https://static-00.iconduck.com/assets.00/user-avatar-icon-512x512-vufpcmdn.png"
+                  }
+                />
               </div>
             </label>
             <ul

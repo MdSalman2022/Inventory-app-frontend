@@ -2,9 +2,16 @@ import React, { useContext } from "react";
 import StatCard from "../../components/Main/Dashboard/StatCard";
 import { useQuery } from "react-query";
 import { StateContext } from "../../contexts/StateProvider/StateProvider";
+import { useNavigate } from "react-router-dom";
 
 const LossProfitPage = () => {
-  const { products } = useContext(StateContext);
+  const { products, userInfo } = useContext(StateContext);
+
+  const navigate = useNavigate();
+
+  if (userInfo?.role !== "Admin") {
+    navigate("/start-order");
+  }
 
   const {
     data: orders,

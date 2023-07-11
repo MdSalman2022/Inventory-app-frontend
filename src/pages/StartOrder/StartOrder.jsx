@@ -74,6 +74,7 @@ const StartOrder = () => {
         isStartNewOrderOpen={isStartNewOrderOpen}
         setIsStartNewOrderOpen={setIsStartNewOrderOpen}
         selectedCustomer={selectedCustomer}
+        setSelectedCustomer={setSelectedCustomer}
       />
       <p className="font-medium">Start Order</p>
       <hr />
