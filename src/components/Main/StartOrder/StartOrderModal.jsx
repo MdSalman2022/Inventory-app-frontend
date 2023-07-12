@@ -73,7 +73,7 @@ const StartOrderModal = ({
     const advance = parseInt(form.advance.value);
     const cash = parseInt(form.cashCollect.value);
     const instruction = form.instruction.value;
-    const image = form.image.files[0];
+    const image = form?.image?.files[0];
 
     if (image) {
       const formData = new FormData();
@@ -137,8 +137,7 @@ const StartOrderModal = ({
                       phone,
                       address,
                       location: district,
-                      total:
-                        0 + total + deliveryCharge - total * (discount / 100),
+                      total: 0 + total + deliveryCharge - discount,
                       order,
                       processingCount: 1,
                       readyCount: 0,
@@ -205,7 +204,7 @@ const StartOrderModal = ({
                   parseInt(selectedCustomer?.purchase?.total) +
                   total +
                   deliveryCharge -
-                  total * (discount / 100),
+                  discount,
                 order,
                 processingCount: selectedCustomer?.orders?.processing + 1,
                 readyCount: selectedCustomer?.orders?.ready,
@@ -274,7 +273,7 @@ const StartOrderModal = ({
                 phone,
                 address,
                 location: district,
-                total: 0 + total + deliveryCharge - total * (discount / 100),
+                total: 0 + total + deliveryCharge - discount,
                 order,
                 processingCount: 1,
                 readyCount: 0,
@@ -322,7 +321,7 @@ const StartOrderModal = ({
             parseInt(selectedCustomer?.purchase?.total) +
             total +
             deliveryCharge -
-            total * (discount / 100),
+            discount,
           order,
           processingCount: selectedCustomer?.orders?.processing + 1,
           readyCount: selectedCustomer?.orders?.ready,
@@ -434,10 +433,15 @@ const StartOrderModal = ({
         0
       );
       setTotalPrice(total);
-      const totalAfterDiscount = total - (total * discount) / 100;
-      const totalAfterDeliveryCharge =
-        totalAfterDiscount + parseInt(deliveryCharge);
-      const totalAfterAdvance = totalAfterDeliveryCharge - advance;
+      // const totalAfterDiscount = total - discount;
+      // const totalAfterDeliveryCharge =
+      // totalAfterDiscount + parseInt(deliveryCharge);
+      console.log("total ", total);
+      console.log("advance ", advance);
+      console.log("discount ", discount);
+      console.log("delivery charge ", deliveryCharge);
+      const totalAfterAdvance = total - advance - discount + deliveryCharge;
+      console.log(totalAfterAdvance);
       setCashCollect(totalAfterAdvance);
     } else {
       setTotalPrice(0);
@@ -445,6 +449,7 @@ const StartOrderModal = ({
     }
   }, [productList, discount, deliveryCharge, advance]);
 
+  console.log(cashCollect);
   console.log(totalPrice);
 
   const handleSelectedProductList = (product) => {

@@ -227,7 +227,7 @@ const OrderProcessing = () => {
                 <th>#</th>
                 <th>Invoice</th>
                 <th>Name</th>
-                <th>Prods/Pics</th>
+                {/* <th>Prods/Pics</th> */}
                 <th>Price</th>
               </tr>
             </thead>
@@ -286,17 +286,7 @@ const OrderProcessing = () => {
                       </div>
                     </div>
                   </td>
-                  <td>
-                    <div className="avatar-group -space-x-6">
-                      {order?.products?.map((product) => (
-                        <div key={product._id} className="avatar">
-                          <div className="w-12">
-                            <img src={product?.image} />
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </td>
+                  {/* <td></td> */}
                   <td>
                     <div className="flex flex-col">
                       <p className="badge badge-info">
@@ -321,7 +311,7 @@ const OrderProcessing = () => {
                 <th>Showing 1 to 2 of 2 entries</th>
                 <th></th>
                 <th></th>
-                <th></th>
+                {/* <th></th> */}
                 <th className="flex justify-end">
                   <div className="join">
                     <button className="join-item btn">Previous</button>

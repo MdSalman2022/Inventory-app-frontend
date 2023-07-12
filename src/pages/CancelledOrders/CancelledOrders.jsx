@@ -146,7 +146,7 @@ const CancelledOrders = () => {
                 <th>#</th>
                 <th>Invoice</th>
                 <th>Name</th>
-                <th>Prods/Pics</th>
+                {/* <th>Prods/Pics</th> */}
                 <th>Price</th>
               </tr>
             </thead>
@@ -201,7 +201,7 @@ const CancelledOrders = () => {
                       </span>
                     </div>
                   </td>
-                  <td>
+                  {/* <td>
                     <div className="avatar-group -space-x-6">
                       {order.products?.map((product) => (
                         <div key={product._id} className="avatar">
@@ -211,7 +211,7 @@ const CancelledOrders = () => {
                         </div>
                       ))}
                     </div>
-                  </td>
+                  </td> */}
                   <td>
                     <div className="flex flex-col">
                       <p className="badge badge-info">
@@ -219,16 +219,12 @@ const CancelledOrders = () => {
                       </p>
                       <p>Quantity: {order?.quantity}</p>
                       <p className="">Price: {order?.total} Tk</p>
-                      {order.discount && (
-                        <p className="">
-                          Discount: {order?.total * (order?.discount / 100)} Tk
-                        </p>
-                      )}
+                      <p className="">Discount: {order?.discount} Tk</p>
                       <p className="">
                         Total Bill:{" "}
                         {parseInt(order?.total) +
                           parseInt(order?.deliveryCharge) -
-                          order?.total * (order?.discount / 100)}
+                          order?.discount}
                         Tk
                       </p>
                       <p className="">Advance: {order?.advance} Tk</p>
@@ -243,7 +239,7 @@ const CancelledOrders = () => {
                 <th>Showing 1 to 2 of 2 entries</th>
                 <th></th>
                 <th></th>
-                <th></th>
+                {/* <th></th> */}
                 <th className="flex justify-end">
                   <div className="join">
                     <button className="join-item btn">Previous</button>
