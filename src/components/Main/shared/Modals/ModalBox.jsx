@@ -5,17 +5,17 @@ const ModalBox = ({ isModalOpen, setIsModalOpen, children }) => {
   if (isModalOpen === true) {
     return (
       <div>
-        <div className="fixed z-10 inset-0 overflow-auto mx-5 md:mx-0">
-          <div className="flex items-center justify-center min-h-screen">
+        <div className="fixed inset-0 z-10 mx-5 overflow-auto md:mx-0">
+          <div className="flex min-h-screen items-center justify-center">
             <div
               onClick={() => setIsModalOpen(!isModalOpen)}
               className="fixed inset-0 bg-gray-500 bg-opacity-10 transition-opacity"
               aria-hidden="true"
             ></div>
-            <div className="relative rounded-[20px] overflow-hidden shadow-xl transform transition-all w-full sm:w-fit bg-white flex flex-wrap h-full">
+            <div className="relative flex h-full w-full transform flex-wrap overflow-hidden rounded-[20px] bg-white shadow-xl transition-all sm:w-fit">
               <CgClose
                 onClick={() => setIsModalOpen(!isModalOpen)}
-                className="cursor-pointer hover:text-blue-500 absolute top-3 right-3 text-2xl"
+                className="absolute right-3 top-3 cursor-pointer text-2xl hover:text-blue-500"
               />
               {children}
             </div>

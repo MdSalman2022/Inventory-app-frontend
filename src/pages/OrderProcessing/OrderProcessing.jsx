@@ -84,35 +84,90 @@ const OrderProcessing = () => {
       });
   };
 
-  const handleOrderStatus = (id) => {
-    fetch(
-      `${import.meta.env.VITE_SERVER_URL}/order/edit-order-status?id=${id}`,
-      {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          orderStatus: "ready",
-        }),
-      }
-    )
-      .then((res) => res.json())
-      .then((data) => {
-        console.log(data);
-        refetch();
-        toast.success("Order status updated successfully");
-      })
-      .catch((err) => {
-        console.log(err);
-        toast.error("Failed to update order status");
-      });
+  const [newOrderId, setNewOrderId] = useState("");
+
+  const handleOrderStatus = (order) => {
+    if (order?.courierStatus === "returned") {
+      console.log("returned order");
+      fetch(`${import.meta.env.VITE_SERVER_URL}/order/get-new-orderid`)
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.success) {
+            console.log("data orderid", data.orderId);
+            toast.success("New order id generated successfully");
+            setNewOrderId(data.orderId);
+
+            const payload = {
+              orderId: data.orderId,
+              orderStatus: "ready",
+            };
+
+            console.log("payload ", payload);
+
+            fetch(
+              `${import.meta.env.VITE_SERVER_URL}/order/edit-order-info?id=${
+                order._id
+              }`,
+
+              {
+                method: "PUT",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify(payload),
+              }
+            )
+              .then((res) => res.json())
+              .then((data) => {
+                console.log("edited info", data);
+                refetch();
+                toast.success("Order status updated successfully");
+              })
+              .catch((err) => {
+                console.log(err);
+                toast.error("Failed to update order status");
+              });
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+          toast.error("Failed to update order status");
+        });
+    } else {
+      fetch(
+        `${import.meta.env.VITE_SERVER_URL}/order/edit-order-status?id=${
+          order._id
+        }`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            orderStatus: "ready",
+          }),
+        }
+      )
+        .then((res) => res.json())
+        .then((data) => {
+          console.log(data);
+          refetch();
+          toast.success("Order status updated successfully");
+        })
+        .catch((err) => {
+          console.log(err);
+          toast.error("Failed to update order status");
+        });
+    }
   };
 
   console.log(selectedOrder);
 
   return (
     <div className="space-y-4">
+      <ModalBox isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen}>
+        <InvoiceGenerator order={selectedOrder} />
+      </ModalBox>
       <DeleteOrderModal
         setIsDeleteModalOpen={setIsDeleteModalOpen}
         isDeleteModalOpen={isDeleteModalOpen}
@@ -188,12 +243,6 @@ const OrderProcessing = () => {
                       }}
                       className="p-1 text-2xl text-success"
                     >
-                      <ModalBox
-                        isModalOpen={isModalOpen}
-                        setIsModalOpen={setIsModalOpen}
-                      >
-                        <InvoiceGenerator order={selectedOrder} />
-                      </ModalBox>
                       <TbFileInvoice />
                     </span>
                   </td>
@@ -218,7 +267,7 @@ const OrderProcessing = () => {
                     <div className="flex items-center gap-2">
                       <div
                         onClick={() => {
-                          handleOrderStatus(order._id);
+                          handleOrderStatus(order);
                         }}
                         className="tooltip rounded-full border border-gray-500 p-1 text-2xl text-info"
                         data-tip="Ready"

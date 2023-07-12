@@ -86,34 +86,47 @@ const SideBar = ({ children }) => {
 
   let activeClassName = `bg-primary text-white rounded-lg`;
 
+  const pagesForNonAdmin = pages.filter(
+    (page) =>
+      page.name !== "dashboard" &&
+      page.name !== "customers" &&
+      page.name !== "loss-profit"
+  );
+
   return (
     <div>
       <div className="grid grid-cols-7 text-black">
         <div className="col-span-1 h-full bg-white">
-          <div className="flex h-[93vh] w-full flex-col gap-5 bg-white px-5 py-4">
-            {pages.map((page, index) => (
-              <NavLink
-                key={index}
-                to={page.route}
-                className={`${({ isActive }) =>
-                  isActive ? activeClassName : "text-gray-600"}
-                
-              ${
-                userInfo?.role !== "Admin" &&
-                (page.name === "dashboard" ||
-                  page.name === "customers" ||
-                  page.name === "loss-profit")
-                  ? "hidden"
-                  : ""
-              }
-              `}
-              >
-                <p className="flex cursor-pointer items-center  justify-start gap-4 rounded-lg p-2 text-sm capitalize hover:bg-primary hover:text-white">
-                  {page.icon}
-                  {page.name}
-                </p>
-              </NavLink>
-            ))}
+          <div className="flex h-[93vh] w-full flex-col gap-2 bg-white px-5 py-4">
+            {userInfo?.role === "Admin"
+              ? pages.map((page, index) => (
+                  <NavLink
+                    key={index}
+                    to={page.route}
+                    className={({ isActive }) =>
+                      isActive ? activeClassName : "text-gray-600"
+                    }
+                  >
+                    <p className="flex cursor-pointer items-center  justify-start gap-4 rounded-lg p-2 text-sm capitalize hover:bg-primary hover:text-white">
+                      {page.icon}
+                      {page.name}
+                    </p>
+                  </NavLink>
+                ))
+              : pagesForNonAdmin.map((page, index) => (
+                  <NavLink
+                    key={index}
+                    to={page.route}
+                    className={({ isActive }) =>
+                      isActive ? activeClassName : "text-gray-600"
+                    }
+                  >
+                    <p className="flex cursor-pointer items-center  justify-start gap-4 rounded-lg p-2 text-sm capitalize hover:bg-primary hover:text-white">
+                      {page.icon}
+                      {page.name}
+                    </p>
+                  </NavLink>
+                ))}
           </div>
         </div>
         <div className="col-span-6 p-5">{children}</div>

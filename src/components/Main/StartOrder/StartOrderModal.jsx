@@ -354,31 +354,6 @@ const StartOrderModal = ({
       .then((result) => {
         console.log("added order info", result);
 
-        const courier_info = {
-          invoice: result?.orderId,
-          recipient_name: order.name,
-          recipient_phone: order.phone,
-          recipient_address: order.address,
-          cod_amount: order.cash,
-          note: order.instruction,
-        };
-
-        // create order to steadfast
-        fetch(`${import.meta.env.VITE_STEADFAST_BASE_URL}/create_order`, {
-          method: "POST",
-          headers: {
-            "Api-Key": `${import.meta.env.VITE_STEADFAST_API_KEY}`,
-            "Secret-Key": `${import.meta.env.VITE_STEADFAST_SECRET_KEY}`,
-            "content-type": "application/json",
-          },
-          body: JSON.stringify(courier_info),
-        })
-          .then((res) => res.json())
-          .then((result) => {
-            console.log("courier info", result);
-            toast.success("Order sent to courier successfully");
-          });
-
         if (result.success) {
           const allProducts = order.products;
 
@@ -668,10 +643,9 @@ const StartOrderModal = ({
             <input
               type="number"
               className="input-bordered input"
-              placeholder="Discount %"
+              placeholder="Discount"
               name="discount"
               onChange={(e) => setDiscount(e.target.value)}
-              required
             />
             <input
               type="number"
@@ -702,14 +676,6 @@ const StartOrderModal = ({
               placeholder="Exchange/special instruction"
               name="instruction"
             />
-            <div className="col-span-2 w-60 space-y-2">
-              <p>Other Pictures</p>
-              <input
-                type="file"
-                name="image"
-                className="file-input-bordered file-input-primary  file-input w-fit"
-              />
-            </div>
             <button
               onClick={() => {
                 setIsModalOpen(false);

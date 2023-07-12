@@ -31,7 +31,7 @@ const CourierPage = () => {
     const response = await fetch(
       `${
         import.meta.env.VITE_SERVER_URL
-      }/order/get-orders?courier=${name}&filter=ready`,
+      }/order/get-orders?courier=${name}&filter=ready&courierStatus=sent`,
       {
         method: "GET",
         headers: {
@@ -99,29 +99,34 @@ const CourierPage = () => {
       });
   };
 
-  const handleOrderStatus = (id, status) => {
-    fetch(
-      `${import.meta.env.VITE_SERVER_URL}/order/edit-order-status?id=${id}`,
-      {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          orderStatus: status,
-        }),
-      }
-    )
-      .then((res) => res.json())
-      .then((data) => {
-        console.log(data);
+  const handleOrderStatus = async (id, status) => {
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_SERVER_URL}/order/edit-order-info?id=${id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            orderStatus: status,
+            courierStatus: "returned",
+            courierInfo: {},
+          }),
+        }
+      );
+
+      if (response.ok) {
+        const resultFromDB = await response.json();
+        console.log("order info", resultFromDB);
         refetch();
-        toast.success("Order status updated successfully");
-      })
-      .catch((err) => {
-        console.log(err);
-        toast.error("Failed to update order status");
-      });
+      } else {
+        throw new Error("Failed to save courier data");
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to save courier data");
+    }
   };
 
   function formatDate(timestamp) {
@@ -233,6 +238,10 @@ const CourierPage = () => {
                         </div>
                         <div className="text-sm opacity-50">
                           {order?.district}
+                        </div>
+                        <div className="text-sm opacity-50">
+                          ConsignmentId:{" "}
+                          {order.courierInfo?.consignment?.consignment_id}
                         </div>
                       </div>
                     </div>

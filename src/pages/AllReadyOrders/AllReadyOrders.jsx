@@ -12,6 +12,8 @@ import { FaCheck } from "react-icons/fa";
 import { TbFileInvoice } from "react-icons/tb";
 import { FcCancel } from "react-icons/fc";
 import InvoiceGenerator from "../../components/Main/shared/InvoiceGenerator/InvoiceGenerator";
+import { GrDeliver } from "react-icons/gr";
+import EditOrderModal from "../../components/Main/Orders/EditOrderModal";
 
 const AllReadyOrders = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -109,11 +111,98 @@ const AllReadyOrders = () => {
       });
   };
 
+  const sendToCourier = async (order) => {
+    try {
+      const courier_info = {
+        invoice: order?.orderId,
+        recipient_name: order.name,
+        recipient_phone: order.phone,
+        recipient_address: order.address,
+        cod_amount: order.cash,
+        note: order.instruction,
+      };
+
+      const response = await fetch(
+        `${import.meta.env.VITE_STEADFAST_BASE_URL}/create_order`,
+        {
+          method: "POST",
+          headers: {
+            "Api-Key": import.meta.env.VITE_STEADFAST_API_KEY,
+            "Secret-Key": import.meta.env.VITE_STEADFAST_SECRET_KEY,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(courier_info),
+        }
+      );
+      console.log(response);
+      if (response.ok) {
+        const resultFromCourier = await response.json();
+        console.log("courier info", resultFromCourier);
+        if (resultFromCourier.status === 200) {
+          console.log(order);
+          toast.success("Order sent to courier successfully");
+          saveToDb(order, resultFromCourier);
+        }
+      } else {
+        toast.error("Failed to send order to courier");
+        throw new Error("Failed to send order to courier");
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to send order to courier");
+    }
+  };
+
+  const saveToDb = async (order, resultFromCourier) => {
+    console.log(order, resultFromCourier);
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_SERVER_URL}/order/edit-order-info?id=${
+          order._id
+        }`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            courierStatus: "sent",
+            courierInfo: resultFromCourier,
+          }),
+        }
+      );
+
+      if (response.ok) {
+        const resultFromDB = await response.json();
+        console.log("order info", resultFromDB);
+        toast.success("Courier data saved successfully");
+        refetch();
+      } else {
+        toast.error("Failed to save courier data");
+        throw new Error("Failed to save courier data");
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to save courier data");
+    }
+  };
+
   return (
     <div className="space-y-4">
+      <EditOrderModal
+        isEditModalOpen={isEditModalOpen}
+        setIsEditModalOpen={setIsEditModalOpen}
+        setSelectedOrder={setSelectedOrder}
+        selectedOrder={selectedOrder}
+        refetch={refetch}
+      />
+      <ModalBox isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen}>
+        <InvoiceGenerator order={selectedOrder} />
+      </ModalBox>
       <DeleteOrderModal
         setIsDeleteModalOpen={setIsDeleteModalOpen}
         isDeleteModalOpen={isDeleteModalOpen}
+        setSelectedOrder={setSelectedOrder}
         selectedOrder={selectedOrder}
         refetch={refetch}
       />
@@ -183,15 +272,12 @@ const AllReadyOrders = () => {
                   <td>{index + 1}</td>
                   <td>
                     <span
-                      onClick={() => setIsModalOpen(!isModalOpen)}
+                      onClick={() => {
+                        setIsModalOpen(!isModalOpen);
+                        setSelectedOrder(order);
+                      }}
                       className="p-1 text-2xl text-success"
                     >
-                      <ModalBox
-                        isModalOpen={isModalOpen}
-                        setIsModalOpen={setIsModalOpen}
-                      >
-                        <InvoiceGenerator order={order} />
-                      </ModalBox>
                       <TbFileInvoice />
                     </span>
                   </td>
@@ -211,11 +297,26 @@ const AllReadyOrders = () => {
                         <div className="text-sm opacity-50">
                           {order.address}
                         </div>
+                        {order?.courierStatus === "sent" && (
+                          <div className="text-sm opacity-50">
+                            ConsignmentID:{" "}
+                            {order.courierInfo?.consignment?.consignment_id}
+                          </div>
+                        )}
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
                       <span className="rounded-full border border-gray-500 p-1 text-2xl text-success">
                         <TbFileInvoice />
+                      </span>
+                      <span
+                        onClick={() => {
+                          setSelectedOrder(order);
+                          setIsEditModalOpen(!isEditModalOpen);
+                        }}
+                        className="rounded-full border border-gray-500 p-1 text-2xl text-neutral"
+                      >
+                        <AiOutlineEdit />
                       </span>
                       <span
                         onClick={() => {
@@ -226,6 +327,18 @@ const AllReadyOrders = () => {
                       >
                         <FaCheck className="text-lg" />
                       </span>
+                      {(!order?.courierStatus ||
+                        order?.courierStatus === "returned") && (
+                        <span
+                          onClick={() => {
+                            sendToCourier(order);
+                          }}
+                          className="tooltip cursor-pointer rounded-full border border-gray-500 p-1 text-2xl text-info"
+                          data-tip={`Send to ${order?.courier} `}
+                        >
+                          <GrDeliver className="text-lg" />
+                        </span>
+                      )}
                       <span
                         onClick={() => {
                           handleOrderStatus(order._id, "processing");

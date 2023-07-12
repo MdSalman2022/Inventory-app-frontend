@@ -85,6 +85,9 @@ const ReturnedOrders = () => {
 
   return (
     <div className="space-y-4">
+      <ModalBox isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen}>
+        <InvoiceGenerator order={selectedOrder} />
+      </ModalBox>
       <div className="flex items-start justify-between border-b py-3">
         <div>
           <p className="text-xl font-semibold">Returned Orders</p>
@@ -151,20 +154,17 @@ const ReturnedOrders = () => {
                   <td>{index + 1}</td>
                   <td>
                     <span
-                      onClick={() => setIsModalOpen(!isModalOpen)}
+                      onClick={() => {
+                        setIsModalOpen(!isModalOpen);
+                        setSelectedOrder(order);
+                      }}
                       className="p-1 text-2xl text-success"
                     >
-                      <ModalBox
-                        isModalOpen={isModalOpen}
-                        setIsModalOpen={setIsModalOpen}
-                      >
-                        <InvoiceGenerator order={order} />
-                      </ModalBox>
                       <TbFileInvoice />
                     </span>
                   </td>
-                  <td className="flex flex-col gap-1">
-                    <div className="flex items-center space-x-3">
+                  <td className="flex h-full flex-col justify-center gap-1">
+                    <div className="flex h-full items-center space-x-3">
                       <div className="avatar">
                         <div className="mask mask-squircle h-12 w-12">
                           <img
@@ -180,20 +180,6 @@ const ReturnedOrders = () => {
                           {order.address}
                         </div>
                       </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span
-                        onClick={() => setIsModalOpen(!isModalOpen)}
-                        className="rounded-full border p-1 text-2xl text-success"
-                      >
-                        <ModalBox
-                          isModalOpen={isModalOpen}
-                          setIsModalOpen={setIsModalOpen}
-                        >
-                          <InvoiceGenerator order={order} />
-                        </ModalBox>
-                        <TbFileInvoice />
-                      </span>
                     </div>
                   </td>
                   <td>
