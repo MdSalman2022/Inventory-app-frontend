@@ -191,7 +191,7 @@ const CourierPage = () => {
                 <th>#</th>
                 <th>Invoice</th>
                 <th>Name</th>
-                <th>Prods/Pics</th>
+                {/* <th>Prods/Pics</th> */}
                 <th>Price</th>
               </tr>
             </thead>
@@ -221,7 +221,7 @@ const CourierPage = () => {
                   </td>
                   <td className="flex flex-col gap-1">
                     <div className="flex items-center space-x-3">
-                      <div className="avatar">
+                      {/* <div className="avatar">
                         <div className="mask mask-squircle h-12 w-12">
                           <img
                             src={order?.image || avatarIcon}
@@ -229,7 +229,7 @@ const CourierPage = () => {
                             className="rounded-full border-2 border-primary p-1"
                           />
                         </div>
-                      </div>
+                      </div> */}
                       <div>
                         <div className="font-bold">{order.name}</div>
                         <div className="text-sm opacity-50">{order?.phone}</div>
@@ -276,7 +276,7 @@ const CourierPage = () => {
                       </div>
                     </div>
                   </td>
-                  <td>
+                  {/* <td>
                     <div className="avatar-group -space-x-6">
                       {order?.products?.map((product) => (
                         <div key={product._id} className="avatar">
@@ -286,7 +286,7 @@ const CourierPage = () => {
                         </div>
                       ))}
                     </div>
-                  </td>
+                  </td> */}
                   <td>
                     <div className="flex flex-col">
                       <p className="badge badge-info">
@@ -311,7 +311,7 @@ const CourierPage = () => {
                 <th>Showing 1 to 2 of 2 entries</th>
                 <th></th>
                 <th></th>
-                <th></th>
+                {/* <th></th> */}
                 <th className="flex justify-end">
                   <div className="join">
                     <button className="join-item btn">Previous</button>

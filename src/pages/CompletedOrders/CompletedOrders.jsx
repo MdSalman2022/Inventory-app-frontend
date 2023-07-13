@@ -193,7 +193,7 @@ const CompletedOrders = () => {
                   </td>
                   <td className="flex flex-col gap-1">
                     <div className="flex items-center space-x-3">
-                      <div className="avatar">
+                      {/* <div className="avatar">
                         <div className="mask mask-squircle h-12 w-12">
                           <img
                             src={order?.image || avatarIcon}
@@ -201,7 +201,7 @@ const CompletedOrders = () => {
                             className="rounded-full border-2 border-primary p-1"
                           />
                         </div>
-                      </div>
+                      </div> */}
                       <div>
                         <div className="font-bold">{order.name}</div>
                         <div className="text-sm opacity-50">

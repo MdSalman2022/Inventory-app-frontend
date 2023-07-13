@@ -65,7 +65,7 @@ const Products = () => {
     const name = form.name.value;
     const description = form.description.value;
     const brand = form.brand.value;
-    const image = form.image.files[0];
+    const image = form?.image?.files[0];
     const supplier = form.supplier.value;
     const country = form.country.value;
     const store = form.store.value;
@@ -368,12 +368,12 @@ const Products = () => {
                       name="qty"
                       placeholder="QTY"
                     />
-
+{/* 
                     <input
                       type="file"
                       name="image"
                       className="file-input-bordered file-input-primary file-input w-full max-w-xs"
-                    />
+                    /> */}
                   </div>
                   <div>
                     <div className="flex w-full justify-between gap-3">
@@ -442,7 +442,7 @@ const Products = () => {
                       <th className="w-5">{index + 1}</th>
                       <td className="max-w-96 flex w-60 min-w-fit flex-col gap-1">
                         <div className="flex items-center space-x-3">
-                          <div className="avatar">
+                          {/* <div className="avatar">
                             <div className="mask mask-squircle h-12 w-12">
                               <img
                                 src={product.image || avatarIcon}
@@ -450,7 +450,7 @@ const Products = () => {
                                 className="rounded-full border-2 border-primary p-1"
                               />
                             </div>
-                          </div>
+                          </div> */}
                           <div>
                             <div className="font-bold">{product.name}</div>
                             <div className="text-sm opacity-50">
@@ -510,7 +510,7 @@ const Products = () => {
                       <th className="w-5">{index + 1}</th>
                       <td className="max-w-96 flex w-60 min-w-fit flex-col gap-1">
                         <div className="flex items-center space-x-3">
-                          <div className="avatar">
+                          {/* <div className="avatar">
                             <div className="mask mask-squircle h-12 w-12">
                               <img
                                 src={product.image || avatarIcon}
@@ -518,7 +518,7 @@ const Products = () => {
                                 className="rounded-full border-2 border-primary p-1"
                               />
                             </div>
-                          </div>
+                          </div> */}
                           <div>
                             <div className="font-bold">{product.name}</div>
                             <div className="text-sm opacity-50">
