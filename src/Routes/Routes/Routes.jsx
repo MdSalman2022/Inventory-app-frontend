@@ -22,6 +22,7 @@ import PrivateRoute from "../PrivateRoutes/PrivateRoutes";
 import EmailVerificationSentPage from "../../pages/EmailVerificationSentPage/EmailVerificationSentPage";
 import FullScreenPage from "../../layout/Main/FullScreenPage/FullScreenPage";
 import { StateContext } from "../../contexts/StateProvider/StateProvider";
+import CustomerProfile from "@/pages/Customers/CustomerProfile";
 
 export const router = createBrowserRouter([
   {
@@ -52,6 +53,10 @@ export const router = createBrowserRouter([
             <Customers />
           </PrivateRoute>
         ),
+      },
+      {
+        path: "/customer/profile/:id",
+        element: <CustomerProfile />,
       },
       {
         path: "/start-order",

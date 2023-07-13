@@ -8,7 +8,7 @@ import avatarIcon from "../../assets/shared/avatar.png";
 import DeleteCustomerModal from "../../components/Main/Customers/DeleteCustomerModal";
 import { useQuery } from "react-query";
 import { StateContext } from "../../contexts/StateProvider/StateProvider";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const Customers = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -384,9 +384,12 @@ const Customers = () => {
                             </div>
                           </div> */}
                           <div>
-                            <div className="font-bold">
+                            <Link
+                              to={`/customer/profile/${customer?._id}`}
+                              className="font-bold text-info"
+                            >
                               {customer?.customer_details?.name}
-                            </div>
+                            </Link>
                             <div className="text-sm opacity-50">
                               {customer?.customer_details?.location}
                             </div>
@@ -470,9 +473,12 @@ const Customers = () => {
                             </div>
                           </div> */}
                           <div>
-                            <div className="font-bold">
+                            <Link
+                              to={`/customer/profile/${customer?._id}`}
+                              className="font-bold text-info"
+                            >
                               {customer?.customer_details?.name}
-                            </div>
+                            </Link>
                             <div className="text-sm opacity-50">
                               {customer?.customer_details?.location}
                             </div>
