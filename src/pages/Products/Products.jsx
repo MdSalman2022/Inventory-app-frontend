@@ -10,11 +10,12 @@ import EditProductModal from "../../components/Main/Products/EditProductModal";
 import { StateContext } from "../../contexts/StateProvider/StateProvider";
 
 const Products = () => {
-  const { products, refetchProducts, productsIsLoading } =
+  const { products, refetchProducts, productsIsLoading, stores } =
     useContext(StateContext);
 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState({});
+  const [store, setStore] = useState({});
 
   console.log(isEditModalOpen);
   //   console.log(selectedProduct);
@@ -338,12 +339,29 @@ const Products = () => {
                       name="store"
                       id="store"
                       className="input-bordered input w-1/2"
+                      onChange={(e) => setStore(JSON.parse(e.target.value))}
                     >
                       <option value="" disabled>
                         Select Store
                       </option>
-                      <option value="One Store">One Store</option>
-                      <option value="Two Store">Two Store</option>
+                      {stores?.map((store) => (
+                        <option
+                          key={store?._id}
+                          value={JSON.stringify({
+                            _id: store._id,
+                            name: store.name,
+                            phone: store.phone,
+                            district: store.district,
+                            address: store.address,
+                            ownerId: store.ownerId,
+                            area: store.area,
+                            zip: store.zip,
+                            status: store.status,
+                          })}
+                        >
+                          {store.name}
+                        </option>
+                      ))}
                     </select>
                   </div>
 
@@ -368,7 +386,7 @@ const Products = () => {
                       name="qty"
                       placeholder="QTY"
                     />
-{/* 
+                    {/* 
                     <input
                       type="file"
                       name="image"

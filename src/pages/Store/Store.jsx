@@ -4,37 +4,21 @@ import EditUserModal from "../../components/Main/Users/EditUserModal";
 import { AiOutlineEdit } from "react-icons/ai";
 import { StateContext } from "../../contexts/StateProvider/StateProvider";
 import { toast } from "react-hot-toast";
-import DeleteUserModal from "../../components/Main/Users/DeleteUserModal";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { BsThreeDots } from "react-icons/bs";
+import DeleteStoreModal from "@/components/Main/Store/AddStore/DeleteStoreModal";
+import AddStoreModal from "@/components/Main/Store/AddStore/AddStoreModal";
+import EditStoreModal from "@/components/Main/Store/AddStore/EditStoreModal";
 
-const Users = () => {
-  const { userInfo } = useContext(StateContext);
+const Store = () => {
+  const { userInfo, stores, storesRefetch } = useContext(StateContext);
   console.log(userInfo);
-  const {
-    data: users,
-    isLoading,
-    isError,
-    error,
-    refetch,
-  } = useQuery("customers", async () => {
-    const response = await fetch(
-      `${import.meta.env.VITE_SERVER_URL}/user/get-users`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
-    if (!response.ok) {
-      throw new Error("Failed to fetch customers");
-    }
-    return response.json().then((data) => data?.users);
-  });
-  const [selectedUser, setSelectedUser] = useState(null);
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  console.log(stores);
+
+  const [selectedStore, setSelectedStore] = useState(null);
+
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const formatTimestamp = (timestamp) => {
@@ -43,25 +27,39 @@ const Users = () => {
     return date.toLocaleString();
   };
 
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+
+  console.log(isEditModalOpen);
 
   return (
     <div className="space-y-5">
-      <p>Users</p>
+      <AddStoreModal
+        isAddModalOpen={isAddModalOpen}
+        setIsAddModalOpen={setIsAddModalOpen}
+      />
+      <div className="flex w-full justify-between">
+        <p>Stores</p>
+        <button
+          onClick={() => setIsAddModalOpen(!isAddModalOpen)}
+          className="btn-primary btn-outline btn"
+        >
+          Add Store
+        </button>
+      </div>
       <hr />
 
       <div className="space-y-5">
-        <EditUserModal
-          setIsModalOpen={setIsModalOpen}
-          isModalOpen={isModalOpen}
-          selectedUser={selectedUser}
-          refetch={refetch}
+        <EditStoreModal
+          setIsEditModalOpen={setIsEditModalOpen}
+          isEditModalOpen={isEditModalOpen}
+          selectedStore={selectedStore}
+          refetch={storesRefetch}
         />
-        <DeleteUserModal
+        <DeleteStoreModal
           isDeleteModalOpen={isDeleteModalOpen}
           setIsDeleteModalOpen={setIsDeleteModalOpen}
-          selectedUser={selectedUser}
-          refetch={refetch}
+          selectedStore={selectedStore}
+          refetch={storesRefetch}
         />
 
         <div className="flex justify-between">
@@ -87,37 +85,33 @@ const Users = () => {
           </div>
         </div>
 
-        <div className="h-full bg-white">
-          <table className="table h-full bg-white ">
+        <div className="h-full  rounded-lg bg-white">
+          <table className="table h-full rounded-lg bg-white">
             {/* head */}
             <thead>
               <tr>
                 <th className="w-5"></th>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Role</th>
-                <th>Verified</th>
-                <th>Last Login</th>
+                <th>Store</th>
+                <th>Phone</th>
+                <th>Address</th>
+                <th>Status</th>
+                <th>Time</th>
                 <th>Action</th>
               </tr>
             </thead>
             <tbody>
-              {users?.map((user, index) => (
+              {stores?.map((user, index) => (
                 <tr key={index}>
                   <th className="w-5">{index + 1}</th>
 
-                  <td>{user?.username}</td>
-                  <td>{user?.email}</td>
+                  <td>{user?.name}</td>
+                  <td>{user?.phone}</td>
+                  <td>{user?.address}</td>
                   <td>
-                    <button className="badge badge-success">
-                      {user?.role}
-                    </button>
-                  </td>
-                  <td>
-                    {user?.verified ? (
-                      <button className="badge badge-success"></button>
+                    {user?.status ? (
+                      <button className="badge badge-success">Active</button>
                     ) : (
-                      <button className="badge badge-error"></button>
+                      <button className="badge badge-error">Inactive</button>
                     )}
                   </td>
                   <td>{formatTimestamp(user?.timestamp)}</td>
@@ -140,7 +134,7 @@ const Users = () => {
                                 userInfo?.authUid === user?.authUid;
                               if (isAdmin && !isItYou) {
                                 setIsDeleteModalOpen(!isDeleteModalOpen);
-                                setSelectedUser(user);
+                                setSelectedStore(user);
                               } else if (isItYou) {
                                 toast.error("You can't delete yourself");
                               } else {
@@ -159,8 +153,8 @@ const Users = () => {
                             onClick={() => {
                               const isAdmin = userInfo?.role === "Admin";
                               if (isAdmin) {
-                                setSelectedUser(user);
-                                setIsModalOpen(!isModalOpen);
+                                setSelectedStore(user);
+                                setIsEditModalOpen(!isEditModalOpen);
                               } else {
                                 toast.error(
                                   "You are not authorized to edit user"
@@ -198,4 +192,4 @@ const Users = () => {
   );
 };
 
-export default Users;
+export default Store;

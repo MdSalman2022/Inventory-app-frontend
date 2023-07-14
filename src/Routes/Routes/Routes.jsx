@@ -23,6 +23,7 @@ import EmailVerificationSentPage from "../../pages/EmailVerificationSentPage/Ema
 import FullScreenPage from "../../layout/Main/FullScreenPage/FullScreenPage";
 import { StateContext } from "../../contexts/StateProvider/StateProvider";
 import CustomerProfile from "@/pages/Customers/CustomerProfile";
+import Store from "@/pages/Store/Store";
 
 export const router = createBrowserRouter([
   {
@@ -167,6 +168,14 @@ export const router = createBrowserRouter([
         element: (
           <PrivateRoute>
             <CourierPage />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "/stores",
+        element: (
+          <PrivateRoute>
+            <Store />
           </PrivateRoute>
         ),
       },

@@ -30,7 +30,7 @@ const DeleteOrderModal = ({
         parseInt(product.quantity)
       ),
     };
-    fetch(`${import.meta.env.VITE_SERVER_URL}/api/delete-order/${id}`, {
+    fetch(`${import.meta.env.VITE_SERVER_URL}/order/delete-order?id=${id}`, {
       method: "DELETE",
     })
       .then((res) => res.json())
@@ -38,13 +38,16 @@ const DeleteOrderModal = ({
         if (data.success) {
           console.log(data);
           toast.success("Customer deleted successfully");
-          fetch(`${import.meta.env.VITE_SERVER_URL}/api/put-edit-products`, {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(updateProducts),
-          })
+          fetch(
+            `${import.meta.env.VITE_SERVER_URL}/product/put-edit-products`,
+            {
+              method: "PUT",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(updateProducts),
+            }
+          )
             .then((res) => res.json())
             .then((data) => {
               if (data.success) {

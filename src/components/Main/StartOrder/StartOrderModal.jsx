@@ -11,7 +11,8 @@ const StartOrderModal = ({
   selectedCustomer,
   setSelectedCustomer,
 }) => {
-  const { products, refetchProducts, couriers } = useContext(StateContext);
+  const { products, refetchProducts, couriers, stores } =
+    useContext(StateContext);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [productList, setProductList] = useState([]);
   const [totalPrice, setTotalPrice] = useState(0);
@@ -24,6 +25,7 @@ const StartOrderModal = ({
     selectedCustomer?.customer_details?.location ?? ""
   );
   const [courier, setCourier] = useState("");
+  const [store, setStore] = useState({});
   console.log("courier ", courier);
 
   console.log("district ", district);
@@ -75,6 +77,7 @@ const StartOrderModal = ({
     const instruction = form.instruction.value;
     const image = form?.image?.files[0];
 
+    console.log(store.name);
     if (image) {
       const formData = new FormData();
       formData.append("image", image);
@@ -119,6 +122,7 @@ const StartOrderModal = ({
                       phone,
                       address,
                       district,
+                      store,
                       products: productList,
                       quantity: productList.length,
                       courier,
@@ -182,6 +186,7 @@ const StartOrderModal = ({
                 phone,
                 address,
                 district,
+                store,
                 products: productList,
                 quantity: productList.length,
                 courier,
@@ -255,6 +260,7 @@ const StartOrderModal = ({
                 phone,
                 address,
                 district,
+                store,
                 products: productList,
                 quantity: productList.length,
                 courier,
@@ -299,6 +305,7 @@ const StartOrderModal = ({
           phone,
           address,
           district,
+          store,
           products: productList,
           quantity: productList.length,
           courier,
@@ -548,6 +555,35 @@ const StartOrderModal = ({
               <option value="Sylhet">Sylhet</option>
               <option value="Rangpur">Rangpur</option>
               <option value="Mymensingh">Mymensingh</option>
+            </select>
+            <select
+              name="store"
+              id="store"
+              className="input-bordered input col-span-2"
+              onChange={(e) => setStore(JSON.parse(e.target.value))}
+              required
+            >
+              <option value="" disabled selected>
+                Select Store
+              </option>
+              {stores.map((store) => (
+                <option
+                  key={store._id}
+                  value={JSON.stringify({
+                    _id: store._id,
+                    name: store.name,
+                    phone: store.phone,
+                    district: store.district,
+                    address: store.address,
+                    ownerId: store.ownerId,
+                    area: store.area,
+                    zip: store.zip,
+                    status: store.status,
+                  })}
+                >
+                  {store.name}
+                </option>
+              ))}
             </select>
             <div className="col-span-2 flex h-full w-fit flex-col gap-3 rounded bg-gray-100 p-5">
               <p className="text-xl font-semibold">Products</p>
