@@ -6,6 +6,7 @@ import { StateContext } from "../../contexts/StateProvider/StateProvider";
 import { toast } from "react-hot-toast";
 import DeleteUserModal from "../../components/Main/Users/DeleteUserModal";
 import { RiDeleteBin6Line } from "react-icons/ri";
+import { BsThreeDots } from "react-icons/bs";
 
 const Users = () => {
   const { userInfo } = useContext(StateContext);
@@ -41,6 +42,8 @@ const Users = () => {
     const date = new Date(timestamp);
     return date.toLocaleString();
   };
+
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   return (
     <div className="space-y-5">
@@ -84,38 +87,25 @@ const Users = () => {
           </div>
         </div>
 
-        <div className="overflow-x-auto">
-          <table className="table bg-white">
+        <div className="h-full overflow-x-auto bg-white">
+          <table className="table h-full bg-white">
             {/* head */}
             <thead>
               <tr>
-                <th className="w-5"></th>
                 <th className="w-5"></th>
                 <th>Name</th>
                 <th>Email</th>
                 <th>Role</th>
                 <th>Verified</th>
                 <th>Last Login</th>
+                <th>Action</th>
               </tr>
             </thead>
             <tbody>
               {users?.map((user, index) => (
                 <tr key={index}>
                   <th className="w-5">{index + 1}</th>
-                  <th
-                    className="w-10 text-xl"
-                    onClick={() => {
-                      const isAdmin = userInfo?.role === "Admin";
-                      if (isAdmin) {
-                        setSelectedUser(user);
-                        setIsModalOpen(!isModalOpen);
-                      } else {
-                        toast.error("You are not authorized to edit user");
-                      }
-                    }}
-                  >
-                    <AiOutlineEdit />
-                  </th>
+
                   <td>{user?.username}</td>
                   <td>{user?.email}</td>
                   <td>
@@ -131,29 +121,63 @@ const Users = () => {
                     )}
                   </td>
                   <td>{formatTimestamp(user?.timestamp)}</td>
+                  <td></td>
                   <td>
-                    <button
-                      className="btn-ghost btn"
-                      onClick={() => {
-                        const isAdmin = userInfo?.role === "Admin";
-                        const isItYou = userInfo?.authUid === user?.authUid;
-                        if (isAdmin && !isItYou) {
-                          setIsDeleteModalOpen(!isDeleteModalOpen);
-                          setSelectedUser(user);
-                        } else if (isItYou) {
-                          toast.error("You can't delete yourself");
-                        } else {
-                          toast.error("You are not authorized to edit user");
-                        }
-                      }}
-                    >
-                      <RiDeleteBin6Line className="text-2xl text-error" />
-                    </button>
+                    <div className="dropdown-left dropdown">
+                      <label tabIndex={0} className="btn m-1">
+                        <BsThreeDots size={18} />
+                      </label>
+                      <ul
+                        tabIndex={0}
+                        className="dropdown-content menu rounded-box z-[1] w-40 bg-base-100  shadow"
+                      >
+                        <li>
+                          <button
+                            className="btn-ghost btn flex h-5 flex-col items-center justify-center text-xs"
+                            onClick={() => {
+                              const isAdmin = userInfo?.role === "Admin";
+                              const isItYou =
+                                userInfo?.authUid === user?.authUid;
+                              if (isAdmin && !isItYou) {
+                                setIsDeleteModalOpen(!isDeleteModalOpen);
+                                setSelectedUser(user);
+                              } else if (isItYou) {
+                                toast.error("You can't delete yourself");
+                              } else {
+                                toast.error(
+                                  "You are not authorized to edit user"
+                                );
+                              }
+                            }}
+                          >
+                            Delete
+                          </button>
+                        </li>
+                        <li>
+                          <button
+                            className="btn-ghost btn flex h-5 flex-col items-center justify-center text-xs"
+                            onClick={() => {
+                              const isAdmin = userInfo?.role === "Admin";
+                              if (isAdmin) {
+                                setSelectedUser(user);
+                                setIsModalOpen(!isModalOpen);
+                              } else {
+                                toast.error(
+                                  "You are not authorized to edit user"
+                                );
+                              }
+                            }}
+                          >
+                            Edit
+                          </button>
+                        </li>
+                      </ul>
+                    </div>
                   </td>
                 </tr>
               ))}
             </tbody>
-            <tfoot className="bg-white">
+            {/* <tfoot className="bg-white">
               <tr>
                 <th>Showing 1 to 2 of 2 entries</th>
                 <th></th>
@@ -166,7 +190,7 @@ const Users = () => {
                   </div>
                 </th>
               </tr>
-            </tfoot>
+            </tfoot> */}
           </table>
         </div>
       </div>
