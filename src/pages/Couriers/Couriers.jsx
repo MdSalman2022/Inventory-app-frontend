@@ -1,18 +1,22 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import ModalBox from "../../components/Main/shared/Modals/ModalBox";
 import { AiOutlineEdit } from "react-icons/ai";
 import EditCourierModal from "../../components/Main/Couriers/EditCourierModal";
 import { useQuery } from "react-query";
 import { toast } from "react-hot-toast";
+import { StateContext } from "@/contexts/StateProvider/StateProvider";
 
 const Couriers = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditCourierModalOpen, setIsEditCourierModalOpen] = useState(false);
   const [selectedCourier, setSelectedCourier] = useState({});
+  const { userInfo } = useContext(StateContext);
 
   const fetchCouriers = async () => {
     const res = await fetch(
-      `${import.meta.env.VITE_SERVER_URL}/courier/get-couriers`
+      `${import.meta.env.VITE_SERVER_URL}/courier/get-couriers?sellerId=${
+        userInfo?._id
+      }`
     );
     const data = await res.json();
     return data.couriers;
@@ -36,6 +40,7 @@ const Couriers = () => {
       chargeInDhaka,
       chargeOutsideDhaka,
       status,
+      sellerId: userInfo?._id,
     };
 
     console.log(courier);

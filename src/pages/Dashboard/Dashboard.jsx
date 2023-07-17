@@ -27,7 +27,9 @@ const Dashboard = () => {
     refetch,
   } = useQuery("orders", async () => {
     const response = await fetch(
-      `${import.meta.env.VITE_SERVER_URL}/order/get-orders?filter=all`,
+      `${import.meta.env.VITE_SERVER_URL}/order/get-orders?sellerId=${
+        userInfo?._id
+      }&filter=all`,
       {
         method: "GET",
         headers: {
@@ -42,6 +44,8 @@ const Dashboard = () => {
 
     return response.json().then((data) => data.orders);
   });
+
+  console.log("all orders ", orders);
 
   const orderInProcess = orders?.filter(
     (order) => order.orderStatus === "processing"

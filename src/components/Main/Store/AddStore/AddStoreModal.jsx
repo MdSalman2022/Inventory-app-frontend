@@ -4,7 +4,7 @@ import { StateContext } from "@/contexts/StateProvider/StateProvider";
 import { toast } from "react-hot-toast";
 
 const AddStoreModal = ({ isAddModalOpen, setIsAddModalOpen }) => {
-  const { userInfo } = useContext(StateContext);
+  const { userInfo, storesRefetch } = useContext(StateContext);
   //   console.log(userInfo);
 
   const handleAddStore = (e) => {
@@ -23,8 +23,8 @@ const AddStoreModal = ({ isAddModalOpen, setIsAddModalOpen }) => {
       phone,
       address,
       district,
-      ownerId: userInfo?._id,
-      ownerInfo: userInfo,
+      sellerId: userInfo?._id,
+      sellerInfo: userInfo,
       area,
       zip,
       status,
@@ -44,6 +44,7 @@ const AddStoreModal = ({ isAddModalOpen, setIsAddModalOpen }) => {
           toast.success("Store added successfully");
           form.reset();
           setIsAddModalOpen(false);
+          storesRefetch();
         }
       })
       .catch((err) => {
@@ -86,28 +87,41 @@ const AddStoreModal = ({ isAddModalOpen, setIsAddModalOpen }) => {
               </label>
               <div className="flex gap-5">
                 <label className="w-1/2">
-                  <p>District</p>
-                  <input
-                    type="text"
-                    className="input-bordered input"
+                  <p>Select Location</p>
+                  <select
                     name="district"
-                  />
+                    id="district"
+                    className="input-bordered input w-full"
+                    required
+                  >
+                    <option value="" disabled selected>
+                      Select Location
+                    </option>
+                    <option value="Dhaka">Dhaka</option>
+                    <option value="Chittagong">Chittagong</option>
+                    <option value="Rajshahi">Rajshahi</option>
+                    <option value="Khulna">Khulna</option>
+                    <option value="Barishal">Barishal</option>
+                    <option value="Sylhet">Sylhet</option>
+                    <option value="Rangpur">Rangpur</option>
+                    <option value="Mymensingh">Mymensingh</option>
+                  </select>
                 </label>
                 <label className="w-1/2">
                   <p>Area</p>
                   <input
                     type="text"
-                    className="input-bordered input"
+                    className="input-bordered input w-full"
                     name="area"
                   />
                 </label>
               </div>
-              <div className="flex">
+              <div className="flex items-center gap-5">
                 <label className="w-1/2">
                   <p>ZIP</p>
                   <input
                     type="text"
-                    className="input-bordered input"
+                    className="input-bordered input w-full"
                     name="zip"
                   />
                 </label>

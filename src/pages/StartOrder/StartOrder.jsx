@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { AiOutlineEdit, AiOutlineShoppingCart } from "react-icons/ai";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import ModalBox from "../../components/Main/shared/Modals/ModalBox";
@@ -7,8 +7,10 @@ import EditCustomerModal from "../../components/Main/Customers/EditCustomerModal
 import avatarIcon from "../../assets/shared/avatar.png";
 import DeleteCustomerModal from "../../components/Main/Customers/DeleteCustomerModal";
 import StartOrderModal from "../../components/Main/StartOrder/StartOrderModal";
+import { StateContext } from "@/contexts/StateProvider/StateProvider";
 
 const StartOrder = () => {
+  const { userInfo, couriers } = useContext(StateContext);
   const [searchResults, setSearchResults] = useState([]);
 
   const handleSearch = (e) => {
@@ -18,7 +20,11 @@ const StartOrder = () => {
 
     console.log(customerSearchKey);
 
-    let url = `${import.meta.env.VITE_SERVER_URL}/customer/search-customer?`;
+    let url = `${
+      import.meta.env.VITE_SERVER_URL
+    }/customer/search-customer?sellerId=${
+      userInfo?._id || userInfo?.sellerId
+    }&`;
 
     if (customerSearchKey.match(/^\d+$/)) {
       url += `phonenumber=${customerSearchKey}`;
@@ -58,6 +64,9 @@ const StartOrder = () => {
 
   const [isStartNewOrderOpen, setIsStartNewOrderOpen] = useState(false);
 
+  console.log("couriers ", couriers);
+  console.log("couriers length ", couriers?.length);
+
   return (
     <div className="flex flex-col gap-3">
       <EditCustomerModal
@@ -93,7 +102,11 @@ const StartOrder = () => {
       <div className="flex items-center gap-2">
         আপনি যে কাস্টমার খুঁজছেন তিনি তালিকায় আছে কি না দেখুন। না থাকলে এখানে
         <button
-          onClick={() => setIsStartNewOrderOpen(true)}
+          onClick={() => {
+            couriers?.length > 0
+              ? setIsStartNewOrderOpen(true)
+              : toast.error("Please add a courier first!!");
+          }}
           className="btn-info btn p-2"
         >
           Start New Order
@@ -140,10 +153,14 @@ const StartOrder = () => {
                   <div className="flex items-center gap-2">
                     <span
                       onClick={() => {
-                        setSelectedCustomer(customer);
-                        setIsStartNewOrderOpen(true);
+                        if (couriers && couriers.length > 0) {
+                          setSelectedCustomer(customer);
+                          setIsStartNewOrderOpen(true);
+                        } else {
+                          toast.error("Please add a courier first!!");
+                        }
                       }}
-                      className="rounded-full border border-gray-500 p-1 text-2xl text-success"
+                      className="cursor-pointer rounded-full border border-gray-500 p-1 text-2xl text-success"
                     >
                       <AiOutlineShoppingCart />
                     </span>
@@ -152,7 +169,7 @@ const StartOrder = () => {
                         setIsEditModalOpen(true);
                         setSelectedCustomer(customer);
                       }}
-                      className="rounded-full border border-gray-500 p-1 text-2xl text-info"
+                      className="cursor-pointer rounded-full border border-gray-500 p-1 text-2xl text-info"
                     >
                       <AiOutlineEdit />
                     </span>
@@ -161,7 +178,7 @@ const StartOrder = () => {
                         setIsDeleteModalOpen(true);
                         setSelectedCustomer(customer);
                       }}
-                      className="rounded-full border border-gray-500 p-1 text-2xl text-error"
+                      className="cursor-pointer rounded-full border border-gray-500 p-1 text-2xl text-error"
                     >
                       <RiDeleteBin6Line />
                     </span>

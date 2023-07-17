@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { AiOutlineEdit, AiOutlineShoppingCart } from "react-icons/ai";
 import { RiArrowGoBackLine, RiDeleteBin6Line } from "react-icons/ri";
 import ModalBox from "../../components/Main/shared/Modals/ModalBox";
@@ -12,8 +12,10 @@ import { TbFileInvoice } from "react-icons/tb";
 import { FaCheck } from "react-icons/fa";
 import DeleteOrderModal from "../../components/Main/Orders/DeleteOrderModal";
 import InvoiceGenerator from "../../components/Main/shared/InvoiceGenerator/InvoiceGenerator";
+import { StateContext } from "@/contexts/StateProvider/StateProvider";
 
 const OrderProcessing = () => {
+  const { userInfo } = useContext(StateContext);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState({});
 
@@ -29,9 +31,11 @@ const OrderProcessing = () => {
     isError,
     error,
     refetch,
-  } = useQuery("orders", async () => {
+  } = useQuery(["orders", userInfo], async () => {
     const response = await fetch(
-      `${import.meta.env.VITE_SERVER_URL}/order/get-orders?filter=processing`,
+      `${import.meta.env.VITE_SERVER_URL}/order/get-orders?sellerId=${
+        userInfo?._id
+      }&filter=processing`,
       {
         method: "GET",
         headers: {
@@ -269,7 +273,7 @@ const OrderProcessing = () => {
                         onClick={() => {
                           handleOrderStatus(order);
                         }}
-                        className="tooltip rounded-full border border-gray-500 p-1 text-2xl text-info"
+                        className="tooltip cursor-pointer rounded-full border border-gray-500 p-1 text-2xl text-info"
                         data-tip="Ready"
                       >
                         <FaCheck className="text-lg" />
@@ -279,7 +283,7 @@ const OrderProcessing = () => {
                           setIsDeleteModalOpen(true);
                           setSelectedOrder(order);
                         }}
-                        className="tooltip rounded-full border border-error p-1 text-2xl text-error"
+                        className="tooltip cursor-pointer rounded-full border border-error p-1 text-2xl text-error"
                         data-tip="Delete order"
                       >
                         <RiDeleteBin6Line />

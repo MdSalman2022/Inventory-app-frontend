@@ -7,7 +7,7 @@ const DeleteProductModal = ({
   setIsDeleteModalOpen,
   isDeleteModalOpen,
   selectedProduct,
-  refetch,
+  refetchProducts,
 }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -31,8 +31,8 @@ const DeleteProductModal = ({
       .then((res) => res.json())
       .then((data) => {
         console.log(data);
-        toast.success("Customer deleted successfully");
-        refetch();
+        toast.success("Product deleted successfully");
+        refetchProducts();
         setIsModalOpen(false);
       })
       .catch((err) => {
@@ -53,12 +53,7 @@ const DeleteProductModal = ({
                 Are you sure you want to delete this customer?
               </p>
               <div className="flex justify-center gap-5">
-                <img
-                  className="h-10 w-10"
-                  src={selectedProduct?.image || avatarIcon}
-                  alt=""
-                />
-                <p className="text-2xl">{selectedProduct?.name}</p>
+                <p className="text-2xl font-bold">{selectedProduct?.name}</p>
               </div>
               <div className="flex justify-between">
                 <button className="btn-error btn-outline btn">Cancel</button>

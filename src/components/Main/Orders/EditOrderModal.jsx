@@ -12,15 +12,17 @@ const EditOrderModal = ({
   refetch,
 }) => {
   const { products, refetchProducts, couriers } = useContext(StateContext);
-  const [productList, setProductList] = useState([]);
-  const [totalPrice, setTotalPrice] = useState(0);
-  const [cashCollect, setCashCollect] = useState(0);
-  const [advance, setAdvance] = useState(0);
-  const [discount, setDiscount] = useState(0);
-  const [deliveryCharge, setDeliveryCharge] = useState(0);
+  const [productList, setProductList] = useState(selectedOrder?.products);
+  const [totalPrice, setTotalPrice] = useState(selectedOrder?.total);
+  const [cashCollect, setCashCollect] = useState(selectedOrder?.cash);
+  const [advance, setAdvance] = useState(selectedOrder?.advance);
+  const [discount, setDiscount] = useState(selectedOrder?.discount);
+  const [deliveryCharge, setDeliveryCharge] = useState(
+    selectedOrder?.deliveryCharge
+  );
   const [district, setDistrict] = useState(setSelectedOrder?.district ?? "");
 
-  const [courier, setCourier] = useState("");
+  const [courier, setCourier] = useState(selectedOrder?.courier);
 
   const formRef = useRef(null);
 
@@ -149,17 +151,28 @@ const EditOrderModal = ({
 
   useEffect(() => {
     if (selectedOrder) {
-      setProductList(selectedOrder?.products);
-      setTotalPrice(selectedOrder?.total);
-      setCashCollect(selectedOrder?.cash);
-      setAdvance(selectedOrder?.advance);
-      setDiscount(selectedOrder?.discount);
-      setDeliveryCharge(selectedOrder?.deliveryCharge);
-
-      setDistrict(selectedOrder?.district);
-      setCourier(selectedOrder?.courier);
+      const total = productList?.reduce(
+        (total, product) => total + product.salePrice * product.quantity,
+        0
+      );
+      setTotalPrice(total);
+      // const totalAfterDiscount = total - discount;
+      // const totalAfterDeliveryCharge =
+      // totalAfterDiscount + parseInt(deliveryCharge);
+      console.log("total ", total);
+      console.log("advance ", advance);
+      console.log("discount ", discount);
+      console.log("delivery charge ", deliveryCharge);
+      const totalAfterAdvance = total - advance - discount + deliveryCharge;
+      console.log(totalAfterAdvance);
+      setCashCollect(totalAfterAdvance);
+    } else {
+      setTotalPrice(0);
+      setCashCollect(0);
     }
-  }, [selectedOrder]);
+  }, [productList, discount, deliveryCharge, advance]);
+
+  console.log("selected order ", selectedOrder);
 
   return (
     <div>
@@ -292,6 +305,7 @@ const EditOrderModal = ({
               name="courier"
               onChange={(e) => setCourier(e.target.value)}
               required
+              defaultValue={selectedOrder?.courier || ""}
             >
               <option value="" disabled selected>
                 Select Courier

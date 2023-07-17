@@ -18,7 +18,7 @@ const EditProductModal = ({
     const name = form.name.value;
     const description = form.description.value;
     const brand = form.brand.value;
-    const image = form.image.files[0];
+    const image = form?.image?.files[0];
     const supplier = form.supplier.value;
     const country = form.country.value;
     const store = form.store.value;
@@ -126,7 +126,7 @@ const EditProductModal = ({
       <ModalBox isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen}>
         <div className="bg-base-100">
           <p className="w-full p-5 text-2xl font-semibold shadow">
-            Customer Information
+            Product Information
           </p>
           <div>
             <form
@@ -255,7 +255,7 @@ const EditProductModal = ({
                   />
                 </label>
               </div>
-              <div className="flex gap-3">
+              {/* <div className="flex gap-3">
                 <img
                   className="h-10 w-10 object-cover"
                   src={selectedProduct?.image}
@@ -266,7 +266,7 @@ const EditProductModal = ({
                   name="image"
                   className="file-input-bordered file-input-primary file-input w-full max-w-xs"
                 />
-              </div>
+              </div> */}
               <div>
                 <div className="flex w-full justify-between gap-3">
                   <label

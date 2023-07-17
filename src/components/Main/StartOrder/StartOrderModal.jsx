@@ -11,7 +11,7 @@ const StartOrderModal = ({
   selectedCustomer,
   setSelectedCustomer,
 }) => {
-  const { products, refetchProducts, couriers, stores } =
+  const { products, refetchProducts, couriers, stores, userInfo } =
     useContext(StateContext);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [productList, setProductList] = useState([]);
@@ -60,6 +60,7 @@ const StartOrderModal = ({
   }, [isModalOpen]);
 
   console.log("product list ", productList);
+  console.log("store ", store);
 
   const handleOrder = (e) => {
     e.preventDefault();
@@ -77,7 +78,7 @@ const StartOrderModal = ({
     const instruction = form.instruction.value;
     const image = form?.image?.files[0];
 
-    console.log(store.name);
+    // console.log(store.name);
     if (image) {
       const formData = new FormData();
       formData.append("image", image);
@@ -122,6 +123,8 @@ const StartOrderModal = ({
                       phone,
                       address,
                       district,
+                      sellerId: userInfo?._id,
+                      storeId: store?.storeId,
                       store,
                       products: productList,
                       quantity: productList.length,
@@ -186,6 +189,8 @@ const StartOrderModal = ({
                 phone,
                 address,
                 district,
+                sellerId: userInfo?._id,
+                storeId: store?.storeId,
                 store,
                 products: productList,
                 quantity: productList.length,
@@ -260,6 +265,8 @@ const StartOrderModal = ({
                 phone,
                 address,
                 district,
+                sellerId: userInfo?._id,
+                storeId: store?.storeId,
                 store,
                 products: productList,
                 quantity: productList.length,
@@ -305,6 +312,8 @@ const StartOrderModal = ({
           phone,
           address,
           district,
+          sellerId: userInfo?._id,
+          storeId: store?._id,
           store,
           products: productList,
           quantity: productList.length,
@@ -502,6 +511,8 @@ const StartOrderModal = ({
     }
   }, [isModalOpen]);
 
+  console.log("couriers ", couriers);
+
   return (
     <div>
       <ModalBox isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen}>
@@ -540,7 +551,7 @@ const StartOrderModal = ({
               name="district"
               id="district"
               className="input-bordered input col-span-2"
-              defaultValue={selectedCustomer?.customer_details?.location || ""}
+              defaultValue={district || ""}
               onChange={(e) => setDistrict(e.target.value)}
               required
             >
@@ -566,7 +577,7 @@ const StartOrderModal = ({
               <option value="" disabled selected>
                 Select Store
               </option>
-              {stores.map((store) => (
+              {stores?.map((store) => (
                 <option
                   key={store._id}
                   value={JSON.stringify({
@@ -575,7 +586,8 @@ const StartOrderModal = ({
                     phone: store.phone,
                     district: store.district,
                     address: store.address,
-                    ownerId: store.ownerId,
+                    sellerId: store.sellerId,
+                    storeId: store.storeId,
                     area: store.area,
                     zip: store.zip,
                     status: store.status,

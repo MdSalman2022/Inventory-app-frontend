@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { AiOutlineEdit, AiOutlineShoppingCart } from "react-icons/ai";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import ModalBox from "../../components/Main/shared/Modals/ModalBox";
@@ -13,8 +13,10 @@ import { RiArrowGoBackLine } from "react-icons/ri";
 import { FaCheck } from "react-icons/fa";
 import { TbFileInvoice } from "react-icons/tb";
 import InvoiceGenerator from "../../components/Main/shared/InvoiceGenerator/InvoiceGenerator";
+import { StateContext } from "@/contexts/StateProvider/StateProvider";
 
 const CompletedOrders = () => {
+  const { userInfo } = useContext(StateContext);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState({});
 
@@ -30,9 +32,11 @@ const CompletedOrders = () => {
     isError,
     error,
     refetch,
-  } = useQuery("orders", async () => {
+  } = useQuery(["orders", userInfo], async () => {
     const response = await fetch(
-      `${import.meta.env.VITE_SERVER_URL}/order/get-orders?filter=completed`,
+      `${import.meta.env.VITE_SERVER_URL}/order/get-orders?sellerId=${
+        userInfo?._id
+      }&filter=completed`,
       {
         method: "GET",
         headers: {
@@ -215,7 +219,7 @@ const CompletedOrders = () => {
                           setIsModalOpen(!isModalOpen);
                           setSelectedOrder(order);
                         }}
-                        className="p-1 text-2xl text-success"
+                        className="cursor-pointer p-1 text-2xl text-success"
                       >
                         <TbFileInvoice />
                       </span>
@@ -223,7 +227,7 @@ const CompletedOrders = () => {
                         onClick={() => {
                           handleOrderStatus(order._id, "returned");
                         }}
-                        className="tooltip rounded-full border border-gray-500 p-1 text-2xl text-error"
+                        className="tooltip cursor-pointer rounded-full border border-gray-500 p-1 text-2xl text-error"
                         data-tip="Order Return"
                       >
                         <RiArrowGoBackLine className="text-lg" />

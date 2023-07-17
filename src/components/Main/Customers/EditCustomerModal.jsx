@@ -6,6 +6,7 @@ const EditCustomerModal = ({
   setIsEditModalOpen,
   isEditModalOpen,
   selectedCustomer,
+  refetch,
 }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -19,7 +20,7 @@ const EditCustomerModal = ({
     const district = form.district.value;
     const address = form.address.value;
     const link = form.link.value;
-    const image = form.image.files[0];
+    const image = form?.image?.files[0];
 
     console.log(selectedCustomer?._id);
 
@@ -86,6 +87,7 @@ const EditCustomerModal = ({
         console.log(result);
         if (result.success) {
           toast.success(`${customer.name} is updated successfully`);
+          refetch();
           setIsModalOpen(false);
           setIsEditModalOpen(false);
         } else {
@@ -111,7 +113,7 @@ const EditCustomerModal = ({
   return (
     <div>
       <ModalBox isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen}>
-        <div className="bg-base-100">
+        <div className="w-80 bg-base-100 md:w-96">
           <p className="w-full p-5 text-2xl font-semibold shadow">
             Customer Information
           </p>
@@ -146,7 +148,7 @@ const EditCustomerModal = ({
                 <select
                   name="district"
                   id="district"
-                  className="input-bordered input"
+                  className="input-bordered input w-full"
                   defaultValue={selectedCustomer?.customer_details?.location}
                 >
                   <option value="" disabled>
@@ -161,7 +163,7 @@ const EditCustomerModal = ({
                   <option value="Rangpur">Rangpur</option>
                   <option value="Mymensingh">Mymensingh</option>
                 </select>
-                <div className="flex items-center gap-3">
+                {/* <div className="flex items-center gap-3">
                   <img
                     className="h-12 w-12 rounded object-cover"
                     src={selectedCustomer?.customer_details?.image}
@@ -172,7 +174,7 @@ const EditCustomerModal = ({
                     name="image"
                     className="file-input-bordered file-input-primary file-input w-full max-w-xs"
                   />
-                </div>
+                </div> */}
               </div>
               <input
                 className="input-bordered input "

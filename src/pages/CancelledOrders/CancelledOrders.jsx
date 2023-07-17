@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { AiOutlineEdit, AiOutlineShoppingCart } from "react-icons/ai";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import ModalBox from "../../components/Main/shared/Modals/ModalBox";
@@ -10,8 +10,10 @@ import { useQuery } from "react-query";
 import { Link } from "react-router-dom";
 import { TbFileInvoice } from "react-icons/tb";
 import InvoiceGenerator from "../../components/Main/shared/InvoiceGenerator/InvoiceGenerator";
+import { StateContext } from "@/contexts/StateProvider/StateProvider";
 
 const CancelledOrders = () => {
+  const { userInfo } = useContext(StateContext);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState({});
 
@@ -27,9 +29,11 @@ const CancelledOrders = () => {
     isError,
     error,
     refetch,
-  } = useQuery("orders", async () => {
+  } = useQuery(["orders", userInfo], async () => {
     const response = await fetch(
-      `${import.meta.env.VITE_SERVER_URL}/order/get-orders?filter=returned`,
+      `${import.meta.env.VITE_SERVER_URL}/order/get-orders?sellerId=${
+        userInfo?._id
+      }&filter=cancelled`,
       {
         method: "GET",
         headers: {

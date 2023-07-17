@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { AiOutlineEdit, AiOutlineShoppingCart } from "react-icons/ai";
 import { RiArrowGoBackLine, RiDeleteBin6Line } from "react-icons/ri";
 import ModalBox from "../../components/Main/shared/Modals/ModalBox";
@@ -14,8 +14,10 @@ import { FcCancel } from "react-icons/fc";
 import InvoiceGenerator from "../../components/Main/shared/InvoiceGenerator/InvoiceGenerator";
 import { GrDeliver } from "react-icons/gr";
 import EditOrderModal from "../../components/Main/Orders/EditOrderModal";
+import { StateContext } from "@/contexts/StateProvider/StateProvider";
 
 const AllReadyOrders = () => {
+  const { userInfo } = useContext(StateContext);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState({});
 
@@ -31,9 +33,11 @@ const AllReadyOrders = () => {
     isError,
     error,
     refetch,
-  } = useQuery("orders", async () => {
+  } = useQuery(["orders", userInfo], async () => {
     const response = await fetch(
-      `${import.meta.env.VITE_SERVER_URL}/order/get-orders?filter=ready`,
+      `${import.meta.env.VITE_SERVER_URL}/order/get-orders?sellerId=${
+        userInfo?._id
+      }&filter=ready`,
       {
         method: "GET",
         headers: {
@@ -306,15 +310,12 @@ const AllReadyOrders = () => {
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="rounded-full border border-gray-500 p-1 text-2xl text-success">
-                        <TbFileInvoice />
-                      </span>
                       <span
                         onClick={() => {
                           setSelectedOrder(order);
                           setIsEditModalOpen(!isEditModalOpen);
                         }}
-                        className="rounded-full border border-gray-500 p-1 text-2xl text-neutral"
+                        className="cursor-pointer rounded-full border border-gray-500 p-1 text-2xl text-neutral"
                       >
                         <AiOutlineEdit />
                       </span>
@@ -322,7 +323,7 @@ const AllReadyOrders = () => {
                         onClick={() => {
                           handleOrderStatus(order._id, "completed");
                         }}
-                        className="tooltip rounded-full border border-gray-500 p-1 text-2xl text-info"
+                        className="tooltip cursor-pointer rounded-full border border-gray-500 p-1 text-2xl text-info"
                         data-tip="Complete"
                       >
                         <FaCheck className="text-lg" />
@@ -333,7 +334,7 @@ const AllReadyOrders = () => {
                           onClick={() => {
                             sendToCourier(order);
                           }}
-                          className="tooltip cursor-pointer rounded-full border border-gray-500 p-1 text-2xl text-info"
+                          className="tooltip cursor-pointer cursor-pointer rounded-full border border-gray-500 p-1 text-2xl text-info"
                           data-tip={`Send to ${order?.courier} `}
                         >
                           <GrDeliver className="text-lg" />
@@ -343,7 +344,7 @@ const AllReadyOrders = () => {
                         onClick={() => {
                           handleOrderStatus(order._id, "processing");
                         }}
-                        className="tooltip rounded-full border border-gray-500 p-1 text-2xl text-error"
+                        className="tooltip cursor-pointer rounded-full border border-gray-500 p-1 text-2xl text-error"
                         data-tip="Back to Processing"
                       >
                         <RiArrowGoBackLine className="text-lg" />
@@ -352,7 +353,7 @@ const AllReadyOrders = () => {
                         onClick={() => {
                           handleOrderStatus(order._id, "cancelled");
                         }}
-                        className="tooltip rounded-full border border-gray-500 p-1 text-2xl text-error"
+                        className="tooltip cursor-pointer rounded-full border border-gray-500 p-1 text-2xl text-error"
                         data-tip="Cancel Order"
                       >
                         <FcCancel className="text-lg" />

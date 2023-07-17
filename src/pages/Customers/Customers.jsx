@@ -28,34 +28,31 @@ const Customers = () => {
     navigate("/start-order");
   }
 
+  console.log(userInfo?._id);
+
   const {
     data: customers,
     isLoading,
     isError,
     error,
     refetch,
-  } = useQuery(
-    "customers",
-    async () => {
-      const response = await fetch(
-        `${import.meta.env.VITE_SERVER_URL}/customer/get-customers`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      if (!response.ok) {
-        throw new Error("Failed to fetch customers");
+  } = useQuery("customers", async () => {
+    const response = await fetch(
+      `${import.meta.env.VITE_SERVER_URL}/customer/get-customers?sellerId=${
+        userInfo?._id
+      }`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
       }
-      return response.json().then((data) => data.customers);
-    },
-    {
-      cacheTime: 30 * 60 * 1000, // Cache data for 30 minutes
-      staleTime: 10 * 60 * 1000, // Consider data fresh for 10 minutes
+    );
+    if (!response.ok) {
+      throw new Error("Failed to fetch customers");
     }
-  );
+    return response.json().then((data) => data.customers);
+  });
 
   console.log(customers);
 
@@ -106,7 +103,7 @@ const Customers = () => {
     const district = form.district.value;
     const address = form.address.value;
     const link = form.link.value;
-    const image = form.image.files[0];
+    const image = form?.image?.files[0];
 
     if (image) {
       const formData = new FormData();
@@ -126,6 +123,7 @@ const Customers = () => {
               district,
               address,
               link,
+              sellerId: userInfo?._id || userInfo?.sellerId,
             };
 
             console.log(customer);
@@ -144,6 +142,7 @@ const Customers = () => {
         district,
         address,
         link,
+        sellerId: userInfo?._id || userInfo?.sellerId,
       };
 
       console.log(customer);
@@ -185,7 +184,11 @@ const Customers = () => {
 
     console.log(customerSearchKey);
 
-    let url = `${import.meta.env.VITE_SERVER_URL}/customer/search-customer?`;
+    let url = `${
+      import.meta.env.VITE_SERVER_URL
+    }/customer/search-customer?sellerId=${
+      userInfo?._id || userInfo?.sellerId
+    }&`;
 
     if (customerSearchKey.match(/^\d+$/)) {
       url += `phonenumber=${customerSearchKey}`;
@@ -216,6 +219,8 @@ const Customers = () => {
 
   console.log(searchResults);
   console.log(searchResults.length);
+
+  console.log("customers ", customers);
 
   return (
     <div className="space-y-4">
@@ -250,7 +255,7 @@ const Customers = () => {
             Add Customer
           </label>
           <ModalBox isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen}>
-            <div className="bg-base-100">
+            <div className="w-80 bg-base-100 md:w-96">
               <p className="w-full p-5 text-2xl font-semibold shadow">
                 Customer Information
               </p>
@@ -282,7 +287,7 @@ const Customers = () => {
                     <select
                       name="district"
                       id="district"
-                      className="input-bordered input"
+                      className="input-bordered input w-full"
                     >
                       <option value="" disabled>
                         Select Location
@@ -296,11 +301,11 @@ const Customers = () => {
                       <option value="Rangpur">Rangpur</option>
                       <option value="Mymensingh">Mymensingh</option>
                     </select>
-                    <input
+                    {/* <input
                       type="file"
                       name="image"
                       className="file-input-bordered file-input-primary file-input w-full max-w-xs"
-                    />
+                    /> */}
                   </div>
                   <input
                     className="input-bordered input "
@@ -407,7 +412,7 @@ const Customers = () => {
                               setIsEditModalOpen(true);
                               setSelectedCustomer(customer);
                             }}
-                            className="rounded-full border border-gray-500 p-1 text-2xl text-info"
+                            className="cursor-pointer rounded-full border border-gray-500 p-1 text-2xl text-info"
                           >
                             <AiOutlineEdit />
                           </span>
@@ -416,7 +421,7 @@ const Customers = () => {
                               setIsDeleteModalOpen(true);
                               setSelectedCustomer(customer);
                             }}
-                            className="rounded-full border border-gray-500 p-1 text-2xl text-error"
+                            className="cursor-pointer rounded-full border border-gray-500 p-1 text-2xl text-error"
                           >
                             <RiDeleteBin6Line />
                           </span>
@@ -496,7 +501,7 @@ const Customers = () => {
                               setIsEditModalOpen(true);
                               setSelectedCustomer(customer);
                             }}
-                            className="rounded-full border border-gray-500 p-1 text-2xl text-info"
+                            className="cursor-pointer rounded-full border border-gray-500 p-1 text-2xl text-info"
                           >
                             <AiOutlineEdit />
                           </span>
@@ -505,7 +510,7 @@ const Customers = () => {
                               setIsDeleteModalOpen(true);
                               setSelectedCustomer(customer);
                             }}
-                            className="rounded-full border border-gray-500 p-1 text-2xl text-error"
+                            className="cursor-pointer rounded-full border border-gray-500 p-1 text-2xl text-error"
                           >
                             <RiDeleteBin6Line />
                           </span>
