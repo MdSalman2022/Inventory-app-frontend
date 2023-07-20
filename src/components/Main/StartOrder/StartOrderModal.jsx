@@ -4,6 +4,14 @@ import { toast } from "react-hot-toast";
 import { StateContext } from "../../../contexts/StateProvider/StateProvider";
 import { useQuery } from "react-query";
 import { RiDeleteBin6Line } from "react-icons/ri";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const StartOrderModal = ({
   isStartNewOrderOpen,
@@ -29,6 +37,12 @@ const StartOrderModal = ({
   console.log("courier ", courier);
 
   console.log("district ", district);
+
+  useEffect(() => {
+    if (selectedCustomer?._id) {
+      setDistrict(selectedCustomer?.customer_details?.location);
+    }
+  }, [selectedCustomer]);
 
   const formRef = useRef(null);
 
@@ -91,6 +105,8 @@ const StartOrderModal = ({
           phone,
           address,
           location: district,
+          sellerId: userInfo?._id,
+          storeId: store?.storeId,
         };
 
         fetch(`${import.meta.env.VITE_SERVER_URL}/customer/create-customer`, {
@@ -152,8 +168,8 @@ const StartOrderModal = ({
                       returnedCount: 0,
                     };
 
-                    console.log(customerInfo);
-                    console.log(order);
+                    console.log("customer info ", customerInfo);
+                    console.log("order info ", order);
                     addOrder(order);
                     updateCustomer(customerInfo);
                   }
@@ -244,6 +260,7 @@ const StartOrderModal = ({
           phone,
           address,
           location: district,
+          sellerId: userInfo?._id,
         };
 
         fetch(`${import.meta.env.VITE_SERVER_URL}/customer/create-customer`, {
@@ -280,11 +297,13 @@ const StartOrderModal = ({
                 timestamp: new Date().toISOString(),
               };
               const customerInfo = {
-                id: newCustomerId,
+                id: result?.result?._id,
                 image: "",
                 name,
                 phone,
                 address,
+                sellerId: userInfo?._id,
+                storeId: store?.storeId,
                 location: district,
                 total: 0 + total + deliveryCharge - discount,
                 order,
@@ -339,6 +358,7 @@ const StartOrderModal = ({
             deliveryCharge -
             discount,
           order,
+          storeId: store?.storeId,
           processingCount: selectedCustomer?.orders?.processing + 1,
           readyCount: selectedCustomer?.orders?.ready,
           completedCount: selectedCustomer?.orders?.completed,
@@ -413,6 +433,8 @@ const StartOrderModal = ({
       });
   };
   const updateCustomer = (customer) => {
+    console.log("customer ", customer);
+    console.log(customer?._id);
     fetch(
       `${import.meta.env.VITE_SERVER_URL}/customer/edit-customer-info?id=${
         customer?.id
@@ -502,6 +524,16 @@ const StartOrderModal = ({
   const handleFormReset = () => {
     setSelectedCustomer(null);
     setProductList([]);
+    setAdvance(0);
+    setCashCollect(0);
+    setCourier("");
+    setDeliveryCharge(0);
+    setDiscount(0);
+    setDistrict("");
+    setNewCustomerId("");
+    setStore({});
+    setTotalPrice(0);
+    setError("");
     formRef?.current?.reset();
   };
 
@@ -551,8 +583,8 @@ const StartOrderModal = ({
               name="district"
               id="district"
               className="input-bordered input col-span-2"
-              defaultValue={district || ""}
               onChange={(e) => setDistrict(e.target.value)}
+              defaultValue={district || ""}
               required
             >
               <option value="" disabled selected>
@@ -599,24 +631,37 @@ const StartOrderModal = ({
             </select>
             <div className="col-span-2 flex h-full w-fit flex-col gap-3 rounded bg-gray-100 p-5">
               <p className="text-xl font-semibold">Products</p>
-              <details className="dropdown">
-                <summary className="btn m-1 w-full bg-primary text-white">
+              <DropdownMenu className="w-full">
+                <DropdownMenuTrigger className="btn m-1 w-full bg-primary text-white">
+                  {" "}
                   Select Product
-                </summary>
-                <ul className="dropdown-content menu rounded-box z-[1] w-full bg-base-100 p-2 shadow">
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-full">
                   {products?.map((product) => (
-                    <li
-                      onClick={() => handleSelectedProductList(product)}
+                    <DropdownMenuItem
+                      className="w-full cursor-pointer"
+                      onClick={() => {
+                        if (product.availableQty > 0) {
+                          handleSelectedProductList(product);
+                        } else {
+                          toast.error("Product is out of stock");
+                        }
+                      }}
                       key={product._id}
+                      disabled={
+                        productList.find((p) => p._id === product._id)
+                          ?.quantity === product.availableQty
+                      }
                     >
                       <a>
                         {product.name} - ৳ {product.salePrice} -{" "}
                         {product.availableQty} available products
                       </a>
-                    </li>
+                    </DropdownMenuItem>
                   ))}
-                </ul>
-              </details>
+                </DropdownMenuContent>
+              </DropdownMenu>
+
               {/* selected products  */}
               <div className="flex flex-col gap-3">
                 <table>
@@ -699,6 +744,7 @@ const StartOrderModal = ({
               placeholder="Discount"
               name="discount"
               onChange={(e) => setDiscount(e.target.value)}
+              defaultValue={0}
             />
             <input
               type="number"
@@ -713,6 +759,7 @@ const StartOrderModal = ({
               placeholder="Advance"
               name="advance"
               min={0}
+              defaultValue={0}
               onChange={(e) => setAdvance(e.target.value)}
               required
             />

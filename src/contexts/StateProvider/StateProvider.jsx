@@ -109,6 +109,30 @@ const StateProvider = ({ children }) => {
     return response.json().then((data) => data?.stores);
   });
 
+  const {
+    data: suppliers,
+    isLoading: suppliersIsLoading,
+    isError: suppliersIsError,
+    error: suppliersError,
+    refetch: refetchSuppliers,
+  } = useQuery(["suppliers", userInfo], async () => {
+    const response = await fetch(
+      `${import.meta.env.VITE_SERVER_URL}/supplier/get-supplier?sellerId=${
+        userInfo?._id
+      }`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    if (!response.ok) {
+      throw new Error("Failed to fetch customers");
+    }
+    return response.json().then((data) => data?.suppliers);
+  });
+
   const stateInfo = {
     products,
     refetchProducts,
@@ -119,6 +143,8 @@ const StateProvider = ({ children }) => {
     stores,
     storesIsLoading,
     storesRefetch,
+    suppliers,
+    refetchSuppliers,
   };
 
   return (

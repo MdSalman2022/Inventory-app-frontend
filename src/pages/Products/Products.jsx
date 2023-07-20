@@ -11,12 +11,21 @@ import { StateContext } from "../../contexts/StateProvider/StateProvider";
 import { Link } from "react-router-dom";
 
 const Products = () => {
-  const { products, refetchProducts, productsIsLoading, stores, userInfo } =
-    useContext(StateContext);
+  const {
+    products,
+    refetchProducts,
+    productsIsLoading,
+    stores,
+    suppliers,
+    userInfo,
+  } = useContext(StateContext);
 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState({});
   const [store, setStore] = useState({});
+  const [supplier, setSupplier] = useState({});
+
+  console.log("supplier info ", supplier);
 
   console.log(isEditModalOpen);
   //   console.log(selectedProduct);
@@ -68,7 +77,6 @@ const Products = () => {
     const description = form.description.value;
     const brand = form.brand.value;
     const image = form?.image?.files[0];
-    const supplier = form.supplier.value;
     const country = form.country.value;
     const liftPrice = form.liftPrice.value;
     const salePrice = form.salePrice.value;
@@ -90,15 +98,15 @@ const Products = () => {
               name,
               description,
               brand,
-              supplier,
-              country,
+              supplierId: supplier?._id,
+              supplier: supplier,
+              storeId: store?.storeId,
               store,
+              country,
               liftPrice,
               salePrice,
               qty,
               sellerId: userInfo?._id,
-              // supplierid:"",
-              storeId: store?.storeId,
             };
 
             console.log(product);
@@ -115,14 +123,15 @@ const Products = () => {
         name,
         description,
         brand,
+        supplierId: supplier?._id,
         supplier,
-        country,
+        storeId: store?.storeId,
         store,
+        country,
         liftPrice,
         salePrice,
         qty,
         sellerId: userInfo?._id,
-        storeId: store?.storeId,
       };
 
       console.log(product);
@@ -257,11 +266,11 @@ const Products = () => {
             <p>Total Available</p>
             <div className="grid grid-cols-2">
               <p>Category</p>
-              <p>{totalSupplierLength?.length}</p>
+              <p>{totalSupplierLength?.length || 0}</p>
               <p>Items </p>
-              <p>{products?.length}</p>
+              <p>{products?.length || 0}</p>
               <p>Value</p>
-              <p>{totalProductValue}</p>
+              <p>{totalProductValue || 0}</p>
             </div>
           </div>
           <div className="rounded-lg border bg-white p-2">
@@ -269,11 +278,11 @@ const Products = () => {
             <p>Total Available</p>
             <div className="grid grid-cols-2">
               <p>Category</p>
-              <p>{totalSupplierLength?.length}</p>
+              <p>{totalSupplierLength?.length || 0}</p>
               <p>Items </p>
-              <p>{products?.length}</p>
+              <p>{products?.length || 0}</p>
               <p>Value</p>
-              <p>{totalProductValue}</p>
+              <p>{totalProductValue || 0}</p>
             </div>
           </div>
           <div className="rounded-lg border bg-white p-2">
@@ -281,11 +290,11 @@ const Products = () => {
             <p>Total Available</p>
             <div className="grid grid-cols-2">
               <p>Category</p>
-              <p>{totalSupplierLength?.length}</p>
+              <p>{totalSupplierLength?.length || 0}</p>
               <p>Items </p>
-              <p>{products?.length}</p>
+              <p>{products?.length || 0}</p>
               <p>Value</p>
-              <p>{totalProductValue}</p>
+              <p>{totalProductValue || 0}</p>
             </div>
           </div>
         </div>
@@ -347,12 +356,26 @@ const Products = () => {
                         name="supplier"
                         id="supplier"
                         className="input-bordered input w-1/2"
+                        onChange={(e) =>
+                          setSupplier(JSON.parse(e.target.value))
+                        }
                       >
-                        <option value="" disabled>
+                        <option value="" disabled selected>
                           Select Supplier
                         </option>
-                        <option value="One Publication">One Publication</option>
-                        <option value="Two Publication">Two Publication</option>
+                        {suppliers?.map((supplier) => (
+                          <option
+                            key={supplier?._id}
+                            value={JSON.stringify({
+                              _id: supplier._id,
+                              name: supplier.name,
+                              phone: supplier.phone,
+                              address: supplier.address,
+                            })}
+                          >
+                            {supplier.name}
+                          </option>
+                        ))}
                       </select>
                       <select
                         name="store"
@@ -528,7 +551,7 @@ const Products = () => {
                           <div>{product.store?.name}</div>
                         </td>
                         <td>
-                          <div>{product.supplier}</div>
+                          <div>{product?.supplier?.name}</div>
                         </td>
                         <td>
                           <div>Avl: {product.availableQty}</div>
@@ -616,21 +639,6 @@ const Products = () => {
                       </tr>
                     ))}
               </tbody>
-              <tfoot className="bg-white">
-                <tr>
-                  <th>Showing 1 to 2 of 2 entries</th>
-                  <th></th>
-                  <th></th>
-                  <th></th>
-                  <th className="flex justify-end">
-                    <div className="join">
-                      <button className="join-item btn">Previous</button>
-                      <button className="btn-primary join-item btn">1</button>
-                      <button className="join-item btn ">Next</button>
-                    </div>
-                  </th>
-                </tr>
-              </tfoot>
             </table>
           </div>
         </div>

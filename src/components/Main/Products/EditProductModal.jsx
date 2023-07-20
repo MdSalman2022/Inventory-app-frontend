@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import ModalBox from "../shared/Modals/ModalBox";
 import { toast } from "react-hot-toast";
+import { StateContext } from "@/contexts/StateProvider/StateProvider";
 
 const EditProductModal = ({
   setIsEditModalOpen,
@@ -8,7 +9,18 @@ const EditProductModal = ({
   selectedProduct,
   refetchProducts,
 }) => {
+  const { stores, suppliers } = useContext(StateContext);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [store, setStore] = useState(selectedProduct?.store);
+  const [supplier, setSupplier] = useState(selectedProduct?.supplier);
+
+  console.log("supplier ", supplier);
+  console.log("store ", store);
+
+  useEffect(() => {
+    setStore(selectedProduct?.store);
+    setSupplier(selectedProduct?.supplier);
+  }, [selectedProduct]);
 
   const handleEditProduct = (event) => {
     event.preventDefault();
@@ -19,9 +31,7 @@ const EditProductModal = ({
     const description = form.description.value;
     const brand = form.brand.value;
     const image = form?.image?.files[0];
-    const supplier = form.supplier.value;
     const country = form.country.value;
-    const store = form.store.value;
     const liftPrice = form.liftPrice.value;
     const salePrice = form.salePrice.value;
     const availableQty = form.availableQty.value;
@@ -38,13 +48,15 @@ const EditProductModal = ({
         .then((res) => res.json())
         .then((imgUpload) => {
           if (imgUpload.success) {
-            const customer = {
+            const product = {
               image: imgUpload.data.url,
               name,
               description,
               brand,
+              supplierId: supplier?._id,
               supplier,
               country,
+              storeId: store?.storeId,
               store,
               liftPrice,
               salePrice,
@@ -52,8 +64,8 @@ const EditProductModal = ({
               qty,
             };
 
-            console.log("edit modal", customer);
-            updatedProduct(customer);
+            console.log("edit modal", product);
+            updatedProduct(product);
           }
         })
         .catch((err) => {
@@ -61,13 +73,15 @@ const EditProductModal = ({
           toast.error("Something went wrong");
         });
     } else {
-      const customer = {
+      const product = {
         image: selectedProduct?.image,
         name,
         description,
         brand,
+        supplierId: supplier?._id,
         supplier,
         country,
+        storeId: store?.storeId,
         store,
         liftPrice,
         salePrice,
@@ -75,12 +89,12 @@ const EditProductModal = ({
         qty,
       };
 
-      console.log("edit modal", customer);
-      updatedProduct(customer);
+      console.log("edit modal", product);
+      updatedProduct(product);
     }
   };
 
-  const updatedProduct = (customer) => {
+  const updatedProduct = (product) => {
     fetch(
       `${import.meta.env.VITE_SERVER_URL}/product/edit-product-info?id=${
         selectedProduct?._id
@@ -90,14 +104,14 @@ const EditProductModal = ({
         headers: {
           "content-type": "application/json",
         },
-        body: JSON.stringify(customer),
+        body: JSON.stringify(product),
       }
     )
       .then((res) => res.json())
       .then((result) => {
         console.log(result);
         if (result.success) {
-          toast.success(`${customer.name} is updated successfully`);
+          toast.success(`${product?.name} is updated successfully`);
           refetchProducts();
           setIsModalOpen(false);
           setIsEditModalOpen(false);
@@ -184,13 +198,25 @@ const EditProductModal = ({
                     name="supplier"
                     id="supplier"
                     className="input-bordered input w-full"
-                    defaultValue={selectedProduct?.supplier}
+                    onChange={(e) => setSupplier(JSON.parse(e.target.value))}
+                    value={JSON.stringify(supplier)}
                   >
                     <option value="" disabled>
                       Select Supplier
                     </option>
-                    <option value="One Publication">One Publication</option>
-                    <option value="Two Publication">Two Publication</option>
+                    {suppliers?.map((supplier) => (
+                      <option
+                        key={supplier?._id}
+                        value={JSON.stringify({
+                          _id: supplier._id,
+                          name: supplier.name,
+                          phone: supplier.phone,
+                          address: supplier.address,
+                        })}
+                      >
+                        {supplier.name}
+                      </option>
+                    ))}
                   </select>
                 </label>
                 <label className="w-1/2 space-y-2">
@@ -199,13 +225,31 @@ const EditProductModal = ({
                     name="store"
                     id="store"
                     className="input-bordered input w-full"
-                    defaultValue={selectedProduct?.store}
+                    onChange={(e) => setStore(JSON.parse(e.target.value))}
+                    value={JSON.stringify(store)}
                   >
                     <option value="" disabled>
                       Select Store
                     </option>
-                    <option value="One Store">One Store</option>
-                    <option value="Two Store">Two Store</option>
+                    {stores?.map((store) => (
+                      <option
+                        key={store?._id}
+                        value={JSON.stringify({
+                          _id: store._id,
+                          name: store.name,
+                          phone: store.phone,
+                          district: store.district,
+                          address: store.address,
+                          sellerId: store.sellerId,
+                          area: store.area,
+                          zip: store.zip,
+                          status: store.status,
+                          storeId: store.storeId,
+                        })}
+                      >
+                        {store.name}
+                      </option>
+                    ))}
                   </select>
                 </label>
               </div>
@@ -271,7 +315,7 @@ const EditProductModal = ({
                 <div className="flex w-full justify-between gap-3">
                   <label
                     type="button"
-                    // onClick={() => setIsModalOpen(false)}
+                    onClick={() => setIsModalOpen(false)}
                     className="btn-error btn-outline btn w-1/2"
                   >
                     Close!

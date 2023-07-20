@@ -24,6 +24,7 @@ import FullScreenPage from "../../layout/Main/FullScreenPage/FullScreenPage";
 import { StateContext } from "../../contexts/StateProvider/StateProvider";
 import CustomerProfile from "@/pages/Customers/CustomerProfile";
 import Store from "@/pages/Store/Store";
+import SupplierPage from "@/pages/SupplierPage/SupplierPage";
 
 export const router = createBrowserRouter([
   {
@@ -176,6 +177,14 @@ export const router = createBrowserRouter([
         element: (
           <PrivateRoute>
             <Store />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "/supplier",
+        element: (
+          <PrivateRoute>
+            <SupplierPage />
           </PrivateRoute>
         ),
       },

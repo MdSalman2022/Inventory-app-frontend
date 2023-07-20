@@ -28,7 +28,7 @@ const Header = () => {
     },
     {
       name: "Suppliers",
-      path: "/suppliers",
+      path: "/supplier",
     },
   ];
   console.log(user);

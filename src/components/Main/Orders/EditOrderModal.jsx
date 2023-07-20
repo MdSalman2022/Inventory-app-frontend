@@ -3,6 +3,14 @@ import ModalBox from "../shared/Modals/ModalBox";
 import { StateContext } from "../../../contexts/StateProvider/StateProvider";
 import { toast } from "react-hot-toast";
 import { RiDeleteBin6Line } from "react-icons/ri";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const EditOrderModal = ({
   isEditModalOpen,
@@ -25,6 +33,21 @@ const EditOrderModal = ({
   const [courier, setCourier] = useState(selectedOrder?.courier);
 
   const formRef = useRef(null);
+
+  console.log("product list ", productList);
+
+  useEffect(() => {
+    if (selectedOrder) {
+      setProductList(selectedOrder?.products);
+      setTotalPrice(selectedOrder?.total);
+      setCashCollect(selectedOrder?.cash);
+      setAdvance(selectedOrder?.advance);
+      setDiscount(selectedOrder?.discount);
+      setDeliveryCharge(selectedOrder?.deliveryCharge);
+      setDistrict(selectedOrder?.district);
+      setCourier(selectedOrder?.courier);
+    }
+  }, [selectedOrder]);
 
   console.log(cashCollect);
   console.log(advance);
@@ -233,24 +256,36 @@ const EditOrderModal = ({
             </select>
             <div className="col-span-2 flex h-full w-fit flex-col gap-3 rounded bg-gray-100 p-5">
               <p className="text-xl font-semibold">Products</p>
-              <details className="dropdown">
-                <summary className="btn m-1 w-full bg-primary text-white">
+              <DropdownMenu className="w-full">
+                <DropdownMenuTrigger className="btn m-1 w-full bg-primary text-white">
+                  {" "}
                   Select Product
-                </summary>
-                <ul className="dropdown-content menu rounded-box z-[1] w-full bg-base-100 p-2 shadow">
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-full">
                   {products?.map((product) => (
-                    <li
-                      onClick={() => handleSelectedProductList(product)}
+                    <DropdownMenuItem
+                      className="w-full cursor-pointer"
+                      onClick={() => {
+                        if (product.availableQty > 0) {
+                          handleSelectedProductList(product);
+                        } else {
+                          toast.error("Product is out of stock");
+                        }
+                      }}
                       key={product._id}
+                      disabled={
+                        productList?.find((p) => p._id === product._id)
+                          ?.quantity === product.availableQty
+                      }
                     >
                       <a>
                         {product.name} - ৳ {product.salePrice} -{" "}
                         {product.availableQty} available products
                       </a>
-                    </li>
+                    </DropdownMenuItem>
                   ))}
-                </ul>
-              </details>
+                </DropdownMenuContent>
+              </DropdownMenu>
               {/* selected products  */}
               <div className="flex flex-col gap-3">
                 <table>
@@ -368,14 +403,14 @@ const EditOrderModal = ({
               name="instruction"
               defaultValue={selectedOrder?.instruction || ""}
             />
-            <div className="col-span-2 w-60 space-y-2">
+            {/* <div className="col-span-2 w-60 space-y-2">
               <p>Other Pictures</p>
               <input
                 type="file"
                 name="image"
                 className="file-input-bordered file-input-primary  file-input w-fit"
               />
-            </div>
+            </div> */}
             <button
               onClick={() => {
                 setIsEditModalOpen(false);
