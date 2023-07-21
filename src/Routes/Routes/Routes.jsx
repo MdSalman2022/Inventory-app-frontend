@@ -26,6 +26,8 @@ import CustomerProfile from "@/pages/Customers/CustomerProfile";
 import Store from "@/pages/Store/Store";
 import SupplierPage from "@/pages/SupplierPage/SupplierPage";
 import AccountDisabledPage from "@/pages/AccountDisabledPage/AccountDisabledPage";
+import Marchants from "@/pages/Marchants/Marchants";
+import SellerProfile from "@/pages/SellerProfile/SellerProfile";
 
 export const router = createBrowserRouter([
   {
@@ -61,6 +63,10 @@ export const router = createBrowserRouter([
       {
         path: "/customer/profile/:id",
         element: <CustomerProfile />,
+      },
+      {
+        path: "/seller/profile/:id",
+        element: <SellerProfile />,
       },
       {
         path: "/start-order",
@@ -155,6 +161,14 @@ export const router = createBrowserRouter([
         element: (
           <PrivateRoute>
             <Users />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "/marchants",
+        element: (
+          <PrivateRoute>
+            <Marchants />
           </PrivateRoute>
         ),
       },

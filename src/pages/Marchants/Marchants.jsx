@@ -1,15 +1,14 @@
-import React, { useContext, useState } from "react";
-import { useQuery } from "react-query";
-import EditUserModal from "../../components/Main/Users/EditUserModal";
-import { AiOutlineEdit } from "react-icons/ai";
-import { StateContext } from "../../contexts/StateProvider/StateProvider";
-import { toast } from "react-hot-toast";
-import DeleteUserModal from "../../components/Main/Users/DeleteUserModal";
-import { RiDeleteBin6Line } from "react-icons/ri";
-import { BsThreeDots } from "react-icons/bs";
 import AddUserModal from "@/components/Main/Users/AddUserModal";
+import DeleteUserModal from "@/components/Main/Users/DeleteUserModal";
+import EditUserModal from "@/components/Main/Users/EditUserModal";
+import { StateContext } from "@/contexts/StateProvider/StateProvider";
+import React, { useContext, useState } from "react";
+import { toast } from "react-hot-toast";
+import { BsThreeDots } from "react-icons/bs";
+import { useQuery } from "react-query";
+import { Link } from "react-router-dom";
 
-const Users = () => {
+const Marchants = () => {
   const { userInfo } = useContext(StateContext);
   console.log(userInfo);
   const {
@@ -20,9 +19,7 @@ const Users = () => {
     refetch,
   } = useQuery(["users", userInfo], async () => {
     const response = await fetch(
-      `${import.meta.env.VITE_SERVER_URL}/user/get-employees?sellerId=${
-        userInfo?.role === "Admin" ? userInfo?._id : userInfo?.sellerId
-      }`,
+      `${import.meta.env.VITE_SERVER_URL}/user/get-sellers`,
       {
         method: "GET",
         headers: {
@@ -42,14 +39,13 @@ const Users = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+
   const formatTimestamp = (timestamp) => {
     // i want the time stamp to output in this format
     const date = new Date(timestamp);
     return date.toLocaleString();
   };
-
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-
   const handleUpdateStatus = async (user, status) => {
     try {
       const response = await fetch(
@@ -79,7 +75,7 @@ const Users = () => {
   return (
     <div className="space-y-5">
       <div className="flex justify-between">
-        <p className="text-xl font-bold">Employees</p>
+        <p className="text-xl font-bold">Marchants</p>
         {/* <button
           onClick={() => setIsAddModalOpen(!isAddModalOpen)}
           className="primary-btn btn"
@@ -151,7 +147,14 @@ const Users = () => {
                 <tr key={index}>
                   <th className="w-5">{index + 1}</th>
 
-                  <td>{user?.username}</td>
+                  <td>
+                    <Link
+                      to={`/seller/profile/${user?._id}`}
+                      className="text-blue-600"
+                    >
+                      {user?.username}
+                    </Link>
+                  </td>
                   <td>{user?.email}</td>
                   <td>
                     <button className="badge badge-success">
@@ -265,4 +268,4 @@ const Users = () => {
   );
 };
 
-export default Users;
+export default Marchants;

@@ -1,8 +1,10 @@
 import React, { useContext } from "react";
 import { Link } from "react-router-dom";
 import { AuthContext } from "../../../../contexts/AuthProvider/AuthProvider";
+import { StateContext } from "@/contexts/StateProvider/StateProvider";
 
 const Header = () => {
+  const { userInfo } = useContext(StateContext);
   const { user, logOut } = useContext(AuthContext);
 
   const menus = [
@@ -10,6 +12,7 @@ const Header = () => {
       name: "Settings",
       path: "/profile",
     },
+
     {
       name: "Users",
       path: "/users",
@@ -31,6 +34,14 @@ const Header = () => {
       path: "/supplier",
     },
   ];
+
+  const masterMenus = [
+    {
+      name: "Marchants",
+      path: "/marchants",
+    },
+  ];
+
   console.log(user);
 
   return (
@@ -68,6 +79,14 @@ const Header = () => {
               tabIndex={0}
               className="dropdown-content menu  rounded-box z-[1] mt-3 w-52 gap-1 bg-base-100 p-2 shadow"
             >
+              {userInfo?.Master === true &&
+                masterMenus?.map((menu, index) => (
+                  <li key={index}>
+                    <Link to={menu.path} className="hover:bg-base-200">
+                      {menu.name}
+                    </Link>
+                  </li>
+                ))}
               {menus?.map((menu, index) => (
                 <li key={index}>
                   <Link to={menu.path} className="hover:bg-base-200">
@@ -75,6 +94,7 @@ const Header = () => {
                   </Link>
                 </li>
               ))}
+
               {user?.uid && (
                 <li>
                   <div onClick={logOut} className="hover:bg-base-200">
