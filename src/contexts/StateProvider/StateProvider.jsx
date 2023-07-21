@@ -49,7 +49,7 @@ const StateProvider = ({ children }) => {
   } = useQuery(["products", user, userInfo], async () => {
     const response = await fetch(
       `${import.meta.env.VITE_SERVER_URL}/product/get-products?sellerId=${
-        userInfo?._id
+        userInfo?.role === "Admin" ? userInfo?._id : userInfo?.sellerId
       }`,
       {
         method: "GET",
@@ -70,7 +70,7 @@ const StateProvider = ({ children }) => {
     if (user) {
       const res = await fetch(
         `${import.meta.env.VITE_SERVER_URL}/courier/get-couriers?sellerId=${
-          userInfo?._id
+          userInfo?.role === "Admin" ? userInfo?._id : userInfo?.sellerId
         }`
       );
       const data = await res.json();
@@ -84,6 +84,7 @@ const StateProvider = ({ children }) => {
   );
 
   console.log("uid", user?.uid);
+  console.log(userInfo);
 
   const {
     data: stores,
@@ -94,7 +95,7 @@ const StateProvider = ({ children }) => {
   } = useQuery(["stores", user, userInfo], async () => {
     const response = await fetch(
       `${import.meta.env.VITE_SERVER_URL}/store/get-stores-by-owner-id?id=${
-        userInfo?._id
+        userInfo?.role === "Admin" ? userInfo?._id : userInfo?.sellerId
       }`,
       {
         method: "GET",
@@ -118,7 +119,7 @@ const StateProvider = ({ children }) => {
   } = useQuery(["suppliers", userInfo], async () => {
     const response = await fetch(
       `${import.meta.env.VITE_SERVER_URL}/supplier/get-supplier?sellerId=${
-        userInfo?._id
+        userInfo?.role === "Admin" ? userInfo?._id : userInfo?.sellerId
       }`,
       {
         method: "GET",

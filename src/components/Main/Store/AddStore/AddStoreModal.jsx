@@ -23,7 +23,7 @@ const AddStoreModal = ({ isAddModalOpen, setIsAddModalOpen }) => {
       phone,
       address,
       district,
-      sellerId: userInfo?._id,
+      sellerId: userInfo?.role === "Admin" ? userInfo?._id : userInfo?.sellerId,
       sellerInfo: userInfo,
       area,
       zip,

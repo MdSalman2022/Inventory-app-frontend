@@ -19,7 +19,7 @@ const AddSupplier = ({ isAddModalOpen, setIsAddModalOpen, refetch }) => {
       name,
       phone,
       address,
-      sellerId: userInfo?._id,
+      sellerId: userInfo?.role === "Admin" ? userInfo?._id : userInfo?.sellerId,
       status,
     };
 

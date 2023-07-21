@@ -25,6 +25,7 @@ import { StateContext } from "../../contexts/StateProvider/StateProvider";
 import CustomerProfile from "@/pages/Customers/CustomerProfile";
 import Store from "@/pages/Store/Store";
 import SupplierPage from "@/pages/SupplierPage/SupplierPage";
+import AccountDisabledPage from "@/pages/AccountDisabledPage/AccountDisabledPage";
 
 export const router = createBrowserRouter([
   {
@@ -40,6 +41,7 @@ export const router = createBrowserRouter([
         path: "/login",
         element: <Login />,
       },
+
       {
         path: "/",
         element: (
@@ -198,6 +200,10 @@ export const router = createBrowserRouter([
       {
         path: "/email-verification-sent",
         element: <EmailVerificationSentPage />,
+      },
+      {
+        path: "/account-disabled",
+        element: <AccountDisabledPage />,
       },
     ],
   },

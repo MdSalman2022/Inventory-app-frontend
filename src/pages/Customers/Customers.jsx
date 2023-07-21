@@ -28,7 +28,7 @@ const Customers = () => {
     navigate("/start-order");
   }
 
-  console.log(userInfo?._id);
+  console.log(userInfo?.role === "Admin" ? userInfo?._id : userInfo?.sellerId);
 
   const {
     data: customers,
@@ -39,7 +39,7 @@ const Customers = () => {
   } = useQuery("customers", async () => {
     const response = await fetch(
       `${import.meta.env.VITE_SERVER_URL}/customer/get-customers?sellerId=${
-        userInfo?._id
+        userInfo?.role === "Admin" ? userInfo?._id : userInfo?.sellerId
       }`,
       {
         method: "GET",
@@ -123,7 +123,8 @@ const Customers = () => {
               district,
               address,
               link,
-              sellerId: userInfo?._id || userInfo?.sellerId,
+              sellerId:
+                userInfo?.role === "Admin" ? userInfo?._id : userInfo?.sellerId,
             };
 
             console.log(customer);
@@ -142,7 +143,8 @@ const Customers = () => {
         district,
         address,
         link,
-        sellerId: userInfo?._id || userInfo?.sellerId,
+        sellerId:
+          userInfo?.role === "Admin" ? userInfo?._id : userInfo?.sellerId,
       };
 
       console.log(customer);
@@ -187,7 +189,7 @@ const Customers = () => {
     let url = `${
       import.meta.env.VITE_SERVER_URL
     }/customer/search-customer?sellerId=${
-      userInfo?._id || userInfo?.sellerId
+      userInfo?.role === "Admin" ? userInfo?._id : userInfo?.sellerId
     }&`;
 
     if (customerSearchKey.match(/^\d+$/)) {

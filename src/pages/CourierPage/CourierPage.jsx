@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { FaCheck } from "react-icons/fa";
 import { RiArrowGoBackLine, RiDeleteBin6Line } from "react-icons/ri";
 import { Link, useParams } from "react-router-dom";
@@ -8,8 +8,9 @@ import { useQuery } from "react-query";
 import { TbFileInvoice } from "react-icons/tb";
 import { toast } from "react-hot-toast";
 import avatarIcon from "../../assets/shared/avatar.png";
-
+import { StateContext } from "@/contexts/StateProvider/StateProvider";
 const CourierPage = () => {
+  const { userInfo } = useContext(StateContext);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState({});
 
@@ -26,12 +27,14 @@ const CourierPage = () => {
     isError,
     error,
     refetch,
-  } = useQuery(["orders", name], async () => {
+  } = useQuery(["orders", userInfo, name], async () => {
     // Fetch data based on the updated name
     const response = await fetch(
       `${
         import.meta.env.VITE_SERVER_URL
-      }/order/get-orders?courier=${name}&filter=ready&courierStatus=sent`,
+      }/order/get-orders?courier=${name}&sellerId=${
+        userInfo?.role === "Admin" ? userInfo?._id : userInfo?.sellerId
+      }&filter=ready&courierStatus=sent`,
       {
         method: "GET",
         headers: {
@@ -46,6 +49,53 @@ const CourierPage = () => {
 
     return response.json().then((data) => data.orders);
   });
+
+  const allOrdersInvoice = orders?.map((order) => order.orderId);
+  console.log("all orders invoice ", allOrdersInvoice);
+
+  const [ordersStatus, setOrdersStatus] = useState([]);
+
+  const fetchOrderStatusByInvoice = async (orderId) => {
+    const response = await fetch(
+      `${import.meta.env.VITE_STEADFAST_BASE_URL}/status_by_invoice/${orderId}`,
+      {
+        method: "GET",
+        headers: {
+          "Api-Key": import.meta.env.VITE_STEADFAST_API_KEY,
+          "Secret-Key": import.meta.env.VITE_STEADFAST_SECRET_KEY,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch order with orderId: ${orderId}`);
+    }
+
+    return response.json();
+  };
+
+  const { data = [], isLoading: isStatusLoading } = useQuery(
+    ["ordersStatus", orders],
+    async () => {
+      // Create an array of promises for each orderId in allOrdersInvoice
+      const fetchPromises = allOrdersInvoice.map((orderId) =>
+        fetchOrderStatusByInvoice(orderId)
+      );
+
+      // Wait for all the promises to resolve using Promise.all()
+      try {
+        const responseData = await Promise.all(fetchPromises);
+        console.log("All order statuses: ", responseData);
+        setOrdersStatus(responseData);
+        // Do something with the responseData here
+      } catch (error) {
+        console.error("Error fetching orders: ", error);
+      }
+    }
+  );
+
+  console.log("order status ", ordersStatus);
 
   console.log("orders for courier ", orders, name);
 
@@ -63,7 +113,6 @@ const CourierPage = () => {
 
   const SumOfTotalCOD = orders?.reduce((acc, order) => acc + order.cash, 0);
 
-  console.log(orders);
   const handleExportClick = () => {
     fetch(`${import.meta.env.VITE_SERVER_URL}/order/order-export`, {
       method: "GET",
@@ -191,7 +240,7 @@ const CourierPage = () => {
                 <th>#</th>
                 <th>Invoice</th>
                 <th>Name</th>
-                {/* <th>Prods/Pics</th> */}
+                <th>Status</th>
                 <th>Price</th>
               </tr>
             </thead>
@@ -216,7 +265,9 @@ const CourierPage = () => {
                       <p className="text-sm text-blue-500">
                         {formatDate(order?.timestamp)}
                       </p>
-                      <p className="text-xs text-blue-500">Created By Admin</p>
+                      <p className="text-xs text-blue-500">
+                        Created By {userInfo?.username} ({userInfo?.role})
+                      </p>
                     </span>
                   </td>
                   <td className="flex flex-col gap-1">
@@ -251,7 +302,7 @@ const CourierPage = () => {
                           setIsModalOpen(!isModalOpen);
                           setSelectedOrder(order);
                         }}
-                        className="rounded-full border border-gray-500 p-1 text-2xl text-success"
+                        className="cursor-pointer rounded-full border border-gray-500 p-1 text-2xl text-success"
                       >
                         <TbFileInvoice />
                       </span>
@@ -259,7 +310,7 @@ const CourierPage = () => {
                         onClick={() => {
                           handleOrderStatus(order._id, "processing");
                         }}
-                        className="tooltip rounded-full border border-gray-500 p-1 text-2xl text-error"
+                        className="tooltip cursor-pointer rounded-full border border-gray-500 p-1 text-2xl text-error"
                         data-tip="Back to Processing"
                       >
                         <RiArrowGoBackLine className="text-lg" />
@@ -269,7 +320,7 @@ const CourierPage = () => {
                           setIsDeleteModalOpen(true);
                           setSelectedOrder(order);
                         }}
-                        className="tooltip rounded-full border border-error p-1 text-2xl text-error"
+                        className="tooltip cursor-pointer rounded-full border border-error p-1 text-2xl text-error"
                         data-tip="Delete order"
                       >
                         <RiDeleteBin6Line />
@@ -287,6 +338,11 @@ const CourierPage = () => {
                       ))}
                     </div>
                   </td> */}
+                  <td>
+                    {isStatusLoading
+                      ? "...Loading"
+                      : ordersStatus[index]?.delivery_status}
+                  </td>
                   <td>
                     <div className="flex flex-col">
                       <p className="badge badge-info">

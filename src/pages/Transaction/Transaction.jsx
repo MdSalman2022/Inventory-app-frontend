@@ -1,12 +1,14 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { FaExchangeAlt } from "react-icons/fa";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { TbCurrencyTaka } from "react-icons/tb";
 import { useQuery } from "react-query";
 import ModalBox from "../../components/Main/shared/Modals/ModalBox";
 import InvoiceGenerator from "../../components/Main/shared/InvoiceGenerator/InvoiceGenerator";
+import { StateContext } from "@/contexts/StateProvider/StateProvider";
 
 const Transaction = () => {
+  const { userInfo } = useContext(StateContext);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const {
@@ -17,7 +19,9 @@ const Transaction = () => {
     refetch,
   } = useQuery("orders", async () => {
     const response = await fetch(
-      `${import.meta.env.VITE_SERVER_URL}/api/get-orders/completed`,
+      `${import.meta.env.VITE_SERVER_URL}/order/get-orders?sellerId=${
+        userInfo?.role === "Admin" ? userInfo?._id : userInfo?.sellerId
+      }&filter=completed`,
       {
         method: "GET",
         headers: {

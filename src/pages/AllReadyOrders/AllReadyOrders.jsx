@@ -36,7 +36,7 @@ const AllReadyOrders = () => {
   } = useQuery(["orders", userInfo], async () => {
     const response = await fetch(
       `${import.meta.env.VITE_SERVER_URL}/order/get-orders?sellerId=${
-        userInfo?._id
+        userInfo?.role === "Admin" ? userInfo?._id : userInfo?.sellerId
       }&filter=ready`,
       {
         method: "GET",
@@ -334,7 +334,7 @@ const AllReadyOrders = () => {
                           onClick={() => {
                             sendToCourier(order);
                           }}
-                          className="tooltip cursor-pointer cursor-pointer rounded-full border border-gray-500 p-1 text-2xl text-info"
+                          className="tooltip cursor-pointer rounded-full border border-gray-500 p-1 text-2xl text-info"
                           data-tip={`Send to ${order?.courier} `}
                         >
                           <GrDeliver className="text-lg" />

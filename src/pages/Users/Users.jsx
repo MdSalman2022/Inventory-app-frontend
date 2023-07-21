@@ -7,6 +7,7 @@ import { toast } from "react-hot-toast";
 import DeleteUserModal from "../../components/Main/Users/DeleteUserModal";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { BsThreeDots } from "react-icons/bs";
+import AddUserModal from "@/components/Main/Users/AddUserModal";
 
 const Users = () => {
   const { userInfo } = useContext(StateContext);
@@ -17,9 +18,11 @@ const Users = () => {
     isError,
     error,
     refetch,
-  } = useQuery("customers", async () => {
+  } = useQuery(["users", userInfo], async () => {
     const response = await fetch(
-      `${import.meta.env.VITE_SERVER_URL}/user/get-users`,
+      `${import.meta.env.VITE_SERVER_URL}/user/get-employees?sellerId=${
+        userInfo?.role === "Admin" ? userInfo?._id : userInfo?.sellerId
+      }`,
       {
         method: "GET",
         headers: {
@@ -32,6 +35,8 @@ const Users = () => {
     }
     return response.json().then((data) => data?.users);
   });
+
+  console.log("all users for this seller", users);
   const [selectedUser, setSelectedUser] = useState(null);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -43,14 +48,53 @@ const Users = () => {
     return date.toLocaleString();
   };
 
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+
+  const handleUpdateStatus = async (user, status) => {
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_SERVER_URL}/user/update-status?id=${user?._id}`,
+        {
+          method: "PUT",
+          headers: {
+            "content-type": "application/json",
+          },
+          body: JSON.stringify({ status: status }),
+        }
+      );
+      const data = await response.json();
+      console.log("data ", data);
+      if (data?.success === true) {
+        console.log("edit user", data);
+        toast.success(`Successfully ${status ? "Activated" : "Deactivated"}`);
+        refetch();
+      } else {
+        toast.error("Something went wrong");
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <div className="space-y-5">
-      <p>Users</p>
+      <div className="flex justify-between">
+        <p>Users</p>
+        {/* <button
+          onClick={() => setIsAddModalOpen(!isAddModalOpen)}
+          className="primary-btn btn"
+        >
+          Add User
+        </button> */}
+      </div>
       <hr />
 
       <div className="space-y-5">
+        <AddUserModal
+          isAddModalOpen={isAddModalOpen}
+          setIsAddModalOpen={setIsAddModalOpen}
+          refetch={refetch}
+        />
         <EditUserModal
           setIsModalOpen={setIsModalOpen}
           isModalOpen={isModalOpen}
@@ -96,6 +140,7 @@ const Users = () => {
                 <th>Name</th>
                 <th>Email</th>
                 <th>Role</th>
+                <th>Status</th>
                 <th>Verified</th>
                 <th>Last Login</th>
                 <th>Action</th>
@@ -112,6 +157,28 @@ const Users = () => {
                     <button className="badge badge-success">
                       {user?.role}
                     </button>
+                  </td>
+                  <td>
+                    <div className="form-control w-full">
+                      <label className="label cursor-pointer">
+                        <input
+                          type="checkbox"
+                          className="toggle-success toggle"
+                          name="status"
+                          onChange={(e) => {
+                            const isAdmin = userInfo?.role === "Admin";
+                            if (isAdmin) {
+                              handleUpdateStatus(user, e.target.checked);
+                            } else {
+                              toast.error(
+                                "You are not authorized to edit user"
+                              );
+                            }
+                          }}
+                          checked={user?.status}
+                        />
+                      </label>
+                    </div>
                   </td>
                   <td>
                     {user?.verified ? (

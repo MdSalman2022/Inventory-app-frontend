@@ -106,7 +106,8 @@ const Products = () => {
               liftPrice,
               salePrice,
               qty,
-              sellerId: userInfo?._id,
+              sellerId:
+                userInfo?.role === "Admin" ? userInfo?._id : userInfo?.sellerId,
             };
 
             console.log(product);
@@ -131,7 +132,8 @@ const Products = () => {
         liftPrice,
         salePrice,
         qty,
-        sellerId: userInfo?._id,
+        sellerId:
+          userInfo?.role === "Admin" ? userInfo?._id : userInfo?.sellerId,
       };
 
       console.log(product);

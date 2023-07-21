@@ -34,7 +34,7 @@ const OrderProcessing = () => {
   } = useQuery(["orders", userInfo], async () => {
     const response = await fetch(
       `${import.meta.env.VITE_SERVER_URL}/order/get-orders?sellerId=${
-        userInfo?._id
+        userInfo?.role === "Admin" ? userInfo?._id : userInfo?.sellerId
       }&filter=processing`,
       {
         method: "GET",

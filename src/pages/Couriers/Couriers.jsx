@@ -15,7 +15,7 @@ const Couriers = () => {
   const fetchCouriers = async () => {
     const res = await fetch(
       `${import.meta.env.VITE_SERVER_URL}/courier/get-couriers?sellerId=${
-        userInfo?._id
+        userInfo?.role === "Admin" ? userInfo?._id : userInfo?.sellerId
       }`
     );
     const data = await res.json();
@@ -40,7 +40,7 @@ const Couriers = () => {
       chargeInDhaka,
       chargeOutsideDhaka,
       status,
-      sellerId: userInfo?._id,
+      sellerId: userInfo?.role === "Admin" ? userInfo?._id : userInfo?.sellerId,
     };
 
     console.log(courier);

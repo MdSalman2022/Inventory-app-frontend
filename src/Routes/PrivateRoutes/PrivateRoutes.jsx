@@ -1,9 +1,11 @@
 import React, { useContext } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { AuthContext } from "../../contexts/AuthProvider/AuthProvider";
+import { StateContext } from "@/contexts/StateProvider/StateProvider";
 
 const PrivateRoute = ({ children }) => {
-  const { user, loading } = useContext(AuthContext);
+  const { user, loading, logOut } = useContext(AuthContext);
+  const { userInfo } = useContext(StateContext);
   const location = useLocation();
 
   if (loading)
@@ -14,12 +16,21 @@ const PrivateRoute = ({ children }) => {
     );
 
   if (user) {
-    if (user.emailVerified) {
+    if (user.emailVerified && userInfo?.status !== false) {
       return children;
-    } else {
+    } else if (!user.emailVerified) {
       return (
         <Navigate
           to="/email-verification-sent"
+          state={{ from: location }}
+          replace
+        ></Navigate>
+      );
+    } else if (userInfo?.status === false) {
+      logOut();
+      return (
+        <Navigate
+          to="/account-disabled"
           state={{ from: location }}
           replace
         ></Navigate>

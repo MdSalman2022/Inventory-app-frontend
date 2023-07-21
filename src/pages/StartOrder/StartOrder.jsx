@@ -23,7 +23,7 @@ const StartOrder = () => {
     let url = `${
       import.meta.env.VITE_SERVER_URL
     }/customer/search-customer?sellerId=${
-      userInfo?._id || userInfo?.sellerId
+      userInfo?.role === "Admin" ? userInfo?._id : userInfo?.sellerId
     }&`;
 
     if (customerSearchKey.match(/^\d+$/)) {

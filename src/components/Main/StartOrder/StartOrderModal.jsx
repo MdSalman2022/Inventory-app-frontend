@@ -105,7 +105,8 @@ const StartOrderModal = ({
           phone,
           address,
           location: district,
-          sellerId: userInfo?._id,
+          sellerId:
+            userInfo?.role === "Admin" ? userInfo?._id : userInfo?.sellerId,
           storeId: store?.storeId,
         };
 
@@ -139,7 +140,10 @@ const StartOrderModal = ({
                       phone,
                       address,
                       district,
-                      sellerId: userInfo?._id,
+                      sellerId:
+                        userInfo?.role === "Admin"
+                          ? userInfo?._id
+                          : userInfo?.sellerId,
                       storeId: store?.storeId,
                       store,
                       products: productList,
@@ -205,7 +209,10 @@ const StartOrderModal = ({
                 phone,
                 address,
                 district,
-                sellerId: userInfo?._id,
+                sellerId:
+                  userInfo?.role === "Admin"
+                    ? userInfo?._id
+                    : userInfo?.sellerId,
                 storeId: store?.storeId,
                 store,
                 products: productList,
@@ -260,7 +267,8 @@ const StartOrderModal = ({
           phone,
           address,
           location: district,
-          sellerId: userInfo?._id,
+          sellerId:
+            userInfo?.role === "Admin" ? userInfo?._id : userInfo?.sellerId,
         };
 
         fetch(`${import.meta.env.VITE_SERVER_URL}/customer/create-customer`, {
@@ -282,7 +290,10 @@ const StartOrderModal = ({
                 phone,
                 address,
                 district,
-                sellerId: userInfo?._id,
+                sellerId:
+                  userInfo?.role === "Admin"
+                    ? userInfo?._id
+                    : userInfo?.sellerId,
                 storeId: store?.storeId,
                 store,
                 products: productList,
@@ -302,7 +313,10 @@ const StartOrderModal = ({
                 name,
                 phone,
                 address,
-                sellerId: userInfo?._id,
+                sellerId:
+                  userInfo?.role === "Admin"
+                    ? userInfo?._id
+                    : userInfo?.sellerId,
                 storeId: store?.storeId,
                 location: district,
                 total: 0 + total + deliveryCharge - discount,
@@ -331,7 +345,8 @@ const StartOrderModal = ({
           phone,
           address,
           district,
-          sellerId: userInfo?._id,
+          sellerId:
+            userInfo?.role === "Admin" ? userInfo?._id : userInfo?.sellerId,
           storeId: store?._id,
           store,
           products: productList,
