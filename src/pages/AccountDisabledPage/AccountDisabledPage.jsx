@@ -11,7 +11,8 @@ const AccountDisabledPage = () => {
           </div>
           <div>
             <p className="font-semibold">Account Disabled</p>
-            <p>You are no longer an Employee of this store</p>
+            <p>Sorry you are deactivated by Admin</p>
+            <p>Contact Admin to know more.</p>
           </div>
         </div>
       </div>
