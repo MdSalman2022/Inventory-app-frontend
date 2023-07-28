@@ -22,7 +22,10 @@ const Couriers = () => {
     return data.couriers;
   };
 
-  const { data: couriers, refetch } = useQuery("couriers", fetchCouriers);
+  const { data: couriers, refetch } = useQuery(
+    ["couriers", userInfo],
+    fetchCouriers
+  );
 
   console.log(couriers);
 
@@ -175,7 +178,7 @@ const Couriers = () => {
                         setIsEditCourierModalOpen(!isEditCourierModalOpen);
                         setSelectedCourier(courier);
                       }}
-                      className="rounded-full border border-black p-1 text-3xl"
+                      className="cursor-pointer rounded-full border border-black p-1 text-3xl"
                     />
                   </td>
                   <td className="w-5">{index + 1}</td>

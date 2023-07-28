@@ -134,6 +134,8 @@ const StateProvider = ({ children }) => {
     return response.json().then((data) => data?.suppliers);
   });
 
+  const [selectedOrders, setSelectedOrders] = useState([]);
+
   const stateInfo = {
     products,
     refetchProducts,
@@ -146,6 +148,8 @@ const StateProvider = ({ children }) => {
     storesRefetch,
     suppliers,
     refetchSuppliers,
+    selectedOrders,
+    setSelectedOrders,
   };
 
   return (

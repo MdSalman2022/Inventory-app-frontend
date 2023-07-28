@@ -28,6 +28,7 @@ import SupplierPage from "@/pages/SupplierPage/SupplierPage";
 import AccountDisabledPage from "@/pages/AccountDisabledPage/AccountDisabledPage";
 import Marchants from "@/pages/Marchants/Marchants";
 import SellerProfile from "@/pages/SellerProfile/SellerProfile";
+import InvoiceGenerator from "@/components/Main/shared/InvoiceGenerator/InvoiceGenerator";
 
 export const router = createBrowserRouter([
   {
@@ -201,6 +202,14 @@ export const router = createBrowserRouter([
         element: (
           <PrivateRoute>
             <SupplierPage />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "/invoice-generator",
+        element: (
+          <PrivateRoute>
+            <InvoiceGenerator />
           </PrivateRoute>
         ),
       },

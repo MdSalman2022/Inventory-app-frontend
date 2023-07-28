@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { FaCheck } from "react-icons/fa";
 import { RiArrowGoBackLine, RiDeleteBin6Line } from "react-icons/ri";
 import { Link, useParams } from "react-router-dom";
@@ -9,17 +9,19 @@ import { TbFileInvoice } from "react-icons/tb";
 import { toast } from "react-hot-toast";
 import avatarIcon from "../../assets/shared/avatar.png";
 import { StateContext } from "@/contexts/StateProvider/StateProvider";
+import SingleInvoiceGenerator from "@/components/Main/shared/InvoiceGenerator/SingleInvoiceGenerator";
 const CourierPage = () => {
-  const { userInfo } = useContext(StateContext);
+  const { userInfo, selectedOrders, setSelectedOrders } =
+    useContext(StateContext);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState({});
-
-  console.log(selectedOrder);
-
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-
   const { name } = useParams();
+
+  useEffect(() => {
+    setSelectedOrders([]);
+  }, []);
 
   const {
     data: orders,
@@ -55,14 +57,33 @@ const CourierPage = () => {
 
   const [ordersStatus, setOrdersStatus] = useState([]);
 
+  const fetchCouriers = async () => {
+    const res = await fetch(
+      `${import.meta.env.VITE_SERVER_URL}/courier/get-couriers?sellerId=${
+        userInfo?.role === "Admin" ? userInfo?._id : userInfo?.sellerId
+      }`
+    );
+    const data = await res.json();
+    return data.couriers;
+  };
+
+  const { data: couriers } = useQuery("couriers", fetchCouriers);
+
+  //find the courier info with regex
+  const steadFastCourier = couriers?.find((courier) =>
+    /steadfast/i.test(courier.name)
+  );
+
+  console.log("steadfast ", steadFastCourier);
+
   const fetchOrderStatusByInvoice = async (orderId) => {
     const response = await fetch(
       `${import.meta.env.VITE_STEADFAST_BASE_URL}/status_by_invoice/${orderId}`,
       {
         method: "GET",
         headers: {
-          "Api-Key": import.meta.env.VITE_STEADFAST_API_KEY,
-          "Secret-Key": import.meta.env.VITE_STEADFAST_SECRET_KEY,
+          "Api-Key": steadFastCourier?.api,
+          "Secret-Key": steadFastCourier?.secret,
           "Content-Type": "application/json",
         },
       }
@@ -189,6 +210,11 @@ const CourierPage = () => {
   return (
     <div className="space-y-4">
       <div className="flex items-start justify-between border-b py-3">
+        <ModalBox isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen}>
+          <div>
+            <SingleInvoiceGenerator order={selectedOrder} />
+          </div>
+        </ModalBox>
         <div>
           <p className="text-xl font-semibold">{name} Ready Orders</p>
           <p>Total Parcels: {orders?.length || 0.0}</p>
@@ -198,6 +224,13 @@ const CourierPage = () => {
           <p>Total Advance: ৳{SumOfTotalAdvance || 0.0}</p>
         </div>
         <div className="flex items-center gap-4">
+          {selectedOrders?.length > 0 && (
+            <Link to="/invoice-generator">
+              <button className="btn-primary btn-outline btn">
+                Print Selected
+              </button>
+            </Link>
+          )}
           <button className="btn-primary btn-outline btn">
             Advance Search
           </button>
@@ -237,35 +270,63 @@ const CourierPage = () => {
             {/* head */}
             <thead className="bg-primary text-white">
               <tr>
-                <th>#</th>
-                <th>Invoice</th>
-                <th>Name</th>
-                <th>Status</th>
-                <th>Price</th>
+                <td className="w-5">
+                  <input
+                    type="checkbox"
+                    defaultChecked={false}
+                    onClick={(e) => {
+                      if (e.target.checked) {
+                        setSelectedOrders(orders);
+                      } else {
+                        setSelectedOrders([]);
+                      }
+                    }}
+                    checked={selectedOrders?.length === orders?.length}
+                    className="checkbox border border-white"
+                  />
+                </td>
+                <th className="w-10">#</th>
+                <th className="w-10">Invoice</th>
+                <th className="w-96">Name</th>
+                <th className="w-10">Status</th>
+                <th className="w-96">Price</th>
               </tr>
             </thead>
             <tbody className="bg-white">
               {orders?.map((order, index) => (
                 <tr key={index}>
-                  <td>{index + 1}</td>
+                  <td className="w-5">
+                    <input
+                      type="checkbox"
+                      defaultChecked={false}
+                      checked={selectedOrders.includes(order)}
+                      onClick={(e) => {
+                        if (e.target.checked) {
+                          setSelectedOrders([...selectedOrders, order]);
+                        } else {
+                          setSelectedOrders(
+                            selectedOrders.filter(
+                              (selectedOrder) => selectedOrder._id !== order._id
+                            )
+                          );
+                        }
+                      }}
+                      className="checkbox border border-black"
+                    />
+                  </td>
+                  <td className="w-10">{index + 1}</td>
                   <td>
                     <span
                       onClick={() => {
                         setIsModalOpen(!isModalOpen);
                         setSelectedOrder(order);
                       }}
-                      className="p-1 text-2xl text-success"
+                      className="cursor-pointer p-1 text-2xl text-success"
                     >
-                      <ModalBox
-                        isModalOpen={isModalOpen}
-                        setIsModalOpen={setIsModalOpen}
-                      >
-                        <InvoiceGenerator order={selectedOrder} />
-                      </ModalBox>
                       <p className="text-sm text-blue-500">
                         {formatDate(order?.timestamp)}
                       </p>
-                      <p className="text-xs text-blue-500">
+                      <p className="cursor text-xs text-blue-500">
                         Created By {userInfo?.username} ({userInfo?.role})
                       </p>
                     </span>

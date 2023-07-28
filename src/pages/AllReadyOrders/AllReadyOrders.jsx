@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from "react";
+import React, { useEffect, useState, useContext, useRef } from "react";
 import { AiOutlineEdit, AiOutlineShoppingCart } from "react-icons/ai";
 import { RiArrowGoBackLine, RiDeleteBin6Line } from "react-icons/ri";
 import ModalBox from "../../components/Main/shared/Modals/ModalBox";
@@ -15,17 +15,41 @@ import InvoiceGenerator from "../../components/Main/shared/InvoiceGenerator/Invo
 import { GrDeliver } from "react-icons/gr";
 import EditOrderModal from "../../components/Main/Orders/EditOrderModal";
 import { StateContext } from "@/contexts/StateProvider/StateProvider";
+import SingleInvoiceGenerator from "@/components/Main/shared/InvoiceGenerator/SingleInvoiceGenerator";
 
 const AllReadyOrders = () => {
-  const { userInfo } = useContext(StateContext);
+  const { userInfo, selectedOrders, setSelectedOrders } =
+    useContext(StateContext);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState({});
-
   console.log(isEditModalOpen);
   console.log(selectedOrder);
-
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  useEffect(() => {
+    setSelectedOrders([]);
+  }, []);
+
+  console.log("selected order ", selectedOrder);
+  const fetchCouriers = async () => {
+    const res = await fetch(
+      `${import.meta.env.VITE_SERVER_URL}/courier/get-couriers?sellerId=${
+        userInfo?.role === "Admin" ? userInfo?._id : userInfo?.sellerId
+      }`
+    );
+    const data = await res.json();
+    return data.couriers;
+  };
+
+  const { data: couriers } = useQuery("couriers", fetchCouriers);
+
+  //find the courier info with regex
+  const steadFastCourier = couriers?.find((courier) =>
+    /steadfast/i.test(courier.name)
+  );
+
+  console.log("steadfast ", steadFastCourier);
 
   const {
     data: orders,
@@ -131,8 +155,8 @@ const AllReadyOrders = () => {
         {
           method: "POST",
           headers: {
-            "Api-Key": import.meta.env.VITE_STEADFAST_API_KEY,
-            "Secret-Key": import.meta.env.VITE_STEADFAST_SECRET_KEY,
+            "Api-Key": steadFastCourier?.api,
+            "Secret-Key": steadFastCourier?.secret,
             "Content-Type": "application/json",
           },
           body: JSON.stringify(courier_info),
@@ -201,7 +225,9 @@ const AllReadyOrders = () => {
         refetch={refetch}
       />
       <ModalBox isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen}>
-        <InvoiceGenerator order={selectedOrder} />
+        <div>
+          <SingleInvoiceGenerator order={selectedOrder} />
+        </div>
       </ModalBox>
       <DeleteOrderModal
         setIsDeleteModalOpen={setIsDeleteModalOpen}
@@ -220,6 +246,14 @@ const AllReadyOrders = () => {
           <p>Total Advance: ৳0.00</p>
         </div>
         <div className="flex items-center gap-4">
+          {selectedOrders?.length > 0 && (
+            <Link to="/invoice-generator">
+              <button className="btn-primary btn-outline btn">
+                Print Selected
+              </button>
+            </Link>
+          )}
+
           <button className="btn-primary btn-outline btn">
             Advance Search
           </button>
@@ -263,29 +297,62 @@ const AllReadyOrders = () => {
             {/* head */}
             <thead className="bg-primary text-white">
               <tr>
-                <th>#</th>
-                <th>Invoice</th>
-                <th>Name</th>
-                {/* <th>Prods/Pics</th> */}
-                <th>Price</th>
+                <td className="w-5">
+                  <input
+                    type="checkbox"
+                    defaultChecked={false}
+                    onClick={(e) => {
+                      if (e.target.checked) {
+                        setSelectedOrders(orders);
+                      } else {
+                        setSelectedOrders([]);
+                      }
+                    }}
+                    checked={selectedOrders?.length === orders?.length}
+                    className="checkbox border border-white"
+                  />
+                </td>
+                <th className="w-10">#</th>
+                <th className="w-10">Invoice</th>
+                <th className="w-96">Name</th>
+                <th className="w-96">Price</th>
               </tr>
             </thead>
             <tbody className="bg-white">
               {orders?.map((order, index) => (
                 <tr key={index}>
-                  <td>{index + 1}</td>
+                  <td className="w-5">
+                    <input
+                      type="checkbox"
+                      defaultChecked={false}
+                      checked={selectedOrders.includes(order)}
+                      onClick={(e) => {
+                        if (e.target.checked) {
+                          setSelectedOrders([...selectedOrders, order]);
+                        } else {
+                          setSelectedOrders(
+                            selectedOrders.filter(
+                              (selectedOrder) => selectedOrder._id !== order._id
+                            )
+                          );
+                        }
+                      }}
+                      className="checkbox border border-black"
+                    />
+                  </td>
+                  <td className="w-10">{index + 1}</td>
                   <td>
                     <span
                       onClick={() => {
                         setIsModalOpen(!isModalOpen);
                         setSelectedOrder(order);
                       }}
-                      className="p-1 text-2xl text-success"
+                      className="cursor-pointer p-1 text-2xl text-success"
                     >
                       <TbFileInvoice />
                     </span>
                   </td>
-                  <td className="flex flex-col gap-1">
+                  <td className="flex w-96 flex-col gap-1">
                     <div className="flex items-center space-x-3">
                       {/* <div className="avatar">
                         <div className="mask mask-squircle h-12 w-12">
@@ -371,7 +438,7 @@ const AllReadyOrders = () => {
                       ))}
                     </div>
                   </td> */}
-                  <td>
+                  <td className="w-96">
                     <div className="flex flex-col">
                       <p className="badge badge-info">
                         {order?.courier}: {order?.deliveryCharge}

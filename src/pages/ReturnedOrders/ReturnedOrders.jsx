@@ -12,17 +12,17 @@ import { RiArrowGoBackLine } from "react-icons/ri";
 import { TbFileInvoice } from "react-icons/tb";
 import InvoiceGenerator from "../../components/Main/shared/InvoiceGenerator/InvoiceGenerator";
 import { StateContext } from "@/contexts/StateProvider/StateProvider";
+import SingleInvoiceGenerator from "@/components/Main/shared/InvoiceGenerator/SingleInvoiceGenerator";
 
 const ReturnedOrders = () => {
-  const { userInfo } = useContext(StateContext);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const { userInfo, selectedOrders, setSelectedOrders } =
+    useContext(StateContext);
   const [selectedOrder, setSelectedOrder] = useState({});
-
-  console.log(isEditModalOpen);
-  console.log(selectedOrder);
-
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  useEffect(() => {
+    setSelectedOrders([]);
+  }, []);
 
   const {
     data: orders,
@@ -87,10 +87,14 @@ const ReturnedOrders = () => {
 
   // console.log(isModalOpen);
 
+  console.log("selected order ", selectedOrder);
+
   return (
     <div className="space-y-4">
       <ModalBox isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen}>
-        <InvoiceGenerator order={selectedOrder} />
+        <div>
+          <SingleInvoiceGenerator order={selectedOrder} />
+        </div>
       </ModalBox>
       <div className="flex items-start justify-between border-b py-3">
         <div>
@@ -102,6 +106,13 @@ const ReturnedOrders = () => {
           <p>Total Advance: ৳0.00</p>
         </div>
         <div className="flex items-center gap-4">
+          {selectedOrders?.length > 0 && (
+            <Link to="/invoice-generator">
+              <button className="btn-primary btn-outline btn">
+                Print Selected
+              </button>
+            </Link>
+          )}
           <button className="btn-primary btn-outline btn">
             Advance Search
           </button>
@@ -145,6 +156,21 @@ const ReturnedOrders = () => {
             {/* head */}
             <thead className="bg-primary text-white">
               <tr>
+                <td className="w-5">
+                  <input
+                    type="checkbox"
+                    defaultChecked={false}
+                    onClick={(e) => {
+                      if (e.target.checked) {
+                        setSelectedOrders(orders);
+                      } else {
+                        setSelectedOrders([]);
+                      }
+                    }}
+                    checked={selectedOrders?.length === orders?.length}
+                    className="checkbox border border-white"
+                  />
+                </td>
                 <th>#</th>
                 <th>Invoice</th>
                 <th>Name</th>
@@ -155,6 +181,25 @@ const ReturnedOrders = () => {
             <tbody className="bg-white">
               {orders?.map((order, index) => (
                 <tr key={index}>
+                  <td className="w-5">
+                    <input
+                      type="checkbox"
+                      defaultChecked={false}
+                      checked={selectedOrders.includes(order)}
+                      onClick={(e) => {
+                        if (e.target.checked) {
+                          setSelectedOrders([...selectedOrders, order]);
+                        } else {
+                          setSelectedOrders(
+                            selectedOrders.filter(
+                              (selectedOrder) => selectedOrder._id !== order._id
+                            )
+                          );
+                        }
+                      }}
+                      className="checkbox border border-black"
+                    />
+                  </td>
                   <td>{index + 1}</td>
                   <td>
                     <span
@@ -162,22 +207,13 @@ const ReturnedOrders = () => {
                         setIsModalOpen(!isModalOpen);
                         setSelectedOrder(order);
                       }}
-                      className="p-1 text-2xl text-success"
+                      className="cursor-pointer p-1 text-2xl text-success"
                     >
                       <TbFileInvoice />
                     </span>
                   </td>
-                  <td className="flex h-full flex-col justify-center gap-1">
+                  <td className="">
                     <div className="flex h-full items-center space-x-3">
-                      {/* <div className="avatar">
-                        <div className="mask mask-squircle h-12 w-12">
-                          <img
-                            src={order?.image || avatarIcon}
-                            alt="image"
-                            className="rounded-full border-2 border-primary p-1"
-                          />
-                        </div>
-                      </div> */}
                       <div>
                         <div className="font-bold">{order.name}</div>
                         <div className="text-sm opacity-50">
@@ -186,17 +222,6 @@ const ReturnedOrders = () => {
                       </div>
                     </div>
                   </td>
-                  {/* <td>
-                    <div className="avatar-group -space-x-6">
-                      {order.products?.map((product) => (
-                        <div key={product._id} className="avatar">
-                          <div className="w-12">
-                            <img src={product?.image} />
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </td> */}
                   <td>
                     <div className="flex flex-col">
                       <p className="badge badge-info">

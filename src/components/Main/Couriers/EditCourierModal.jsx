@@ -13,12 +13,16 @@ const EditCourierModal = ({
 
     const form = e.target;
     const name = form.name.value;
+    const api = form.api.value;
+    const secret = form.secret.value;
     const chargeInDhaka = form.chargeInDhaka.value;
     const chargeOutsideDhaka = form.chargeOutsideDhaka.value;
     const status = form.status.checked;
 
     const courier = {
       name,
+      api,
+      secret,
       chargeInDhaka,
       chargeOutsideDhaka,
       status,
@@ -59,30 +63,59 @@ const EditCourierModal = ({
         isModalOpen={isEditCourierModalOpen}
         setIsModalOpen={setIsEditCourierModalOpen}
       >
-        <div className="space-y-5 p-5">
+        <div className="w-96 space-y-5 p-5">
           <p>Courier Information</p>
           <form onSubmit={handleCourierSubmit} className="flex flex-col gap-3">
-            <input
-              type="text"
-              name="name"
-              className="input-bordered input"
-              placeholder="Name"
-              defaultValue={selectedCourier?.name}
-            />
-            <input
-              type="number"
-              name="chargeInDhaka"
-              className="input-bordered input"
-              placeholder="Price in Dhaka"
-              defaultValue={selectedCourier?.chargeInDhaka}
-            />
-            <input
-              type="number"
-              name="chargeOutsideDhaka"
-              className="input-bordered input"
-              placeholder="Price outside Dhaka"
-              defaultValue={selectedCourier?.chargeOutsideDhaka}
-            />
+            <label htmlFor="" className="space-y-1">
+              <p>Courier Name</p>
+              <input
+                type="text"
+                name="name"
+                className="input-bordered input w-full"
+                placeholder="Name"
+                defaultValue={selectedCourier?.name}
+              />
+            </label>
+            <label htmlFor="" className="space-y-1">
+              <p>Api-Key</p>
+              <input
+                type="text"
+                name="api"
+                className="input-bordered input w-full"
+                placeholder="Api Key"
+                defaultValue={selectedCourier?.api}
+              />
+            </label>
+            <label htmlFor="" className="space-y-1">
+              <p>Secret-Key</p>
+              <input
+                type="text"
+                name="secret"
+                className="input-bordered input w-full"
+                placeholder="Secret key"
+                defaultValue={selectedCourier?.secret}
+              />
+            </label>
+            <label htmlFor="" className="space-y-1">
+              <p>Charge In Dhaka</p>
+              <input
+                type="number"
+                name="chargeInDhaka"
+                className="input-bordered input w-full"
+                placeholder="Price in Dhaka"
+                defaultValue={selectedCourier?.chargeInDhaka}
+              />
+            </label>
+            <label htmlFor="" className="space-y-1">
+              <p>Charge Outside Dhaka</p>
+              <input
+                type="number"
+                name="chargeOutsideDhaka"
+                className="input-bordered input w-full"
+                placeholder="Price outside Dhaka"
+                defaultValue={selectedCourier?.chargeOutsideDhaka}
+              />
+            </label>
             <div className="form-control w-52">
               <label className="label cursor-pointer">
                 <span className="label-text">Status</span>

@@ -17,7 +17,7 @@ const Transaction = () => {
     isError,
     error,
     refetch,
-  } = useQuery("orders", async () => {
+  } = useQuery(["orders", userInfo], async () => {
     const response = await fetch(
       `${import.meta.env.VITE_SERVER_URL}/order/get-orders?sellerId=${
         userInfo?.role === "Admin" ? userInfo?._id : userInfo?.sellerId

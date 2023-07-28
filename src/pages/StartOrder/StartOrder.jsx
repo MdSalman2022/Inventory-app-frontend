@@ -8,6 +8,7 @@ import avatarIcon from "../../assets/shared/avatar.png";
 import DeleteCustomerModal from "../../components/Main/Customers/DeleteCustomerModal";
 import StartOrderModal from "../../components/Main/StartOrder/StartOrderModal";
 import { StateContext } from "@/contexts/StateProvider/StateProvider";
+import { Link } from "react-router-dom";
 
 const StartOrder = () => {
   const { userInfo, couriers } = useContext(StateContext);
@@ -40,6 +41,10 @@ const StartOrder = () => {
         console.log(data);
         if (data.success) {
           toast.success("Customer Found!!");
+          if (customerSearchKey.match(/^\d+$/)) {
+            setIsStartNewOrderOpen(true);
+            setSelectedCustomer(data.customers[0]);
+          }
           setSearchResults(data.customers);
         } else {
           toast.error("Customer Not Found!!");
@@ -139,9 +144,12 @@ const StartOrder = () => {
                       </div>
                     </div>
                     <div>
-                      <div className="font-bold">
-                        {customer.customer_details.name}
-                      </div>
+                      <Link
+                        to={`/customer/profile/${customer?._id}`}
+                        className="font-bold text-info"
+                      >
+                        {customer?.customer_details?.name}
+                      </Link>
                       <div className="text-sm opacity-50">
                         {customer.customer_details.location}
                       </div>
