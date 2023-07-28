@@ -129,13 +129,51 @@ const AllReadyOrders = () => {
     )
       .then((res) => res.json())
       .then((data) => {
-        console.log(data);
+        console.log("update status ", data);
         refetch();
+        updateCustomer(data?.order?.customerId, status);
         toast.success("Order status updated successfully");
       })
       .catch((err) => {
         console.log(err);
         toast.error("Failed to update order status");
+      });
+  };
+
+  const updateCustomer = (id, status) => {
+    console.log("update customer ");
+    const payload = {};
+
+    if (status === "completed") {
+      payload.completedCount = 1;
+    } else if (status === "cancelled") {
+      payload.cancelledCount = 1;
+    } else if (status === "processing") {
+      payload.processingCount = 1;
+    }
+
+    fetch(
+      `${import.meta.env.VITE_SERVER_URL}/customer/update-order-count?id=${id}`,
+      {
+        method: "PUT",
+        headers: {
+          "content-type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      }
+    )
+      .then((res) => res.json())
+      .then((result) => {
+        console.log("result update customer ", result);
+        if (result.success) {
+          console.log("customer updated successfully");
+        } else {
+          toast.error("Something went wrong");
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        toast.error("Something went wrong");
       });
   };
 
@@ -215,6 +253,51 @@ const AllReadyOrders = () => {
     }
   };
 
+  const [searchResult, setSearchResult] = useState([]);
+
+  const SearchOrderById = async (event) => {
+    event.preventDefault();
+    const form = event.target;
+    const orderId = form.orderId.value;
+
+    console.log("orderId ", orderId);
+
+    try {
+      const response = await fetch(
+        `${
+          import.meta.env.VITE_SERVER_URL
+        }/order/search-order?orderId=${orderId}&sellerId=${
+          userInfo?.role === "Admin" ? userInfo?._id : userInfo?.sellerId
+        }`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      if (response.ok) {
+        const resultFromDB = await response.json();
+        if (resultFromDB.success) {
+          console.log("order info", resultFromDB);
+          toast.success("Order found successfully");
+          setSearchResult(resultFromDB.orders);
+        } else {
+          toast.error("Failed to find order");
+        }
+      } else {
+        toast.error("Failed to find order");
+        throw new Error("Failed to find order");
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to find order");
+    }
+  };
+
+  console.log("search result", searchResult);
+  console.log("orders ", orders);
+
   return (
     <div className="space-y-4">
       <EditOrderModal
@@ -285,10 +368,15 @@ const AllReadyOrders = () => {
           </select>
           <p>entries</p>
         </div>
-        <div className="flex items-center gap-2">
+        <form onSubmit={SearchOrderById} className="flex items-center gap-2">
           <p>Search</p>
-          <input type="text" className="input-bordered input" />
-        </div>
+          <input
+            type="text"
+            name="orderId"
+            placeholder="Order Id"
+            className="input-bordered input"
+          />
+        </form>
       </div>
 
       <div>
@@ -319,42 +407,44 @@ const AllReadyOrders = () => {
               </tr>
             </thead>
             <tbody className="bg-white">
-              {orders?.map((order, index) => (
-                <tr key={index}>
-                  <td className="w-5">
-                    <input
-                      type="checkbox"
-                      defaultChecked={false}
-                      checked={selectedOrders.includes(order)}
-                      onClick={(e) => {
-                        if (e.target.checked) {
-                          setSelectedOrders([...selectedOrders, order]);
-                        } else {
-                          setSelectedOrders(
-                            selectedOrders.filter(
-                              (selectedOrder) => selectedOrder._id !== order._id
-                            )
-                          );
-                        }
-                      }}
-                      className="checkbox border border-black"
-                    />
-                  </td>
-                  <td className="w-10">{index + 1}</td>
-                  <td>
-                    <span
-                      onClick={() => {
-                        setIsModalOpen(!isModalOpen);
-                        setSelectedOrder(order);
-                      }}
-                      className="cursor-pointer p-1 text-2xl text-success"
-                    >
-                      <TbFileInvoice />
-                    </span>
-                  </td>
-                  <td className="flex w-96 flex-col gap-1">
-                    <div className="flex items-center space-x-3">
-                      {/* <div className="avatar">
+              {(searchResult?.length > 0 ? searchResult : orders)?.map(
+                (order, index) => (
+                  <tr key={index}>
+                    <td className="w-5">
+                      <input
+                        type="checkbox"
+                        defaultChecked={false}
+                        checked={selectedOrders.includes(order)}
+                        onClick={(e) => {
+                          if (e.target.checked) {
+                            setSelectedOrders([...selectedOrders, order]);
+                          } else {
+                            setSelectedOrders(
+                              selectedOrders.filter(
+                                (selectedOrder) =>
+                                  selectedOrder._id !== order._id
+                              )
+                            );
+                          }
+                        }}
+                        className="checkbox border border-black"
+                      />
+                    </td>
+                    <td className="w-10">{index + 1}</td>
+                    <td>
+                      <span
+                        onClick={() => {
+                          setIsModalOpen(!isModalOpen);
+                          setSelectedOrder(order);
+                        }}
+                        className="cursor-pointer p-1 text-2xl text-success"
+                      >
+                        <TbFileInvoice />
+                      </span>
+                    </td>
+                    <td className="flex w-96 flex-col gap-1">
+                      <div className="flex items-center space-x-3">
+                        {/* <div className="avatar">
                         <div className="mask mask-squircle h-12 w-12">
                           <img
                             src={order?.image || avatarIcon}
@@ -363,71 +453,71 @@ const AllReadyOrders = () => {
                           />
                         </div>
                       </div> */}
-                      <div>
-                        <div className="font-bold">{order.name}</div>
-                        <div className="text-sm opacity-50">
-                          {order.address}
-                        </div>
-                        {order?.courierStatus === "sent" && (
+                        <div>
+                          <div className="font-bold">{order.name}</div>
                           <div className="text-sm opacity-50">
-                            ConsignmentID:{" "}
-                            {order.courierInfo?.consignment?.consignment_id}
+                            {order.address}
                           </div>
-                        )}
+                          {order?.courierStatus === "sent" && (
+                            <div className="text-sm opacity-50">
+                              ConsignmentID:{" "}
+                              {order.courierInfo?.consignment?.consignment_id}
+                            </div>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span
-                        onClick={() => {
-                          setSelectedOrder(order);
-                          setIsEditModalOpen(!isEditModalOpen);
-                        }}
-                        className="cursor-pointer rounded-full border border-gray-500 p-1 text-2xl text-neutral"
-                      >
-                        <AiOutlineEdit />
-                      </span>
-                      <span
-                        onClick={() => {
-                          handleOrderStatus(order._id, "completed");
-                        }}
-                        className="tooltip cursor-pointer rounded-full border border-gray-500 p-1 text-2xl text-info"
-                        data-tip="Complete"
-                      >
-                        <FaCheck className="text-lg" />
-                      </span>
-                      {(!order?.courierStatus ||
-                        order?.courierStatus === "returned") && (
+                      <div className="flex items-center gap-2">
                         <span
                           onClick={() => {
-                            sendToCourier(order);
+                            setSelectedOrder(order);
+                            setIsEditModalOpen(!isEditModalOpen);
+                          }}
+                          className="cursor-pointer rounded-full border border-gray-500 p-1 text-2xl text-neutral"
+                        >
+                          <AiOutlineEdit />
+                        </span>
+                        <span
+                          onClick={() => {
+                            handleOrderStatus(order._id, "completed");
                           }}
                           className="tooltip cursor-pointer rounded-full border border-gray-500 p-1 text-2xl text-info"
-                          data-tip={`Send to ${order?.courier} `}
+                          data-tip="Complete"
                         >
-                          <GrDeliver className="text-lg" />
+                          <FaCheck className="text-lg" />
                         </span>
-                      )}
-                      <span
-                        onClick={() => {
-                          handleOrderStatus(order._id, "processing");
-                        }}
-                        className="tooltip cursor-pointer rounded-full border border-gray-500 p-1 text-2xl text-error"
-                        data-tip="Back to Processing"
-                      >
-                        <RiArrowGoBackLine className="text-lg" />
-                      </span>
-                      <span
-                        onClick={() => {
-                          handleOrderStatus(order._id, "cancelled");
-                        }}
-                        className="tooltip cursor-pointer rounded-full border border-gray-500 p-1 text-2xl text-error"
-                        data-tip="Cancel Order"
-                      >
-                        <FcCancel className="text-lg" />
-                      </span>
-                    </div>
-                  </td>
-                  {/* <td>
+                        {(!order?.courierStatus ||
+                          order?.courierStatus === "returned") && (
+                          <span
+                            onClick={() => {
+                              sendToCourier(order);
+                            }}
+                            className="tooltip cursor-pointer rounded-full border border-gray-500 p-1 text-2xl text-info"
+                            data-tip={`Send to ${order?.courier} `}
+                          >
+                            <GrDeliver className="text-lg" />
+                          </span>
+                        )}
+                        <span
+                          onClick={() => {
+                            handleOrderStatus(order._id, "processing");
+                          }}
+                          className="tooltip cursor-pointer rounded-full border border-gray-500 p-1 text-2xl text-error"
+                          data-tip="Back to Processing"
+                        >
+                          <RiArrowGoBackLine className="text-lg" />
+                        </span>
+                        <span
+                          onClick={() => {
+                            handleOrderStatus(order._id, "cancelled");
+                          }}
+                          className="tooltip cursor-pointer rounded-full border border-gray-500 p-1 text-2xl text-error"
+                          data-tip="Cancel Order"
+                        >
+                          <FcCancel className="text-lg" />
+                        </span>
+                      </div>
+                    </td>
+                    {/* <td>
                     <div className="avatar-group -space-x-6">
                       {order.products?.map((product) => (
                         <div key={product._id} className="avatar">
@@ -438,43 +528,29 @@ const AllReadyOrders = () => {
                       ))}
                     </div>
                   </td> */}
-                  <td className="w-96">
-                    <div className="flex flex-col">
-                      <p className="badge badge-info">
-                        {order?.courier}: {order?.deliveryCharge}
-                      </p>
-                      <p>Quantity: {order?.quantity}</p>
-                      <p className="">Price: {order?.total} Tk</p>
-                      <p className="">Discount: {order?.discount} Tk</p>
-                      <p className="">
-                        Total Bill:{" "}
-                        {parseInt(order?.total) +
-                          parseInt(order?.deliveryCharge) -
-                          order?.discount}
-                        Tk
-                      </p>
-                      <p className="">Advance: {order?.advance} Tk</p>
-                      <p className="">COD: {order?.cash} Tk</p>
-                    </div>
-                  </td>
-                </tr>
-              ))}
+                    <td className="w-96">
+                      <div className="flex flex-col">
+                        <p className="badge badge-info">
+                          {order?.courier}: {order?.deliveryCharge}
+                        </p>
+                        <p>Quantity: {order?.quantity}</p>
+                        <p className="">Price: {order?.total} Tk</p>
+                        <p className="">Discount: {order?.discount} Tk</p>
+                        <p className="">
+                          Total Bill:{" "}
+                          {parseInt(order?.total) +
+                            parseInt(order?.deliveryCharge) -
+                            order?.discount}
+                          Tk
+                        </p>
+                        <p className="">Advance: {order?.advance} Tk</p>
+                        <p className="">COD: {order?.cash} Tk</p>
+                      </div>
+                    </td>
+                  </tr>
+                )
+              )}
             </tbody>
-            <tfoot className="bg-white">
-              <tr>
-                <th>Showing 1 to 2 of 2 entries</th>
-                <th></th>
-                <th></th>
-                {/* <th></th> */}
-                <th className="flex justify-end">
-                  <div className="join">
-                    <button className="join-item btn">Previous</button>
-                    <button className="btn-primary join-item btn">1</button>
-                    <button className="join-item btn ">Next</button>
-                  </div>
-                </th>
-              </tr>
-            </tfoot>
           </table>
         </div>
       </div>

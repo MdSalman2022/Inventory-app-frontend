@@ -29,6 +29,7 @@ import AccountDisabledPage from "@/pages/AccountDisabledPage/AccountDisabledPage
 import Marchants from "@/pages/Marchants/Marchants";
 import SellerProfile from "@/pages/SellerProfile/SellerProfile";
 import InvoiceGenerator from "@/components/Main/shared/InvoiceGenerator/InvoiceGenerator";
+import AllOrdersSearch from "@/pages/AllOrdersSearch/AllOrdersSearch";
 
 export const router = createBrowserRouter([
   {
@@ -210,6 +211,14 @@ export const router = createBrowserRouter([
         element: (
           <PrivateRoute>
             <InvoiceGenerator />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "/orders/all",
+        element: (
+          <PrivateRoute>
+            <AllOrdersSearch />
           </PrivateRoute>
         ),
       },

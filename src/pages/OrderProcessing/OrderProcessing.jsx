@@ -13,17 +13,20 @@ import { FaCheck } from "react-icons/fa";
 import DeleteOrderModal from "../../components/Main/Orders/DeleteOrderModal";
 import InvoiceGenerator from "../../components/Main/shared/InvoiceGenerator/InvoiceGenerator";
 import { StateContext } from "@/contexts/StateProvider/StateProvider";
+import SingleInvoiceGenerator from "@/components/Main/shared/InvoiceGenerator/SingleInvoiceGenerator";
+import EditOrderModal from "@/components/Main/Orders/EditOrderModal";
 
 const OrderProcessing = () => {
-  const { userInfo } = useContext(StateContext);
+  const { userInfo, selectedOrders, setSelectedOrders } =
+    useContext(StateContext);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState({});
-
-  console.log(isEditModalOpen);
-  console.log(selectedOrder);
-
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  useEffect(() => {
+    setSelectedOrders([]);
+  }, []);
 
   const {
     data: orders,
@@ -154,7 +157,9 @@ const OrderProcessing = () => {
       )
         .then((res) => res.json())
         .then((data) => {
-          console.log(data);
+          console.log("status update ", data);
+          console.log("customer id ", order?.customerId);
+          updateCustomer(order?.customerId);
           refetch();
           toast.success("Order status updated successfully");
         })
@@ -165,12 +170,95 @@ const OrderProcessing = () => {
     }
   };
 
+  const updateCustomer = (id) => {
+    console.log("update customer ");
+    fetch(
+      `${import.meta.env.VITE_SERVER_URL}/customer/update-order-count?id=${id}`,
+      {
+        method: "PUT",
+        headers: {
+          "content-type": "application/json",
+        },
+        body: JSON.stringify({
+          readyCount: 1,
+        }),
+      }
+    )
+      .then((res) => res.json())
+      .then((result) => {
+        console.log(result);
+        if (result.success) {
+          console.log("customer updated successfully");
+        } else {
+          toast.error("Something went wrong");
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        toast.error("Something went wrong");
+      });
+  };
+
   console.log(selectedOrder);
+
+  const [searchResult, setSearchResult] = useState([]);
+
+  const SearchOrderById = async (event) => {
+    event.preventDefault();
+    const form = event.target;
+    const orderId = form.orderId.value;
+
+    console.log("orderId ", orderId);
+
+    try {
+      const response = await fetch(
+        `${
+          import.meta.env.VITE_SERVER_URL
+        }/order/search-order?orderId=${orderId}&sellerId=${
+          userInfo?.role === "Admin" ? userInfo?._id : userInfo?.sellerId
+        }`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      if (response.ok) {
+        const resultFromDB = await response.json();
+        if (resultFromDB.success) {
+          console.log("order info", resultFromDB);
+          toast.success("Order found successfully");
+          setSearchResult(resultFromDB.orders);
+        } else {
+          toast.error("Failed to find order");
+        }
+      } else {
+        toast.error("Failed to find order");
+        throw new Error("Failed to find order");
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to find order");
+    }
+  };
+
+  console.log("search result", searchResult);
+  console.log("orders ", orders);
 
   return (
     <div className="space-y-4">
+      <EditOrderModal
+        isEditModalOpen={isEditModalOpen}
+        setIsEditModalOpen={setIsEditModalOpen}
+        setSelectedOrder={setSelectedOrder}
+        selectedOrder={selectedOrder}
+        refetch={refetch}
+      />
       <ModalBox isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen}>
-        <InvoiceGenerator order={selectedOrder} />
+        <div>
+          <SingleInvoiceGenerator order={selectedOrder} />
+        </div>
       </ModalBox>
       <DeleteOrderModal
         setIsDeleteModalOpen={setIsDeleteModalOpen}
@@ -188,6 +276,13 @@ const OrderProcessing = () => {
           <p>Total Advance: ৳0.00</p>
         </div>
         <div className="flex items-center gap-4">
+          {selectedOrders?.length > 0 && (
+            <Link to="/invoice-generator">
+              <button className="btn-primary btn-outline btn">
+                Print Selected
+              </button>
+            </Link>
+          )}
           <button className="btn-primary btn-outline btn">
             Advance Search
           </button>
@@ -216,10 +311,15 @@ const OrderProcessing = () => {
           </select>
           <p>entries</p>
         </div>
-        <div className="flex items-center gap-2">
+        <form onSubmit={SearchOrderById} className="flex items-center gap-2">
           <p>Search</p>
-          <input type="text" className="input-bordered input" />
-        </div>
+          <input
+            type="text"
+            name="orderId"
+            placeholder="Order Id"
+            className="input-bordered input"
+          />
+        </form>
       </div>
 
       <div>
@@ -228,6 +328,21 @@ const OrderProcessing = () => {
             {/* head */}
             <thead className="bg-primary text-white">
               <tr>
+                <td className="w-5">
+                  <input
+                    type="checkbox"
+                    defaultChecked={false}
+                    onClick={(e) => {
+                      if (e.target.checked) {
+                        setSelectedOrders(orders);
+                      } else {
+                        setSelectedOrders([]);
+                      }
+                    }}
+                    checked={selectedOrders?.length === orders?.length}
+                    className="checkbox border border-white"
+                  />
+                </td>
                 <th>#</th>
                 <th>Invoice</th>
                 <th>Name</th>
@@ -236,23 +351,44 @@ const OrderProcessing = () => {
               </tr>
             </thead>
             <tbody className="bg-white">
-              {orders?.map((order, index) => (
-                <tr key={index}>
-                  <td>{index + 1}</td>
-                  <td>
-                    <span
-                      onClick={() => {
-                        setIsModalOpen(!isModalOpen);
-                        setSelectedOrder(order);
-                      }}
-                      className="p-1 text-2xl text-success"
-                    >
-                      <TbFileInvoice />
-                    </span>
-                  </td>
-                  <td className="flex flex-col gap-1">
-                    <div className="flex items-center space-x-3">
-                      {/* <div className="avatar">
+              {(searchResult?.length > 0 ? searchResult : orders)?.map(
+                (order, index) => (
+                  <tr key={index}>
+                    <td className="w-5">
+                      <input
+                        type="checkbox"
+                        defaultChecked={false}
+                        checked={selectedOrders.includes(order)}
+                        onClick={(e) => {
+                          if (e.target.checked) {
+                            setSelectedOrders([...selectedOrders, order]);
+                          } else {
+                            setSelectedOrders(
+                              selectedOrders.filter(
+                                (selectedOrder) =>
+                                  selectedOrder._id !== order._id
+                              )
+                            );
+                          }
+                        }}
+                        className="checkbox border border-black"
+                      />
+                    </td>
+                    <td>{index + 1}</td>
+                    <td>
+                      <span
+                        onClick={() => {
+                          setIsModalOpen(!isModalOpen);
+                          setSelectedOrder(order);
+                        }}
+                        className="p-1 text-2xl text-success"
+                      >
+                        <TbFileInvoice />
+                      </span>
+                    </td>
+                    <td className="flex flex-col gap-1">
+                      <div className="flex items-center space-x-3">
+                        {/* <div className="avatar">
                         <div className="mask mask-squircle h-12 w-12">
                           <img
                             src={order?.image || avatarIcon}
@@ -261,54 +397,64 @@ const OrderProcessing = () => {
                           />
                         </div>
                       </div> */}
-                      <div>
-                        <div className="font-bold">{order.name}</div>
-                        <div className="text-sm opacity-50">
-                          {order.address}
+                        <div>
+                          <div className="font-bold">{order.name}</div>
+                          <div className="text-sm opacity-50">
+                            {order.address}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div
-                        onClick={() => {
-                          handleOrderStatus(order);
-                        }}
-                        className="tooltip cursor-pointer rounded-full border border-gray-500 p-1 text-2xl text-info"
-                        data-tip="Ready"
-                      >
-                        <FaCheck className="text-lg" />
+                      <div className="flex items-center gap-2">
+                        <span
+                          onClick={() => {
+                            setSelectedOrder(order);
+                            setIsEditModalOpen(!isEditModalOpen);
+                          }}
+                          className="cursor-pointer rounded-full border border-gray-500 p-1 text-2xl text-neutral"
+                        >
+                          <AiOutlineEdit />
+                        </span>
+                        <div
+                          onClick={() => {
+                            handleOrderStatus(order);
+                          }}
+                          className="tooltip cursor-pointer rounded-full border border-gray-500 p-1 text-2xl text-info"
+                          data-tip="Ready"
+                        >
+                          <FaCheck className="text-lg" />
+                        </div>
+                        <div
+                          onClick={() => {
+                            setIsDeleteModalOpen(true);
+                            setSelectedOrder(order);
+                          }}
+                          className="tooltip cursor-pointer rounded-full border border-error p-1 text-2xl text-error"
+                          data-tip="Delete order"
+                        >
+                          <RiDeleteBin6Line />
+                        </div>
                       </div>
-                      <div
-                        onClick={() => {
-                          setIsDeleteModalOpen(true);
-                          setSelectedOrder(order);
-                        }}
-                        className="tooltip cursor-pointer rounded-full border border-error p-1 text-2xl text-error"
-                        data-tip="Delete order"
-                      >
-                        <RiDeleteBin6Line />
+                    </td>
+                    {/* <td></td> */}
+                    <td>
+                      <div className="flex flex-col">
+                        <p className="badge badge-info">
+                          {order?.courier}: {order?.deliveryCharge}
+                        </p>
+                        <p>Quantity: {order?.quantity}</p>
+                        <p className="">Price: {order?.total}</p>
+                        <p className="">
+                          Total Bill:{" "}
+                          {parseInt(order?.total) +
+                            parseInt(order?.deliveryCharge)}
+                        </p>
+                        <p className="">Advance: {order?.advance}</p>
+                        <p className="">COD: {order?.cash}</p>
                       </div>
-                    </div>
-                  </td>
-                  {/* <td></td> */}
-                  <td>
-                    <div className="flex flex-col">
-                      <p className="badge badge-info">
-                        {order?.courier}: {order?.deliveryCharge}
-                      </p>
-                      <p>Quantity: {order?.quantity}</p>
-                      <p className="">Price: {order?.total}</p>
-                      <p className="">
-                        Total Bill:{" "}
-                        {parseInt(order?.total) +
-                          parseInt(order?.deliveryCharge)}
-                      </p>
-                      <p className="">Advance: {order?.advance}</p>
-                      <p className="">COD: {order?.cash}</p>
-                    </div>
-                  </td>
-                </tr>
-              ))}
+                    </td>
+                  </tr>
+                )
+              )}
             </tbody>
             <tfoot className="bg-white">
               <tr>

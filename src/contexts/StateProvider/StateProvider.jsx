@@ -8,6 +8,7 @@ const StateProvider = ({ children }) => {
   // const [allData, setAllData] = useState([]);
   const { user } = useContext(AuthContext);
 
+  const [searchOrder, setSearchOrder] = useState([]);
   const [designerId, setDesignerId] = useState("");
 
   const {
@@ -150,6 +151,8 @@ const StateProvider = ({ children }) => {
     refetchSuppliers,
     selectedOrders,
     setSelectedOrders,
+    searchOrder,
+    setSearchOrder,
   };
 
   return (

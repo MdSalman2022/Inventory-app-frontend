@@ -102,13 +102,43 @@ const CompletedOrders = () => {
     )
       .then((res) => res.json())
       .then((data) => {
-        console.log(data);
+        console.log("update status ", data);
         refetch();
+        updateCustomer(data?.order?.customerId);
         toast.success("Order status updated successfully");
       })
       .catch((err) => {
         console.log(err);
         toast.error("Failed to update order status");
+      });
+  };
+
+  const updateCustomer = (id) => {
+    console.log("update customer ");
+    fetch(
+      `${import.meta.env.VITE_SERVER_URL}/customer/update-order-count?id=${id}`,
+      {
+        method: "PUT",
+        headers: {
+          "content-type": "application/json",
+        },
+        body: JSON.stringify({
+          returnedCount: 1,
+        }),
+      }
+    )
+      .then((res) => res.json())
+      .then((result) => {
+        console.log("result update customer ", result);
+        if (result.success) {
+          console.log("customer updated successfully");
+        } else {
+          toast.error("Something went wrong");
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        toast.error("Something went wrong");
       });
   };
 
