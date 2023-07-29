@@ -278,17 +278,8 @@ const AllOrdersSearch = () => {
                       <TbFileInvoice />
                     </span>
                   </td>
-                  <td className="flex w-96 flex-col gap-1">
+                  <td className="w-96 space-y-2">
                     <div className="flex items-center space-x-3">
-                      {/* <div className="avatar">
-                        <div className="mask mask-squircle h-12 w-12">
-                          <img
-                            src={order?.image || avatarIcon}
-                            alt="image"
-                            className="rounded-full border-2 border-primary p-1"
-                          />
-                        </div>
-                      </div> */}
                       <div>
                         <div className="font-bold">{order.name}</div>
                         <div className="text-sm opacity-50">
@@ -319,7 +310,8 @@ const AllOrdersSearch = () => {
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
-                      {order?.orderStatus === ("ready" || "processing") && (
+                      {(order?.orderStatus === "ready" ||
+                        order?.orderStatus === "processing") && (
                         <span
                           onClick={() => {
                             setSelectedOrder(order);
@@ -330,13 +322,23 @@ const AllOrdersSearch = () => {
                           <AiOutlineEdit />
                         </span>
                       )}
-                      {order?.orderStatus === "ready" && (
+                      {(order?.orderStatus === "ready" ||
+                        order?.orderStatus === "processing") && (
                         <span
                           onClick={() => {
-                            handleOrderStatus(order._id, "completed");
+                            handleOrderStatus(
+                              order._id,
+                              order?.orderStatus === "ready"
+                                ? "completed"
+                                : "ready"
+                            );
                           }}
                           className="tooltip cursor-pointer rounded-full border border-gray-500 p-1 text-2xl text-info"
-                          data-tip="Complete"
+                          data-tip={
+                            order?.orderStatus === "ready"
+                              ? "completed"
+                              : "ready"
+                          }
                         >
                           <FaCheck className="text-lg" />
                         </span>
@@ -352,24 +354,28 @@ const AllOrdersSearch = () => {
                           <GrDeliver className="text-lg" />
                         </span>
                       )}
-                      <span
-                        onClick={() => {
-                          handleOrderStatus(order._id, "processing");
-                        }}
-                        className="tooltip cursor-pointer rounded-full border border-gray-500 p-1 text-2xl text-error"
-                        data-tip="Back to Processing"
-                      >
-                        <RiArrowGoBackLine className="text-lg" />
-                      </span>
-                      <span
-                        onClick={() => {
-                          handleOrderStatus(order._id, "cancelled");
-                        }}
-                        className="tooltip cursor-pointer rounded-full border border-gray-500 p-1 text-2xl text-error"
-                        data-tip="Cancel Order"
-                      >
-                        <FcCancel className="text-lg" />
-                      </span>
+                      {order?.orderStatus === "ready" && (
+                        <span
+                          onClick={() => {
+                            handleOrderStatus(order._id, "processing");
+                          }}
+                          className="tooltip cursor-pointer rounded-full border border-gray-500 p-1 text-2xl text-error"
+                          data-tip="Back to Processing"
+                        >
+                          <RiArrowGoBackLine className="text-lg" />
+                        </span>
+                      )}
+                      {order?.orderStatus === "ready" && (
+                        <span
+                          onClick={() => {
+                            handleOrderStatus(order._id, "cancelled");
+                          }}
+                          className="tooltip cursor-pointer rounded-full border border-gray-500 p-1 text-2xl text-error"
+                          data-tip="Cancel Order"
+                        >
+                          <FcCancel className="text-lg" />
+                        </span>
+                      )}
                     </div>
                   </td>
                   {/* <td>
