@@ -294,6 +294,22 @@ const AllOrdersSearch = () => {
                         <div className="text-sm opacity-50">
                           {order.address}
                         </div>
+                        <div
+                          className={`badge ${
+                            order?.orderStatus === "returned"
+                              ? "badge-warning"
+                              : order?.orderStatus === "cancelled"
+                              ? "badge-error"
+                              : order?.orderStatus === "processing"
+                              ? "badge-info"
+                              : order?.orderStatus === "ready"
+                              ? "badge-primary"
+                              : order?.orderStatus === "completed" &&
+                                "badge-success"
+                          }`}
+                        >
+                          {order?.orderStatus}
+                        </div>
                         {order?.courierStatus === "sent" && (
                           <div className="text-sm opacity-50">
                             ConsignmentID:{" "}
@@ -303,26 +319,29 @@ const AllOrdersSearch = () => {
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span
-                        onClick={() => {
-                          setSelectedOrder(order);
-                          setIsEditModalOpen(!isEditModalOpen);
-                        }}
-                        className="cursor-pointer rounded-full border border-gray-500 p-1 text-2xl text-neutral"
-                      >
-                        <AiOutlineEdit />
-                      </span>
-                      <span
-                        onClick={() => {
-                          handleOrderStatus(order._id, "completed");
-                        }}
-                        className="tooltip cursor-pointer rounded-full border border-gray-500 p-1 text-2xl text-info"
-                        data-tip="Complete"
-                      >
-                        <FaCheck className="text-lg" />
-                      </span>
-                      {(!order?.courierStatus ||
-                        order?.courierStatus === "returned") && (
+                      {order?.orderStatus === ("ready" || "processing") && (
+                        <span
+                          onClick={() => {
+                            setSelectedOrder(order);
+                            setIsEditModalOpen(!isEditModalOpen);
+                          }}
+                          className="cursor-pointer rounded-full border border-gray-500 p-1 text-2xl text-neutral"
+                        >
+                          <AiOutlineEdit />
+                        </span>
+                      )}
+                      {order?.orderStatus === "ready" && (
+                        <span
+                          onClick={() => {
+                            handleOrderStatus(order._id, "completed");
+                          }}
+                          className="tooltip cursor-pointer rounded-full border border-gray-500 p-1 text-2xl text-info"
+                          data-tip="Complete"
+                        >
+                          <FaCheck className="text-lg" />
+                        </span>
+                      )}
+                      {order?.orderStatus === "ready" && (
                         <span
                           onClick={() => {
                             sendToCourier(order);
