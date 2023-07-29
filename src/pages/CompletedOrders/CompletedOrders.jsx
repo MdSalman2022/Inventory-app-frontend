@@ -88,6 +88,14 @@ const CompletedOrders = () => {
   };
 
   const handleOrderStatus = (id, status) => {
+    const payload = {
+      orderStatus: status,
+      updatedBy: userInfo?.username,
+      updatedById: userInfo?._id,
+      update: {
+        orderStatus: status,
+      },
+    };
     fetch(
       `${import.meta.env.VITE_SERVER_URL}/order/edit-order-status?id=${id}`,
       {
@@ -95,9 +103,7 @@ const CompletedOrders = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          orderStatus: status,
-        }),
+        body: JSON.stringify(payload),
       }
     )
       .then((res) => res.json())

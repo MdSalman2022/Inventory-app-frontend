@@ -8,7 +8,6 @@ const StateProvider = ({ children }) => {
   // const [allData, setAllData] = useState([]);
   const { user } = useContext(AuthContext);
 
-  const [searchOrder, setSearchOrder] = useState([]);
   const [designerId, setDesignerId] = useState("");
 
   const {
@@ -41,6 +40,9 @@ const StateProvider = ({ children }) => {
       staleTime: 5 * 60 * 1000, // Consider data fresh for 10 minutes
     }
   );
+
+  const sellerId =
+    userInfo?.role === "Admin" ? userInfo?._id : userInfo?.sellerId;
 
   const {
     data: products,
@@ -136,6 +138,37 @@ const StateProvider = ({ children }) => {
   });
 
   const [selectedOrders, setSelectedOrders] = useState([]);
+  const [searchName, setSearchName] = useState("");
+
+  const fetchOrderByName = async () => {
+    const response = await fetch(
+      `${
+        import.meta.env.VITE_SERVER_URL
+      }/order/search-order-by-name?name=${searchName}&sellerId=${sellerId}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    if (!response.ok) {
+      throw new Error("Failed to fetch order");
+    }
+    return response.json();
+  };
+  const {
+    data: searchOrders,
+    isLoading,
+    isError,
+    error,
+    refetch: refetchSearch,
+  } = useQuery(
+    ["searchOrders"],
+    () => fetchOrderByName(searchName, sellerId) // Empty name as we don't have it initially
+  );
+
+  console.log("orders ", searchOrders);
 
   const stateInfo = {
     products,
@@ -151,8 +184,10 @@ const StateProvider = ({ children }) => {
     refetchSuppliers,
     selectedOrders,
     setSelectedOrders,
-    searchOrder,
-    setSearchOrder,
+    refetchSearch,
+    searchOrders,
+    fetchOrderByName,
+    setSearchName,
   };
 
   return (

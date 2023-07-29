@@ -1,20 +1,26 @@
+import DeleteOrderModal from "@/components/Main/Orders/DeleteOrderModal";
+import EditOrderModal from "@/components/Main/Orders/EditOrderModal";
+import SingleInvoiceGenerator from "@/components/Main/shared/InvoiceGenerator/SingleInvoiceGenerator";
+import ModalBox from "@/components/Main/shared/Modals/ModalBox";
 import { StateContext } from "@/contexts/StateProvider/StateProvider";
 import React, { useContext, useEffect, useState } from "react";
+import { toast } from "react-hot-toast";
 import { AiOutlineEdit } from "react-icons/ai";
 import { FaCheck } from "react-icons/fa";
 import { FcCancel } from "react-icons/fc";
 import { GrDeliver } from "react-icons/gr";
 import { RiArrowGoBackLine } from "react-icons/ri";
 import { TbFileInvoice } from "react-icons/tb";
+import { useQuery } from "react-query";
 import { useLocation, useParams } from "react-router-dom";
 
 const AllOrdersSearch = () => {
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const searchParam = queryParams.get("search");
-  const { searchOrder, setSearchOrder } = useContext(StateContext);
+  const { searchOrders } = useContext(StateContext);
 
-  const { userInfo, selectedOrders, setSelectedOrders } =
+  const { userInfo, selectedOrders, setSelectedOrders, refetchSearch } =
     useContext(StateContext);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState({});
@@ -27,11 +33,189 @@ const AllOrdersSearch = () => {
     setSelectedOrders([]);
   }, []);
 
-  console.log("search orders", searchOrder);
+  const handleOrderStatus = (id, status) => {
+    fetch(
+      `${import.meta.env.VITE_SERVER_URL}/order/edit-order-status?id=${id}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          orderStatus: status,
+        }),
+      }
+    )
+      .then((res) => res.json())
+      .then((data) => {
+        console.log("update status ", data);
+        refetchSearch();
+        updateCustomer(data?.order?.customerId, status);
+        toast.success("Order status updated successfully");
+      })
+      .catch((err) => {
+        console.log(err);
+        toast.error("Failed to update order status");
+      });
+  };
+
+  const updateCustomer = (id, status) => {
+    console.log("update customer ");
+    const payload = {};
+
+    if (status === "completed") {
+      payload.completedCount = 1;
+    } else if (status === "cancelled") {
+      payload.cancelledCount = 1;
+    } else if (status === "processing") {
+      payload.processingCount = 1;
+    }
+
+    fetch(
+      `${import.meta.env.VITE_SERVER_URL}/customer/update-order-count?id=${id}`,
+      {
+        method: "PUT",
+        headers: {
+          "content-type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      }
+    )
+      .then((res) => res.json())
+      .then((result) => {
+        console.log("result update customer ", result);
+        if (result.success) {
+          console.log("customer updated successfully");
+        } else {
+          toast.error("Something went wrong");
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        toast.error("Something went wrong");
+      });
+  };
+
+  console.log("selected order ", selectedOrder);
+  const fetchCouriers = async () => {
+    const res = await fetch(
+      `${import.meta.env.VITE_SERVER_URL}/courier/get-couriers?sellerId=${
+        userInfo?.role === "Admin" ? userInfo?._id : userInfo?.sellerId
+      }`
+    );
+    const data = await res.json();
+    return data.couriers;
+  };
+
+  const { data: couriers } = useQuery("couriers", fetchCouriers);
+
+  //find the courier info with regex
+  const steadFastCourier = couriers?.find((courier) =>
+    /steadfast/i.test(courier.name)
+  );
+
+  console.log("steadfast ", steadFastCourier);
+
+  const sendToCourier = async (order) => {
+    try {
+      const courier_info = {
+        invoice: order?.orderId,
+        recipient_name: order.name,
+        recipient_phone: order.phone,
+        recipient_address: order.address,
+        cod_amount: order.cash,
+        note: order.instruction,
+      };
+
+      const response = await fetch(
+        `${import.meta.env.VITE_STEADFAST_BASE_URL}/create_order`,
+        {
+          method: "POST",
+          headers: {
+            "Api-Key": steadFastCourier?.api,
+            "Secret-Key": steadFastCourier?.secret,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(courier_info),
+        }
+      );
+      console.log(response);
+      if (response.ok) {
+        const resultFromCourier = await response.json();
+        console.log("courier info", resultFromCourier);
+        if (resultFromCourier.status === 200) {
+          console.log(order);
+          toast.success("Order sent to courier successfully");
+          saveToDb(order, resultFromCourier);
+        }
+      } else {
+        toast.error("Failed to send order to courier");
+        throw new Error("Failed to send order to courier");
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to send order to courier");
+    }
+  };
+
+  const saveToDb = async (order, resultFromCourier) => {
+    console.log(order, resultFromCourier);
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_SERVER_URL}/order/edit-order-info?id=${
+          order._id
+        }`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            courierStatus: "sent",
+            courierInfo: resultFromCourier,
+          }),
+        }
+      );
+
+      if (response.ok) {
+        const resultFromDB = await response.json();
+        console.log("order info", resultFromDB);
+        toast.success("Courier data saved successfully");
+        refetchSearch();
+      } else {
+        toast.error("Failed to save courier data");
+        throw new Error("Failed to save courier data");
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to save courier data");
+    }
+  };
 
   return (
-    <div>
-      <p>Search result for: {searchParam}</p>
+    <div className="space-y-3">
+      <EditOrderModal
+        isEditModalOpen={isEditModalOpen}
+        setIsEditModalOpen={setIsEditModalOpen}
+        setSelectedOrder={setSelectedOrder}
+        selectedOrder={selectedOrder}
+        refetch={refetchSearch}
+      />
+      <ModalBox isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen}>
+        <div>
+          <SingleInvoiceGenerator order={selectedOrder} />
+        </div>
+      </ModalBox>
+      <DeleteOrderModal
+        setIsDeleteModalOpen={setIsDeleteModalOpen}
+        isDeleteModalOpen={isDeleteModalOpen}
+        setSelectedOrder={setSelectedOrder}
+        selectedOrder={selectedOrder}
+        refetch={refetchSearch}
+      />
+      <p className="text-xl">
+        Search result for: <span className="font-semibold">{searchParam}</span>
+      </p>
 
       <div>
         <div className="overflow-x-auto">
@@ -45,12 +229,12 @@ const AllOrdersSearch = () => {
                     defaultChecked={false}
                     onClick={(e) => {
                       if (e.target.checked) {
-                        setSelectedOrders(searchOrder);
+                        setSelectedOrders(searchOrders);
                       } else {
                         setSelectedOrders([]);
                       }
                     }}
-                    checked={selectedOrders?.length === searchOrder?.length}
+                    checked={selectedOrders?.length === searchOrders?.length}
                     className="checkbox border border-white"
                   />
                 </td>
@@ -61,7 +245,7 @@ const AllOrdersSearch = () => {
               </tr>
             </thead>
             <tbody className="bg-white">
-              {searchOrder?.map((order, index) => (
+              {searchOrders?.orders?.map((order, index) => (
                 <tr key={index}>
                   <td className="w-5">
                     <input

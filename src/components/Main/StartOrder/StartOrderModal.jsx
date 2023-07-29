@@ -358,6 +358,8 @@ const StartOrderModal = ({
           advance,
           cash,
           instruction,
+          createdBy: userInfo?.username,
+          createdById: userInfo?._id,
           timestamp: new Date().toISOString(),
         };
         const customerInfo = {

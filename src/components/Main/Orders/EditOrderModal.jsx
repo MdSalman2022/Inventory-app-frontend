@@ -19,7 +19,8 @@ const EditOrderModal = ({
   selectedOrder,
   refetch,
 }) => {
-  const { products, refetchProducts, couriers } = useContext(StateContext);
+  const { products, refetchProducts, couriers, userInfo } =
+    useContext(StateContext);
   const [productList, setProductList] = useState(selectedOrder?.products);
   const [totalPrice, setTotalPrice] = useState(selectedOrder?.total);
   const [cashCollect, setCashCollect] = useState(selectedOrder?.cash);
@@ -135,10 +136,34 @@ const EditOrderModal = ({
       advance,
       cash,
       instruction,
+      updatedBy: userInfo?.username,
+      updatedById: userInfo?._id,
+      update: {},
       timestamp: new Date().toISOString(),
     };
 
     console.log(orderUpdate);
+
+    const selectedOrderFields = [
+      "name",
+      "phone",
+      "address",
+      "district",
+      "products",
+      "courier",
+      "deliveryCharge",
+      "discount",
+      "total",
+      "advance",
+      "cash",
+      "instruction",
+    ];
+
+    selectedOrderFields.forEach((field) => {
+      if (orderUpdate[field] !== selectedOrder[field]) {
+        orderUpdate.update[field] = orderUpdate[field];
+      }
+    });
 
     try {
       const response = await fetch(

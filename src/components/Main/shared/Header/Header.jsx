@@ -5,7 +5,13 @@ import { StateContext } from "@/contexts/StateProvider/StateProvider";
 import { toast } from "react-hot-toast";
 
 const Header = () => {
-  const { userInfo, searchOrder, setSearchOrder } = useContext(StateContext);
+  const {
+    userInfo,
+    searchOrder,
+    fetchOrderByName,
+    refetchSearch,
+    setSearchName,
+  } = useContext(StateContext);
   const { user, logOut } = useContext(AuthContext);
 
   const menus = [
@@ -52,35 +58,13 @@ const Header = () => {
     const name = form.name.value;
 
     console.log("name ", name);
+    setSearchName(name);
 
     try {
-      const response = await fetch(
-        `${
-          import.meta.env.VITE_SERVER_URL
-        }/order/search-order-by-name?name=${name}&sellerId=${
-          userInfo?.role === "Admin" ? userInfo?._id : userInfo?.sellerId
-        }`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      if (response.ok) {
-        const resultFromDB = await response.json();
-        if (resultFromDB.success) {
-          console.log("order info", resultFromDB);
-          toast.success("Order found successfully");
-          setSearchOrder(resultFromDB.orders);
-          navigate(`/orders/all?search=${name}`);
-        } else {
-          toast.error("Failed to find order");
-        }
-      } else {
-        toast.error("Failed to find order");
-        throw new Error("Failed to find order");
-      }
+      await fetchOrderByName(name);
+      refetchSearch();
+      toast.success("Order found successfully");
+      navigate(`/orders/all?search=${name}`);
     } catch (error) {
       console.error(error);
       toast.error("Failed to find order");

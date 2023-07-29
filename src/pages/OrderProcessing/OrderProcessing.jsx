@@ -107,6 +107,13 @@ const OrderProcessing = () => {
             const payload = {
               orderId: data.orderId,
               orderStatus: "ready",
+              updatedBy: userInfo?.username,
+              updatedById: userInfo?._id,
+              update: {
+                oldOrderId: order?.orderId,
+                orderId: data.orderId,
+                orderStatus: "ready",
+              },
             };
 
             console.log("payload ", payload);
@@ -141,6 +148,15 @@ const OrderProcessing = () => {
           toast.error("Failed to update order status");
         });
     } else {
+      const payload = {
+        orderStatus: "ready",
+        updatedBy: userInfo?.username,
+        updatedById: userInfo?._id,
+        update: {
+          orderStatus: "ready",
+        },
+      };
+
       fetch(
         `${import.meta.env.VITE_SERVER_URL}/order/edit-order-status?id=${
           order._id
@@ -150,9 +166,7 @@ const OrderProcessing = () => {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({
-            orderStatus: "ready",
-          }),
+          body: JSON.stringify(payload),
         }
       )
         .then((res) => res.json())
