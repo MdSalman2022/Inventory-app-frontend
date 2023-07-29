@@ -13,7 +13,7 @@ import { GrDeliver } from "react-icons/gr";
 import { RiArrowGoBackLine, RiDeleteBin6Line } from "react-icons/ri";
 import { TbFileInvoice } from "react-icons/tb";
 import { useQuery } from "react-query";
-import { useLocation, useParams } from "react-router-dom";
+import { Link, useLocation, useParams } from "react-router-dom";
 
 const AllOrdersSearch = () => {
   const location = useLocation();
@@ -193,6 +193,41 @@ const AllOrdersSearch = () => {
     }
   };
 
+  const handleExportClick = () => {
+    fetch(`${import.meta.env.VITE_SERVER_URL}/api/customer-export`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((res) => res.blob())
+      .then((blob) => {
+        // Create a temporary URL for the blob
+        const url = window.URL.createObjectURL(blob);
+
+        // Create a link element
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = "exported_data.csv";
+
+        // Append the link to the document body
+        document.body.appendChild(link);
+
+        // Simulate a click on the link to trigger the download
+        link.click();
+
+        // Remove the link from the document body
+        document.body.removeChild(link);
+
+        // Release the temporary URL
+        window.URL.revokeObjectURL(url);
+      })
+      .catch((error) => {
+        console.error("Error exporting data:", error);
+        // Handle error appropriately
+      });
+  };
+
   return (
     <div className="space-y-3">
       <EditOrderModal
@@ -214,10 +249,37 @@ const AllOrdersSearch = () => {
         selectedOrder={selectedOrder}
         refetch={refetchSearch}
       />
-      <p className="text-xl">
-        Search result for: <span className="font-semibold">{searchParam}</span>
-      </p>
+      <div className="flex justify-between">
+        <p className="text-xl">
+          Search result for:{" "}
+          <span className="font-semibold">{searchParam}</span>
+        </p>
+        <div className="flex gap-3">
+          {selectedOrders?.length > 0 && (
+            <Link to="/invoice-generator">
+              <button className="btn-primary btn-outline btn">
+                Print Selected
+              </button>
+            </Link>
+          )}
 
+          <button className="btn-primary btn-outline btn">
+            Advance Search
+          </button>
+          <Link
+            to="/orders-processing/import-csv"
+            className="btn-primary btn-outline btn"
+          >
+            Create Bulk Order
+          </Link>
+          <button
+            onClick={handleExportClick}
+            className="btn-primary btn-outline btn"
+          >
+            Export Orders
+          </button>
+        </div>
+      </div>
       <div>
         <div className="overflow-x-auto">
           <table className="table">
@@ -230,12 +292,14 @@ const AllOrdersSearch = () => {
                     defaultChecked={false}
                     onClick={(e) => {
                       if (e.target.checked) {
-                        setSelectedOrders(searchOrders);
+                        setSelectedOrders(searchOrders?.orders);
                       } else {
                         setSelectedOrders([]);
                       }
                     }}
-                    checked={selectedOrders?.length === searchOrders?.length}
+                    checked={
+                      selectedOrders?.length === searchOrders?.orders?.length
+                    }
                     className="checkbox border border-white"
                   />
                 </td>
@@ -252,13 +316,13 @@ const AllOrdersSearch = () => {
                     <input
                       type="checkbox"
                       defaultChecked={false}
-                      checked={selectedOrders.includes(order)}
+                      checked={selectedOrders?.includes(order)}
                       onClick={(e) => {
                         if (e.target.checked) {
                           setSelectedOrders([...selectedOrders, order]);
                         } else {
                           setSelectedOrders(
-                            selectedOrders.filter(
+                            selectedOrders?.filter(
                               (selectedOrder) => selectedOrder._id !== order._id
                             )
                           );

@@ -32,12 +32,16 @@ const InvoiceGenerator = () => {
         {selectedOrders?.map((order, index) => (
           <div
             key={order._id}
+            className="order-section"
             style={{
               padding: "1rem",
               color: "black",
               fontSize: "18px",
-              minHeight: "100vh",
               maxHeight: "100%",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "start",
+              pageBreakInside: "avoid",
             }}
           >
             <div

@@ -37,6 +37,7 @@ const SingleInvoiceGenerator = ({ order }) => {
           padding: "1rem",
           color: "black",
           fontSize: "18px",
+          pageBreakInside: "avoid",
         }}
         id="print"
         ref={componentRef}
@@ -93,7 +94,7 @@ const SingleInvoiceGenerator = ({ order }) => {
             <p>Total Product: {order?.quantity || 1}</p>
             <p>Delivery: {order?.courier}</p>
           </div>
-          <div className="col-span-2 flex w-[50%] cursor-pointer flex-col">
+          <div className="col-span-2 flex w-full flex-col items-center">
             <QRCode
               style={{
                 height: "100px",
