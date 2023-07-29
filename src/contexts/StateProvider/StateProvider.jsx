@@ -13,6 +13,7 @@ const StateProvider = ({ children }) => {
   const {
     data: userInfo,
     isLoading: userInfoIsLoading,
+    isFetched: userInfoIsFetched,
     isError: userIsError,
     error: userError,
     refetch: userRefetch,
@@ -32,6 +33,7 @@ const StateProvider = ({ children }) => {
         throw new Error("Failed to fetch customers");
       }
       return response.json().then((data) => {
+        console.log(data);
         return data.user;
       });
     },
@@ -40,6 +42,10 @@ const StateProvider = ({ children }) => {
       staleTime: 5 * 60 * 1000, // Consider data fresh for 10 minutes
     }
   );
+
+  if (userInfoIsLoading) {
+    <div className="h-16 w-16 animate-spin rounded-full border-4 border-dashed dark:border-violet-400"></div>;
+  }
 
   const sellerId =
     userInfo?.role === "Admin" ? userInfo?._id : userInfo?.sellerId;
@@ -188,6 +194,8 @@ const StateProvider = ({ children }) => {
     searchOrders,
     fetchOrderByName,
     setSearchName,
+    userInfoIsFetched,
+    userRefetch,
   };
 
   return (

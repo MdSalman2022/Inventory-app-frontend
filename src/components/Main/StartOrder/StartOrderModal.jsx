@@ -12,6 +12,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { EditUserLog } from "@/utils/fetchApi";
 
 const StartOrderModal = ({
   isStartNewOrderOpen,
@@ -282,6 +283,11 @@ const StartOrderModal = ({
           .then((result) => {
             console.log(result);
             if (result.success) {
+              EditUserLog(
+                userInfo?._id,
+                "Added a customer",
+                `${customerInfo?.name} added`
+              );
               console.log(result?.result?._id);
               const order = {
                 image: "",
@@ -410,6 +416,11 @@ const StartOrderModal = ({
           const allProducts = order.products;
 
           toast.success(`${order.name} is added successfully`);
+          EditUserLog(
+            userInfo?._id,
+            "Created an order",
+            `${result?.orderId} order created`
+          );
           fetch(
             `${
               import.meta.env.VITE_SERVER_URL
@@ -429,7 +440,7 @@ const StartOrderModal = ({
                 refetchProducts();
                 toast.success("Stock is updated successfully");
               } else {
-                console.log("something went wrong stock update");
+                console.log("Something went wrong stock update");
                 toast.error("Something went wrong stock update");
               }
             })

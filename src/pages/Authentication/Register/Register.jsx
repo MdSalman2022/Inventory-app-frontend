@@ -3,6 +3,7 @@ import { AuthContext } from "../../../contexts/AuthProvider/AuthProvider";
 import { toast } from "react-hot-toast";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { sendEmailVerification } from "firebase/auth";
+import { CreateUserLog } from "@/utils/fetchApi";
 
 const Register = () => {
   const { createUser, updateUser, providerLogin, logOut } =
@@ -69,6 +70,7 @@ const Register = () => {
       .then((res) => res.json())
       .then((data) => {
         console.log("save user", data);
+        CreateUserLog(data?.result?._id);
       });
   };
 
@@ -88,6 +90,7 @@ const Register = () => {
       .then((res) => res.json())
       .then((data) => {
         console.log("save user", data);
+        CreateUserLog(data?.result?._id);
       });
   };
 

@@ -15,6 +15,7 @@ import { TbFileInvoice } from "react-icons/tb";
 import InvoiceGenerator from "../../components/Main/shared/InvoiceGenerator/InvoiceGenerator";
 import { StateContext } from "@/contexts/StateProvider/StateProvider";
 import SingleInvoiceGenerator from "@/components/Main/shared/InvoiceGenerator/SingleInvoiceGenerator";
+import { GiReturnArrow } from "react-icons/gi";
 
 const CompletedOrders = () => {
   const { userInfo, selectedOrders, setSelectedOrders } =
@@ -290,7 +291,7 @@ const CompletedOrders = () => {
                         className="tooltip cursor-pointer rounded-full border border-gray-500 p-1 text-2xl text-error"
                         data-tip="Order Return"
                       >
-                        <RiArrowGoBackLine className="text-lg" />
+                        <GiReturnArrow className="text-lg" />
                       </span>
                     </div>
                   </td>

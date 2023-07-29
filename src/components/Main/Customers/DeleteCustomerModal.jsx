@@ -1,7 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import ModalBox from "../shared/Modals/ModalBox";
 import { toast } from "react-hot-toast";
 import avatarIcon from "../../../assets/shared/avatar.png";
+import { EditUserLog } from "@/utils/fetchApi";
+import { StateContext } from "@/contexts/StateProvider/StateProvider";
 
 const DeleteCustomerModal = ({
   setIsDeleteModalOpen,
@@ -9,6 +11,7 @@ const DeleteCustomerModal = ({
   selectedCustomer,
   refetch,
 }) => {
+  const { userInfo } = useContext(StateContext);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
@@ -34,6 +37,11 @@ const DeleteCustomerModal = ({
         toast.success("Customer deleted successfully");
         refetch();
         setIsModalOpen(false);
+        EditUserLog(
+          userInfo?._id,
+          "Deleted a customer",
+          `${selectedCustomer?.customer_details?.name} deleted`
+        );
       })
       .catch((err) => {
         console.log(err);

@@ -178,7 +178,9 @@ const Dashboard = () => {
 
   const { data: allCustomers } = useQuery("allCustomers", async () => {
     const response = await fetch(
-      `${import.meta.env.VITE_SERVER_URL}/customer/get-customers`,
+      `${import.meta.env.VITE_SERVER_URL}/customer/get-customers?sellerId=${
+        userInfo?.role === "Admin" ? userInfo?._id : userInfo?.sellerId
+      }`,
       {
         method: "GET",
         headers: {
@@ -212,27 +214,45 @@ const Dashboard = () => {
       customerDate.getFullYear() === today.getFullYear()
     );
   });
+
   console.log("customer added this month", customerAddedThisMonth);
+
+  const repeatedCustomer = allCustomers?.filter((customer) => {
+    let count = 0;
+    for (let i = 0; i < allCustomers?.length; i++) {
+      if (customer?.orders?.completed > 1) {
+        count++;
+      }
+    }
+    return count;
+  });
+
+  console.log("repeatedCustomer ", repeatedCustomer);
+
+  const repeatedParcentage =
+    (repeatedCustomer?.length / allCustomers?.length) * 100;
 
   const customers = [
     {
       name: "Today",
-      value: "0",
+      value: customerAddedToday?.length || 0,
       icon: <BsPeopleFill />,
     },
     {
       name: "This Month",
-      value: "3",
+      value: customerAddedThisMonth?.length || 0,
       icon: <BsPeopleFill />,
     },
     {
       name: "Total",
-      value: "2",
+      value: allCustomers?.length || 0,
       icon: <BsPeopleFill />,
     },
     {
       name: "Repeated",
-      value: "1 (50.00)%",
+      value: `${repeatedCustomer?.length || 0} (${
+        isNaN(repeatedParcentage) ? 0 : repeatedParcentage.toFixed(2)
+      }%)`,
       icon: <BsPeopleFill />,
     },
   ];

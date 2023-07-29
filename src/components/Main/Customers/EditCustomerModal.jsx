@@ -1,6 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import ModalBox from "../shared/Modals/ModalBox";
 import { toast } from "react-hot-toast";
+import { EditUserLog } from "@/utils/fetchApi";
+import { StateContext } from "@/contexts/StateProvider/StateProvider";
 
 const EditCustomerModal = ({
   setIsEditModalOpen,
@@ -8,6 +10,7 @@ const EditCustomerModal = ({
   selectedCustomer,
   refetch,
 }) => {
+  const { userInfo } = useContext(StateContext);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleEditCustomer = (event) => {
@@ -90,6 +93,11 @@ const EditCustomerModal = ({
           refetch();
           setIsModalOpen(false);
           setIsEditModalOpen(false);
+          EditUserLog(
+            userInfo?._id,
+            "Added a customer",
+            `${customer?.name} added`
+          );
         } else {
           toast.error("Something went wrong");
         }

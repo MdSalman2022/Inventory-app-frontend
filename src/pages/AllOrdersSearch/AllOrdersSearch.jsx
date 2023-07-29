@@ -8,6 +8,7 @@ import { toast } from "react-hot-toast";
 import { AiOutlineEdit } from "react-icons/ai";
 import { FaCheck } from "react-icons/fa";
 import { FcCancel } from "react-icons/fc";
+import { GiReturnArrow } from "react-icons/gi";
 import { GrDeliver } from "react-icons/gr";
 import { RiArrowGoBackLine, RiDeleteBin6Line } from "react-icons/ri";
 import { TbFileInvoice } from "react-icons/tb";
@@ -386,6 +387,19 @@ const AllOrdersSearch = () => {
                           data-tip="Delete order"
                         >
                           <RiDeleteBin6Line />
+                        </div>
+                      )}
+                      {order?.orderStatus === "completed" && (
+                        <div className="mt-1 flex items-center gap-2">
+                          <span
+                            onClick={() => {
+                              handleOrderStatus(order._id, "returned");
+                            }}
+                            className="tooltip cursor-pointer rounded-full border border-gray-500 p-1 text-2xl text-primary"
+                            data-tip="Order Return"
+                          >
+                            <GiReturnArrow className="text-lg" />
+                          </span>
                         </div>
                       )}
                     </div>

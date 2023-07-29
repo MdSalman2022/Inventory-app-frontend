@@ -9,6 +9,7 @@ import DeleteCustomerModal from "../../components/Main/Customers/DeleteCustomerM
 import { useQuery } from "react-query";
 import { StateContext } from "../../contexts/StateProvider/StateProvider";
 import { Link, useNavigate } from "react-router-dom";
+import { EditUserLog } from "@/utils/fetchApi";
 
 const Customers = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -167,6 +168,11 @@ const Customers = () => {
           toast.success(`${customer.name} is added successfully`);
           refetch();
           setIsModalOpen(false);
+          EditUserLog(
+            userInfo?._id,
+            "Added a customer",
+            `${customer?.name} added`
+          );
         } else {
           toast.error("Something went wrong");
         }
