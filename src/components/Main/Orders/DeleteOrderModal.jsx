@@ -93,7 +93,14 @@ const DeleteOrderModal = ({
                 <p className="text-2xl">{selectedOrder?.name}</p>
               </div>
               <div className="flex justify-between">
-                <button className="btn-error btn-outline btn">Cancel</button>
+                <button
+                  onClick={() => {
+                    setIsModalOpen(false);
+                  }}
+                  className="btn-error btn-outline btn"
+                >
+                  Cancel
+                </button>
                 <button
                   onClick={() => handleDeleteOrder(selectedOrder?._id)}
                   className="btn-error btn"

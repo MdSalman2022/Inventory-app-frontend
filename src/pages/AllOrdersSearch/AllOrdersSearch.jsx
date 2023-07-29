@@ -9,7 +9,7 @@ import { AiOutlineEdit } from "react-icons/ai";
 import { FaCheck } from "react-icons/fa";
 import { FcCancel } from "react-icons/fc";
 import { GrDeliver } from "react-icons/gr";
-import { RiArrowGoBackLine } from "react-icons/ri";
+import { RiArrowGoBackLine, RiDeleteBin6Line } from "react-icons/ri";
 import { TbFileInvoice } from "react-icons/tb";
 import { useQuery } from "react-query";
 import { useLocation, useParams } from "react-router-dom";
@@ -375,6 +375,18 @@ const AllOrdersSearch = () => {
                         >
                           <FcCancel className="text-lg" />
                         </span>
+                      )}
+                      {order?.orderStatus === "processing" && (
+                        <div
+                          onClick={() => {
+                            setIsDeleteModalOpen(true);
+                            setSelectedOrder(order);
+                          }}
+                          className="tooltip cursor-pointer rounded-full border border-error p-1 text-2xl text-error"
+                          data-tip="Delete order"
+                        >
+                          <RiDeleteBin6Line />
+                        </div>
                       )}
                     </div>
                   </td>
