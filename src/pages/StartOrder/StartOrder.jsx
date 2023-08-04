@@ -49,6 +49,17 @@ const StartOrder = () => {
         } else {
           toast.error("Customer Not Found!!");
           setSearchResults([]);
+          if (customerSearchKey.match(/^\d+$/)) {
+            setIsStartNewOrderOpen(true);
+            setSelectedCustomer({
+              customer_details: {
+                name: "",
+                phone: customerSearchKey,
+                image: "",
+              },
+              _id: "",
+            });
+          }
         }
       })
       .catch((error) => {

@@ -283,11 +283,7 @@ const StartOrderModal = ({
           .then((result) => {
             console.log(result);
             if (result.success) {
-              EditUserLog(
-                userInfo?._id,
-                "Added a customer",
-                `${customerInfo?.name} added`
-              );
+              EditUserLog(userInfo?._id, "Added a customer", `${name} added`);
               console.log(result?.result?._id);
               const order = {
                 image: "",
