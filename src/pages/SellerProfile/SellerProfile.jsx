@@ -1,27 +1,15 @@
 import { StateContext } from "@/contexts/StateProvider/StateProvider";
-import React, { useContext } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { useQuery } from "react-query";
 import { useParams } from "react-router-dom";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
-
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import profile from "../../assets/profile.webp";
+import OrdersTable from "./OrdersTable";
 
 const SellerProfile = () => {
   const { userInfo } = useContext(StateContext);
   const { id } = useParams();
+  const [selectedCategory, setSelectedCategory] = useState("All");
+  const [selectedOrders, setSelectedOrders] = useState([]);
 
   const {
     data: seller,
@@ -145,7 +133,7 @@ const SellerProfile = () => {
     return response.json().then((data) => data?.orders);
   });
 
-  console.log("orders ", orders);
+  // console.log("orders ", orders);
 
   const processingOrders = orders?.filter(
     (order) => order?.orderStatus === "processing"
@@ -161,11 +149,59 @@ const SellerProfile = () => {
     (order) => order?.orderStatus === "cancelled"
   );
 
+  console.log("stores", stores);
+  console.log("orders", orders);
+  console.log("seller", seller);
+
+  const ordersByStore = stores?.map((store) => {
+    return orders?.filter((order) => order?.storeId === store?.storeId);
+  });
+
+  const productsByStore = stores?.map((store) => {
+    return products?.filter((product) => product?.storeId === store?.storeId);
+  });
+
+  console.log("prd", products);
+  console.log("products by store", productsByStore);
+
+  console.log("ordersByStore", ordersByStore);
+
+  const ordersCategory = [
+    "All",
+    "Processing Orders",
+    "Ready Orders",
+    "Completed Orders",
+    "Returned Orders",
+  ];
+
+  useEffect(() => {
+    if (selectedCategory === "All") {
+      setSelectedOrders(orders);
+    } else if (selectedCategory === "Processing Orders") {
+      setSelectedOrders(processingOrders);
+    } else if (selectedCategory === "Ready Orders") {
+      setSelectedOrders(readyOrders);
+    } else if (selectedCategory === "Completed Orders") {
+      setSelectedOrders(completedOrders);
+    } else if (selectedCategory === "Returned Orders") {
+      setSelectedOrders(returnedOrders);
+    } else if (selectedCategory === "Cancelled Orders") {
+      setSelectedOrders(cancelledOrders);
+    }
+  }, [selectedCategory]);
+
+  console.log("selected ", selectedOrders);
+
   return (
     <div>
       <div className="grid grid-cols-4 gap-5">
         <div>
-          <div className="flex flex-col items-start gap-2 text-center">
+          <div className="flex flex-col items-center gap-2 rounded-xl bg-white p-5 text-center shadow-lg">
+            <img
+              className="h-32 w-32 rounded-full object-contain"
+              src={profile}
+              alt=""
+            />
             <p className="">
               <span className="font-semibold">Name:</span> {seller?.username}
             </p>
@@ -173,237 +209,83 @@ const SellerProfile = () => {
               {" "}
               <span className="font-semibold">Email:</span> {seller?.email}
             </p>
-            <p>
-              {" "}
-              <span className="font-semibold">Number of Stores: </span>
-              {stores?.length}{" "}
-            </p>
-            <p>
-              <span className="font-semibold">Number of Products: </span>
-              {products?.length}{" "}
-            </p>
-            <p>
-              <span className="font-semibold">Number of Suppliers: </span>
-              {suppliers?.length}
-            </p>
-            <p>
-              <span className="font-semibold">Number of Employees: </span>
-              {employees?.length}
-            </p>
-            <p>
-              {" "}
-              <span className="font-semibold">Number of Orders: </span>
-              {orders?.length}
-            </p>
+            <div className="grid w-60 grid-cols-2">
+              <p className="text-start">
+                {" "}
+                <span className="font-semibold">Stores: </span>
+                {stores?.length}{" "}
+              </p>
+              <p className="text-start">
+                <span className="font-semibold">Products: </span>
+                {products?.length}{" "}
+              </p>
+              <p className="text-start">
+                <span className="font-semibold">Suppliers: </span>
+                {suppliers?.length}
+              </p>
+              <p className="text-start">
+                <span className="font-semibold">Employees: </span>
+                {employees?.length}
+              </p>
+              <p className="text-start">
+                {" "}
+                <span className="font-semibold">Orders: </span>
+                {orders?.length}
+              </p>
+            </div>
           </div>
         </div>
-        <div className="col-span-3">
-          <Accordion type="single" collapsible className="w-full">
-            <AccordionItem value="item-1">
-              <AccordionTrigger className="w-full rounded-t-lg border bg-base-100 p-3 text-start">
-                Processing Orders: {processingOrders?.length}
-              </AccordionTrigger>
-              <AccordionContent className="w-full border p-3 text-start">
-                {processingOrders?.length > 0 ? (
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead className="w-[50px]"></TableHead>
-                        <TableHead>Invoice</TableHead>
-                        <TableHead className="text-right">Price</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {processingOrders?.map((order, index) => (
-                        <TableRow key={order._id}>
-                          <TableCell className="font-medium">
-                            {index + 1}
-                          </TableCell>
-                          <TableCell>{order?.orderId}</TableCell>
-                          <TableCell className="text-right">
-                            <div className="flex flex-col items-end">
-                              <p className="badge badge-info">
-                                {order?.courier}: {order?.deliveryCharge} Tk
-                              </p>
-                              <p>Quantity: {order?.quantity}</p>
-                              <p className="">Price: {order?.total} Tk</p>
-                              <p className="">
-                                Total Bill:{" "}
-                                {parseInt(order?.total) +
-                                  parseInt(order?.deliveryCharge)}{" "}
-                                Tk
-                              </p>
-                              <p>Discount: {order?.discount} Tk</p>
-                              <p className="">Advance: {order?.advance} Tk</p>
-                              <p className="">COD: {order?.cash} Tk</p>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                ) : (
-                  <div className="flex items-center justify-center">
-                    <p className="text-2xl text-gray-400">
-                      No Processing Orders
+        <div className="col-span-3 w-full rounded-lg">
+          <div className="flex flex-col gap-5">
+            {stores?.map((store, index) => {
+              const ordersForCurrentStore = selectedOrders?.filter(
+                (order) => order?.storeId === store?.storeId
+              );
+              return (
+                <div
+                  className="flex flex-col items-center gap-2 rounded-lg bg-gray-200 p-5 text-center"
+                  key={index}
+                >
+                  <div className="flex w-full flex-col items-center">
+                    <p className="text-xl">
+                      <span className="font-semibold">Store Name:</span>{" "}
+                      {store?.name}
+                    </p>
+                    <p className="text-lg">
+                      <span className="font-semibold">Email:</span>{" "}
+                      {seller?.email}
                     </p>
                   </div>
-                )}
-              </AccordionContent>
-            </AccordionItem>
-            <AccordionItem value="item-2">
-              <AccordionTrigger className="w-full  border bg-base-100 p-3 text-start">
-                Ready Orders: {readyOrders?.length}
-              </AccordionTrigger>
-              <AccordionContent className="w-full border p-3 text-start">
-                {readyOrders?.length > 0 ? (
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead className="w-[50px]"></TableHead>
-                        <TableHead>Invoice</TableHead>
-                        <TableHead className="text-right">Price</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {readyOrders?.map((order, index) => (
-                        <TableRow key={order._id}>
-                          <TableCell className="font-medium">
-                            {index + 1}
-                          </TableCell>
-                          <TableCell>{order?.orderId}</TableCell>
-                          <TableCell className="text-right">
-                            <div className="flex flex-col items-end">
-                              <p className="badge badge-info">
-                                {order?.courier}: {order?.deliveryCharge} Tk
-                              </p>
-                              <p>Quantity: {order?.quantity}</p>
-                              <p className="">Price: {order?.total} Tk</p>
-                              <p className="">
-                                Total Bill:{" "}
-                                {parseInt(order?.total) +
-                                  parseInt(order?.deliveryCharge)}{" "}
-                                Tk
-                              </p>
-                              <p>Discount: {order?.discount} Tk</p>
-                              <p className="">Advance: {order?.advance} Tk</p>
-                              <p className="">COD: {order?.cash} Tk</p>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                ) : (
-                  <div className="flex items-center justify-center">
-                    <p className="text-2xl text-gray-400">No Ready Orders</p>
-                  </div>
-                )}
-              </AccordionContent>
-            </AccordionItem>
-            <AccordionItem value="item-3">
-              <AccordionTrigger className="w-full  border bg-base-100 p-3 text-start">
-                Completed Orders: {completedOrders?.length}
-              </AccordionTrigger>
-              <AccordionContent className="w-full border p-3 text-start">
-                {completedOrders?.length > 0 ? (
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead className="w-[50px]"></TableHead>
-                        <TableHead>Invoice</TableHead>
-                        <TableHead className="text-right">Price</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {completedOrders?.map((order, index) => (
-                        <TableRow key={order._id}>
-                          <TableCell className="font-medium">
-                            {index + 1}
-                          </TableCell>
-                          <TableCell>{order?.orderId}</TableCell>
-                          <TableCell className="text-right">
-                            <div className="flex flex-col items-end">
-                              <p className="badge badge-info">
-                                {order?.courier}: {order?.deliveryCharge} Tk
-                              </p>
-                              <p>Quantity: {order?.quantity}</p>
-                              <p className="">Price: {order?.total} Tk</p>
-                              <p className="">
-                                Total Bill:{" "}
-                                {parseInt(order?.total) +
-                                  parseInt(order?.deliveryCharge)}{" "}
-                                Tk
-                              </p>
-                              <p>Discount: {order?.discount} Tk</p>
-                              <p className="">Advance: {order?.advance} Tk</p>
-                              <p className="">COD: {order?.cash} Tk</p>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                ) : (
-                  <div className="flex items-center justify-center">
-                    <p className="text-2xl text-gray-400">
-                      No Completed Orders
+                  <div className="flex items-center gap-5">
+                    <p>
+                      Number Of Products: {productsByStore[index]?.length || 0}
                     </p>
+                    <p>Number Of Orders: {ordersByStore[index]?.length || 0}</p>
                   </div>
-                )}
-              </AccordionContent>
-            </AccordionItem>
-            <AccordionItem value="item-4">
-              <AccordionTrigger className="w-full  border bg-base-100 p-3 text-start">
-                Returned Orders: {returnedOrders?.length}
-              </AccordionTrigger>
-              <AccordionContent className="w-full border p-3 text-start">
-                {returnedOrders?.length > 0 ? (
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead className="w-[50px]"></TableHead>
-                        <TableHead>Invoice</TableHead>
-                        <TableHead className="text-right">Price</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {returnedOrders?.map((order, index) => (
-                        <TableRow key={order._id}>
-                          <TableCell className="font-medium">
-                            {index + 1}
-                          </TableCell>
-                          <TableCell>{order?.orderId}</TableCell>
-                          <TableCell className="text-right">
-                            <div className="flex flex-col items-end">
-                              <p className="badge badge-info">
-                                {order?.courier}: {order?.deliveryCharge} Tk
-                              </p>
-                              <p>Quantity: {order?.quantity}</p>
-                              <p className="">Price: {order?.total} Tk</p>
-                              <p className="">
-                                Total Bill:{" "}
-                                {parseInt(order?.total) +
-                                  parseInt(order?.deliveryCharge)}{" "}
-                                Tk
-                              </p>
-                              <p>Discount: {order?.discount} Tk</p>
-                              <p className="">Advance: {order?.advance} Tk</p>
-                              <p className="">COD: {order?.cash} Tk</p>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                ) : (
-                  <div className="flex items-center justify-center">
-                    <p className="text-2xl text-gray-400">No Returned Orders</p>
+                  <div className="flex w-full items-center justify-between gap-5">
+                    {ordersCategory?.map((category, index) => (
+                      <span
+                        onClick={() => setSelectedCategory(category)}
+                        className={`w-full rounded-lg px-3 py-2 font-semibold transition-all duration-300 hover:bg-gray-400 ${
+                          category === selectedCategory
+                            ? "bg-gray-400"
+                            : "bg-gray-300 "
+                        }
+                      cursor-pointer
+                      `}
+                        key={index}
+                      >
+                        {category}
+                      </span>
+                    ))}
                   </div>
-                )}
-              </AccordionContent>
-            </AccordionItem>
-          </Accordion>
+                  <div className="w-full">
+                    {<OrdersTable orders={ordersForCurrentStore} />}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </div>
       </div>
     </div>
