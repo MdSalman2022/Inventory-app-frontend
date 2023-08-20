@@ -95,8 +95,8 @@ const SideBar = ({ children }) => {
 
   return (
     <div>
-      <div className="grid grid-cols-7 text-black">
-        <div className="col-span-1 h-full bg-white">
+      <div className="flex grid-cols-7 text-black md:grid">
+        <div className="col-span-1 hidden h-full bg-white md:block">
           <div className="flex h-[93vh] w-full flex-col gap-2 bg-white px-5 py-4">
             {userInfo?.role === "Admin"
               ? pages.map((page, index) => (
@@ -129,7 +129,7 @@ const SideBar = ({ children }) => {
                 ))}
           </div>
         </div>
-        <div className="col-span-6 p-5">{children}</div>
+        <div className="col-span-6 md:p-5">{children}</div>
       </div>
     </div>
   );

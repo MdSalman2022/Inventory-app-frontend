@@ -84,7 +84,7 @@ const StartOrder = () => {
   console.log("couriers length ", couriers?.length);
 
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex w-screen flex-col gap-3 px-3 md:w-full md:px-0">
       <EditCustomerModal
         setIsEditModalOpen={setIsEditModalOpen}
         isEditModalOpen={isEditModalOpen}
@@ -101,21 +101,21 @@ const StartOrder = () => {
         selectedCustomer={selectedCustomer}
         setSelectedCustomer={setSelectedCustomer}
       />
-      <p className="font-medium">Start Order</p>
+      <p className="text-xl font-medium">Start Order</p>
       <hr />
       <p>Please enter Customer Phone Number or Facebook Name!!</p>
-      <form onSubmit={handleSearch} className="flex flex-col gap-5">
+      <form onSubmit={handleSearch} className="flex w-full flex-col gap-5">
         <input
-          className="input-bordered input-primary input w-1/2"
+          className="input-bordered input-primary input w-full md:w-1/2"
           type="text"
           name="search-key"
           placeholder="Name or Phone Number (any one)"
         />
-        <button type="submit" className="btn-primary btn w-1/2">
+        <button type="submit" className="btn-primary btn w-full md:w-1/2">
           Search
         </button>
       </form>
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 text-xs md:text-lg">
         আপনি যে কাস্টমার খুঁজছেন তিনি তালিকায় আছে কি না দেখুন। না থাকলে এখানে
         <button
           onClick={() => {

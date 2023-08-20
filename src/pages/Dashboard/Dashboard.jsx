@@ -303,7 +303,7 @@ const Dashboard = () => {
   return (
     <div className="space-y-3">
       <p className="text-xl">Order Summary</p>
-      <div className="grid grid-cols-4 gap-5">
+      <div className="grid grid-cols-1 gap-5 md:grid-cols-4">
         {orderSummary.map((order, index) => (
           <StatCard key={index}>
             <div className="flex h-16 items-center justify-between p-2">
@@ -319,7 +319,7 @@ const Dashboard = () => {
         ))}
       </div>
       <p className="text-xl">Customers</p>
-      <div className="grid grid-cols-4 gap-5">
+      <div className="grid grid-cols-1 gap-5 md:grid-cols-4">
         {customers.map((customer, index) => (
           <StatCard key={index}>
             <div className="flex h-16 items-center justify-between p-2">
@@ -334,7 +334,7 @@ const Dashboard = () => {
           </StatCard>
         ))}
       </div>
-      <div className="grid grid-cols-4 gap-5">
+      <div className="grid grid-cols-1 gap-5 md:grid-cols-4">
         {stats.map((stat, index) => (
           <StatCard key={index}>
             <div className="flex flex-col gap-2 p-2">

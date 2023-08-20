@@ -9,7 +9,7 @@ import DeleteCustomerModal from "../../components/Main/Customers/DeleteCustomerM
 import { useQuery } from "react-query";
 import { Link } from "react-router-dom";
 import { TbFileInvoice } from "react-icons/tb";
-import { FaCheck } from "react-icons/fa";
+import { FaCheck, FaSearch } from "react-icons/fa";
 import DeleteOrderModal from "../../components/Main/Orders/DeleteOrderModal";
 import InvoiceGenerator from "../../components/Main/shared/InvoiceGenerator/InvoiceGenerator";
 import { StateContext } from "@/contexts/StateProvider/StateProvider";
@@ -23,6 +23,8 @@ const OrderProcessing = () => {
   const [selectedOrder, setSelectedOrder] = useState({});
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
 
   useEffect(() => {
     setSelectedOrders([]);
@@ -222,6 +224,8 @@ const OrderProcessing = () => {
     const form = event.target;
     const orderId = form.orderId.value;
 
+    setIsSearchModalOpen(false);
+
     console.log("orderId ", orderId);
 
     try {
@@ -261,7 +265,7 @@ const OrderProcessing = () => {
   console.log("orders ", orders);
 
   return (
-    <div className="space-y-4">
+    <div className="w-screen p-3 md:w-full md:space-y-4 md:p-0">
       <EditOrderModal
         isEditModalOpen={isEditModalOpen}
         setIsEditModalOpen={setIsEditModalOpen}
@@ -280,7 +284,7 @@ const OrderProcessing = () => {
         selectedOrder={selectedOrder}
         refetch={refetch}
       />
-      <div className="flex items-start justify-between border-b py-3">
+      <div className="flex flex-col items-start justify-between border-b py-3 md:flex-row">
         <div>
           <p className="text-xl font-semibold">Order Processing</p>
           <p>Total Parcels: 0</p>
@@ -289,23 +293,26 @@ const OrderProcessing = () => {
           <p>Total COD: ৳0.00</p>
           <p>Total Advance: ৳0.00</p>
         </div>
-        <div className="flex items-center gap-4">
+        <div className="mt-3 flex w-full flex-col gap-3 md:mt-0 md:w-auto md:flex-row md:gap-5">
           {selectedOrders?.length > 0 && (
             <Link to="/invoice-generator">
-              <button className="btn-primary btn-outline btn">
+              <button className="btn-primary btn-outline btn w-full md:w-52">
                 Print Selected
               </button>
             </Link>
           )}
-          <button className="btn-primary btn-outline btn">
+          <button className="btn-primary btn-outline btn w-full md:w-52">
             Advance Search
           </button>
-          <Link to="import-csv" className="btn-primary btn-outline btn">
+          <Link
+            to="import-csv"
+            className="btn-primary btn-outline btn w-full md:w-52"
+          >
             Create Bulk Order
           </Link>
           <button
             onClick={handleExportClick}
-            className="btn-primary btn-outline btn"
+            className="btn-primary btn-outline btn w-full md:w-52"
           >
             Export Orders
           </button>
@@ -323,9 +330,11 @@ const OrderProcessing = () => {
             <option value="50">50</option>
             <option value="100">100</option>
           </select>
-          <p>entries</p>
         </div>
-        <form onSubmit={SearchOrderById} className="flex items-center gap-2">
+        <form
+          onSubmit={SearchOrderById}
+          className="hidden items-center gap-2 md:flex"
+        >
           <p>Search</p>
           <input
             type="text"
@@ -334,6 +343,41 @@ const OrderProcessing = () => {
             className="input-bordered input"
           />
         </form>
+        <div className="my-2 flex items-center md:hidden">
+          <button
+            className="btn-primary btn-outline btn"
+            onClick={() => setIsSearchModalOpen(!isSearchModalOpen)}
+          >
+            <FaSearch className="text-xl" />
+          </button>
+          {isSearchModalOpen && (
+            <ModalBox
+              setIsModalOpen={setIsSearchModalOpen}
+              isModalOpen={isSearchModalOpen}
+            >
+              <div className="flex h-40 w-full flex-col items-center justify-center gap-5 bg-base-100 p-5">
+                <p className="text-2xl font-bold">Search Customer</p>
+                <form onSubmit={SearchOrderById} className="w-full">
+                  <div className="flex w-full items-center justify-between gap-3">
+                    <input
+                      name="orderId"
+                      placeholder="Order Id"
+                      type="text"
+                      className="input-box h-12 w-full rounded-full border border-primary px-2"
+                    />
+                    <button
+                      type="submit"
+                      className="btn-primary btn-md btn rounded-full"
+                    >
+                      {" "}
+                      <FaSearch />
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </ModalBox>
+          )}
+        </div>
       </div>
 
       <div>

@@ -10,6 +10,18 @@ import { useQuery } from "react-query";
 import { StateContext } from "../../contexts/StateProvider/StateProvider";
 import { Link, useNavigate } from "react-router-dom";
 import { EditUserLog } from "@/utils/fetchApi";
+import { FaSearch } from "react-icons/fa";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 const Customers = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -20,6 +32,7 @@ const Customers = () => {
 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
 
   const { userInfo } = useContext(StateContext);
 
@@ -192,6 +205,8 @@ const Customers = () => {
 
     console.log(customerSearchKey);
 
+    setIsSearchModalOpen(false);
+
     let url = `${
       import.meta.env.VITE_SERVER_URL
     }/customer/search-customer?sellerId=${
@@ -231,7 +246,7 @@ const Customers = () => {
   console.log("customers ", customers);
 
   return (
-    <div className="space-y-4">
+    <div className="w-screen p-3 md:w-full md:space-y-4 md:p-0">
       <EditCustomerModal
         setIsEditModalOpen={setIsEditModalOpen}
         isEditModalOpen={isEditModalOpen}
@@ -244,12 +259,14 @@ const Customers = () => {
         selectedCustomer={selectedCustomer}
         refetch={refetch}
       />
-      <div className="flex justify-between border-b py-3">
-        <p className="text-xl font-semibold">Customers List</p>
+      <div className="flex flex-col gap-3 border-b py-3 md:justify-between md:gap-0">
+        <p className="flex items-center text-xl font-semibold">
+          Customers List
+        </p>
         <div className="flex items-center gap-4">
           <button
             onClick={handleExportClick}
-            className="btn-primary btn-outline btn"
+            className="btn-primary btn-outline btn-sm btn md:btn-md"
           >
             Export
           </button>
@@ -258,7 +275,7 @@ const Customers = () => {
           {/* The button to open modal */}
           <label
             onClick={() => setIsModalOpen(!isModalOpen)}
-            className="btn-primary btn-outline btn"
+            className="btn-primary btn-outline btn-sm btn md:btn-md"
           >
             Add Customer
           </label>
@@ -344,18 +361,21 @@ const Customers = () => {
           </ModalBox>
         </div>
       </div>
-      <div className="flex justify-between">
+      <div className="my-2 flex justify-between">
         <div className="flex items-center gap-2">
           <p>Show</p>
-          <select name="page" id="page" className="input-bordered input p-2">
+          <select
+            name="page"
+            id="page"
+            className="input-bordered input select select-sm md:select-md"
+          >
             <option value="10">10</option>
             <option value="25">25</option>
             <option value="50">50</option>
             <option value="100">100</option>
           </select>
-          <p>entries</p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="hidden items-center gap-2 md:flex">
           <p>Search</p>
           <form onSubmit={handleSearch}>
             <input
@@ -364,6 +384,40 @@ const Customers = () => {
               className="input-bordered input"
             />
           </form>
+        </div>
+        <div className="flex items-center md:hidden">
+          <button
+            className="btn-primary btn-outline btn"
+            onClick={() => setIsSearchModalOpen(!isSearchModalOpen)}
+          >
+            <FaSearch className="text-xl" />
+          </button>
+          {isSearchModalOpen && (
+            <ModalBox
+              setIsModalOpen={setIsSearchModalOpen}
+              isModalOpen={isSearchModalOpen}
+            >
+              <div className="flex h-40 w-full flex-col items-center justify-center gap-5 bg-base-100 p-5">
+                <p className="text-2xl font-bold">Search Customer</p>
+                <form onSubmit={handleSearch} className="w-full">
+                  <div className="flex w-full items-center justify-between gap-3">
+                    <input
+                      name="search-key"
+                      type="text"
+                      className="input-box h-12 w-full rounded-full border border-primary px-2"
+                    />
+                    <button
+                      type="submit"
+                      className="btn-primary btn-md btn rounded-full"
+                    >
+                      {" "}
+                      <FaSearch />
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </ModalBox>
+          )}
         </div>
       </div>
 

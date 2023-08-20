@@ -156,7 +156,7 @@ const Login = () => {
   };
 
   return (
-    <div className="fixed inset-0 z-10 mx-5 overflow-auto bg-primary md:mx-0">
+    <div className="fixed inset-0 z-10 overflow-auto bg-primary">
       <div className="flex h-full w-full flex-col items-center justify-center">
         <form
           onSubmit={handleSignIn}
