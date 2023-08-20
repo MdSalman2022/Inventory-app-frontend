@@ -229,7 +229,9 @@ const EditOrderModal = ({
         setIsModalOpen={setIsEditModalOpen}
       >
         <div className="flex flex-col ">
-          <p className="border-b p-5">Order Information</p>
+          <p className="border-b p-5 text-xl font-semibold">
+            Order Information
+          </p>
           <form
             ref={formRef}
             onSubmit={handleOrder}

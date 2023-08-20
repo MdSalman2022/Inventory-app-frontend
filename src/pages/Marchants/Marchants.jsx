@@ -73,7 +73,7 @@ const Marchants = () => {
   };
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-5 p-5">
       <div className="flex justify-between">
         <p className="text-xl font-bold">Marchants</p>
         {/* <button

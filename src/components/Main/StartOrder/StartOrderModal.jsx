@@ -34,7 +34,7 @@ const StartOrderModal = ({
     selectedCustomer?.customer_details?.location ?? ""
   );
   const [courier, setCourier] = useState("");
-  const [store, setStore] = useState({});
+  const [store, setStore] = useState(stores[0]);
   console.log("courier ", courier);
 
   console.log("district ", district);
@@ -108,7 +108,7 @@ const StartOrderModal = ({
           location: district,
           sellerId:
             userInfo?.role === "Admin" ? userInfo?._id : userInfo?.sellerId,
-          storeId: store?.storeId,
+          storeId: stores[0]?.storeId,
         };
 
         fetch(`${import.meta.env.VITE_SERVER_URL}/customer/create-customer`, {
@@ -145,8 +145,8 @@ const StartOrderModal = ({
                         userInfo?.role === "Admin"
                           ? userInfo?._id
                           : userInfo?.sellerId,
-                      storeId: store?.storeId,
-                      store,
+                      storeId: stores[0]?.storeId,
+                      store: stores[0],
                       products: productList,
                       quantity: productList.length,
                       courier,
@@ -214,8 +214,8 @@ const StartOrderModal = ({
                   userInfo?.role === "Admin"
                     ? userInfo?._id
                     : userInfo?.sellerId,
-                storeId: store?.storeId,
-                store,
+                storeId: stores[0]?.storeId,
+                store: stores[0],
                 products: productList,
                 quantity: productList.length,
                 courier,
@@ -296,8 +296,8 @@ const StartOrderModal = ({
                   userInfo?.role === "Admin"
                     ? userInfo?._id
                     : userInfo?.sellerId,
-                storeId: store?.storeId,
-                store,
+                storeId: stores[0]?.storeId,
+                store: stores[0],
                 products: productList,
                 quantity: productList.length,
                 courier,
@@ -319,7 +319,7 @@ const StartOrderModal = ({
                   userInfo?.role === "Admin"
                     ? userInfo?._id
                     : userInfo?.sellerId,
-                storeId: store?.storeId,
+                storeId: stores[0]?.storeId,
                 location: district,
                 total: 0 + total + deliveryCharge - discount,
                 order,
@@ -349,8 +349,8 @@ const StartOrderModal = ({
           district,
           sellerId:
             userInfo?.role === "Admin" ? userInfo?._id : userInfo?.sellerId,
-          storeId: store?._id,
-          store,
+          storeId: stores[0]?._id,
+          store: stores[0],
           products: productList,
           quantity: productList.length,
           courier,
@@ -377,7 +377,7 @@ const StartOrderModal = ({
             deliveryCharge -
             discount,
           order,
-          storeId: store?.storeId,
+          storeId: stores[0]?.storeId,
           processingCount: selectedCustomer?.orders?.processing + 1,
           readyCount: selectedCustomer?.orders?.ready,
           completedCount: selectedCustomer?.orders?.completed,
@@ -573,7 +573,9 @@ const StartOrderModal = ({
     <div>
       <ModalBox isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen}>
         <div className="flex flex-col ">
-          <p className="border-b p-5">Order Information</p>
+          <p className="border-b p-5 text-xl font-semibold">
+            Order Information
+          </p>
           <form
             ref={formRef}
             onSubmit={handleOrder}
@@ -623,7 +625,7 @@ const StartOrderModal = ({
               <option value="Rangpur">Rangpur</option>
               <option value="Mymensingh">Mymensingh</option>
             </select>
-            <select
+            {/* <select
               name="store"
               id="store"
               className="input-bordered input col-span-2"
@@ -652,7 +654,7 @@ const StartOrderModal = ({
                   {store.name}
                 </option>
               ))}
-            </select>
+            </select> */}
             <div className="col-span-2 flex h-full w-fit flex-col gap-3 rounded bg-gray-100 p-5">
               <p className="text-xl font-semibold">Products</p>
               <DropdownMenu className="w-full">

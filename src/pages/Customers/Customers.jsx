@@ -259,7 +259,7 @@ const Customers = () => {
         selectedCustomer={selectedCustomer}
         refetch={refetch}
       />
-      <div className="flex flex-col gap-3 border-b py-3 md:justify-between md:gap-0">
+      <div className="flex w-full flex-col gap-3 border-b pb-3 md:flex-row md:justify-between md:gap-0">
         <p className="flex items-center text-xl font-semibold">
           Customers List
         </p>

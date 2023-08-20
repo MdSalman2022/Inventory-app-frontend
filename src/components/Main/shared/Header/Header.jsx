@@ -170,7 +170,7 @@ const Header = () => {
 
   return (
     <div className="relative z-10">
-      <div className="flex h-16 w-screen items-center justify-between bg-base-100 px-5 shadow-lg">
+      <div className="flex h-16 w-full items-center justify-between bg-base-100 px-5 shadow-lg">
         <div className="flex md:hidden">
           <div className="dropdown-start dropdown">
             <label tabIndex={0} className="btn-ghost btn-circle btn">

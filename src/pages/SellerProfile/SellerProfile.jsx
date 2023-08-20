@@ -188,14 +188,57 @@ const SellerProfile = () => {
     } else if (selectedCategory === "Cancelled Orders") {
       setSelectedOrders(cancelledOrders);
     }
-  }, [selectedCategory]);
+  }, [selectedCategory, userInfo, orders]);
 
   console.log("selected ", selectedOrders);
 
+  const handleExportClick = () => {
+    const selectedOrdersIds = selectedOrders.map((order) => order._id);
+    console.log("selectedOrdersIds", selectedOrdersIds);
+
+    fetch(
+      `${import.meta.env.VITE_SERVER_URL}/order/order-export?sellerId=${
+        userInfo?.role === "Admin" ? userInfo?._id : userInfo?.sellerId
+      }&orderIds=${selectedOrdersIds}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    )
+      .then((res) => res.blob())
+      .then((blob) => {
+        // Create a temporary URL for the blob
+        const url = window.URL.createObjectURL(blob);
+
+        // Create a link element
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = "exported_data.csv";
+
+        // Append the link to the document body
+        document.body.appendChild(link);
+
+        // Simulate a click on the link to trigger the download
+        link.click();
+
+        // Remove the link from the document body
+        document.body.removeChild(link);
+
+        // Release the temporary URL
+        window.URL.revokeObjectURL(url);
+      })
+      .catch((error) => {
+        console.error("Error exporting data:", error);
+        // Handle error appropriately
+      });
+  };
+
   return (
     <div>
-      <div className="grid grid-cols-4 gap-5">
-        <div>
+      <div className="flex flex-col gap-5 py-5">
+        {/* <div>
           <div className="flex flex-col items-center gap-2 rounded-xl bg-white p-5 text-center shadow-lg">
             <img
               className="h-32 w-32 rounded-full object-contain"
@@ -234,7 +277,7 @@ const SellerProfile = () => {
               </p>
             </div>
           </div>
-        </div>
+        </div> */}
         <div className="col-span-3 w-full rounded-lg">
           <div className="flex flex-col gap-5">
             {stores?.map((store, index) => {
@@ -243,9 +286,15 @@ const SellerProfile = () => {
               );
               return (
                 <div
-                  className="flex flex-col items-center gap-2 rounded-lg bg-gray-200 p-5 text-center"
+                  className="relative flex flex-col items-center gap-2 rounded-lg bg-gray-200 p-5 text-center"
                   key={index}
                 >
+                  <button
+                    onClick={() => handleExportClick()}
+                    className="btn-primary btn absolute right-5 top-5"
+                  >
+                    Download
+                  </button>
                   <div className="flex w-full flex-col items-center">
                     <p className="text-xl">
                       <span className="font-semibold">Store Name:</span>{" "}

@@ -96,7 +96,7 @@ const ReturnedOrders = () => {
           <SingleInvoiceGenerator order={selectedOrder} />
         </div>
       </ModalBox>
-      <div className="flex items-start justify-between border-b py-3">
+      <div className="flex items-start justify-between border-b px-3">
         <div>
           <p className="text-xl font-semibold">Returned Orders</p>
           <p>Total Parcels: 1</p>

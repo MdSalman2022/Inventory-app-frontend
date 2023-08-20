@@ -284,7 +284,7 @@ const OrderProcessing = () => {
         selectedOrder={selectedOrder}
         refetch={refetch}
       />
-      <div className="flex flex-col items-start justify-between border-b py-3 md:flex-row">
+      <div className="flex flex-col items-start justify-between border-b px-3 md:flex-row">
         <div>
           <p className="text-xl font-semibold">Order Processing</p>
           <p>Total Parcels: 0</p>

@@ -62,7 +62,7 @@ const LossProfitPage = () => {
   console.log(TotalProfit);
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-5 px-3 py-5">
       <div className="flex gap-5">
         <input
           type="text"

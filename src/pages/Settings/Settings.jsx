@@ -13,7 +13,7 @@ const Settings = () => {
   };
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-5 p-5">
       <div className="flex items-center justify-between">
         <p>Business Information</p>
         <p

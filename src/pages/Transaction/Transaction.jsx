@@ -61,7 +61,7 @@ const Transaction = () => {
   }, 0);
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-5 px-3 py-5">
       <ModalBox isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen}>
         <InvoiceGenerator order={selectedOrder} />
       </ModalBox>
