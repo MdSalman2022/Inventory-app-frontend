@@ -230,7 +230,7 @@ const Header = () => {
           </div>
 
           <div className="flex">
-            <a className="btn-ghost btn text-xl normal-case">
+            <a className="btn border-0 bg-base-100 text-xl normal-case hover:bg-base-100">
               <img
                 className="h-10 w-full object-cover"
                 src="https://i.ibb.co/TW8T2kc/logo-momley.png"
@@ -240,7 +240,7 @@ const Header = () => {
           </div>
         </div>
         <div className="hidden md:flex md:flex-1">
-          <a className="btn-ghost btn text-xl normal-case">
+          <a className="btn border-0 bg-base-100 text-xl normal-case hover:bg-base-100">
             <img
               className="h-10 w-full object-cover"
               src="https://i.ibb.co/TW8T2kc/logo-momley.png"

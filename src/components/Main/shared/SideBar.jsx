@@ -129,7 +129,7 @@ const SideBar = ({ children }) => {
                 ))}
           </div>
         </div>
-        <div className="col-span-6 md:p-5">{children}</div>
+        <div className="col-span-7 md:col-span-6 md:p-5">{children}</div>
       </div>
     </div>
   );
