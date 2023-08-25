@@ -34,7 +34,7 @@ const StartOrderModal = ({
     selectedCustomer?.customer_details?.location ?? ""
   );
   const [courier, setCourier] = useState("");
-  const [store, setStore] = useState(stores[0]);
+  const [store, setStore] = useState({});
   console.log("courier ", courier);
 
   console.log("district ", district);

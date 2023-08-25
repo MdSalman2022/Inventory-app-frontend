@@ -62,8 +62,8 @@ const LossProfitPage = () => {
   console.log(TotalProfit);
 
   return (
-    <div className="space-y-5 px-3 py-5">
-      <div className="flex gap-5">
+    <div className="w-screen p-3 md:w-full md:space-y-4 md:p-0">
+      <div className="flex flex-col gap-5 md:flex-row">
         <input
           type="text"
           className="input-bordered input"
@@ -79,7 +79,7 @@ const LossProfitPage = () => {
       </p>
       <p>Note: Red 0-39%, Yellow 40-59%, Blue 60-79%, Green above 79%</p>
 
-      <div className="grid grid-cols-4 gap-5">
+      <div className="grid gap-5 md:grid-cols-4">
         <StatCard>
           <p className="font-semibold">Total Orders</p>
           <p>{orders?.length}</p>

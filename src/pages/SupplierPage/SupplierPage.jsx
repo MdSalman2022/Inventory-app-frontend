@@ -29,7 +29,7 @@ const SupplierPage = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   return (
-    <div className="space-y-5">
+    <div className="w-screen space-y-3 p-3 md:w-full md:space-y-4 md:p-0 ">
       <div className="flex w-full items-center justify-between">
         <p>Suppliers</p>
         <button
@@ -68,21 +68,10 @@ const SupplierPage = () => {
               <option value="50">50</option>
               <option value="100">100</option>
             </select>
-            <p>entries</p>
-          </div>
-          <div className="flex items-center gap-2">
-            <p>Search</p>
-            <form>
-              <input
-                name="search-key"
-                type="text"
-                className="input-bordered input"
-              />
-            </form>
           </div>
         </div>
 
-        <div className="h-full bg-white">
+        <div className="h-full overflow-x-auto bg-white">
           <table className="table h-full bg-white ">
             <thead>
               <tr>

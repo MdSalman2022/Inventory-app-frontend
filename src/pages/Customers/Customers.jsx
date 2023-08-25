@@ -22,8 +22,10 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import StartOrderModal from "@/components/Main/StartOrder/StartOrderModal";
 
 const Customers = () => {
+  const { userInfo, couriers } = useContext(StateContext);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState({});
 
@@ -33,8 +35,6 @@ const Customers = () => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
-
-  const { userInfo } = useContext(StateContext);
 
   const navigate = useNavigate();
 
@@ -244,6 +244,9 @@ const Customers = () => {
   console.log(searchResults.length);
 
   console.log("customers ", customers);
+  const [isStartNewOrderOpen, setIsStartNewOrderOpen] = useState(false);
+
+  console.log("new order modal open ", isStartNewOrderOpen);
 
   return (
     <div className="w-screen p-3 md:w-full md:space-y-4 md:p-0">
@@ -258,6 +261,12 @@ const Customers = () => {
         isDeleteModalOpen={isDeleteModalOpen}
         selectedCustomer={selectedCustomer}
         refetch={refetch}
+      />
+      <StartOrderModal
+        isStartNewOrderOpen={isStartNewOrderOpen}
+        setIsStartNewOrderOpen={setIsStartNewOrderOpen}
+        selectedCustomer={selectedCustomer}
+        setSelectedCustomer={setSelectedCustomer}
       />
       <div className="flex w-full flex-col gap-3 border-b pb-3 md:flex-row md:justify-between md:gap-0">
         <p className="flex items-center text-xl font-semibold">
@@ -466,7 +475,17 @@ const Customers = () => {
                           </div>
                         </div>
                         <div className="flex items-center gap-2">
-                          <span className="rounded-full border border-gray-500 p-1 text-2xl text-success">
+                          <span
+                            onClick={() => {
+                              if (couriers && couriers.length > 0) {
+                                setSelectedCustomer(customer);
+                                setIsStartNewOrderOpen(true);
+                              } else {
+                                toast.error("Please add a courier first!!");
+                              }
+                            }}
+                            className="cursor-pointer rounded-full border border-gray-500 p-1 text-2xl text-success"
+                          >
                             <AiOutlineShoppingCart />
                           </span>
                           <span
@@ -555,7 +574,17 @@ const Customers = () => {
                           </div>
                         </div>
                         <div className="flex items-center gap-2">
-                          <span className="rounded-full border border-gray-500 p-1 text-2xl text-success">
+                          <span
+                            onClick={() => {
+                              if (couriers && couriers.length > 0) {
+                                setSelectedCustomer(customer);
+                                setIsStartNewOrderOpen(true);
+                              } else {
+                                toast.error("Please add a courier first!!");
+                              }
+                            }}
+                            className="cursor-pointer rounded-full border border-gray-500 p-1 text-2xl text-success"
+                          >
                             <AiOutlineShoppingCart />
                           </span>
                           <span

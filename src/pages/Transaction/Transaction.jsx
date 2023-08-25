@@ -61,7 +61,7 @@ const Transaction = () => {
   }, 0);
 
   return (
-    <div className="space-y-5 px-3 py-5">
+    <div className="w-screen space-y-3 p-3 md:w-full md:space-y-4 md:p-0">
       <ModalBox isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen}>
         <InvoiceGenerator order={selectedOrder} />
       </ModalBox>
@@ -92,21 +92,6 @@ const Transaction = () => {
             </span>
           </p>
         </div>
-        <select className="select-primary select w-full max-w-xs">
-          <option disabled selected>
-            Filter by Courier
-          </option>
-          <option value="All">All</option>
-          <option value="Pathao">Pathao</option>
-          <option value="RedX">RedX</option>
-          <option value="Steadfast">Steadfast</option>
-          <option value="Pidex">Pidex</option>
-          <option value="eCourier">eCourier</option>
-          <option value="PaperFly">PaperFly</option>
-          <option value="Sundarban">Sundarban</option>
-          <option value="SA Paribahan">SA Paribahan</option>
-          <option value="Store Pickup">Store Pickup</option>
-        </select>
       </div>
       <hr />
       <div className="flex justify-between">
@@ -118,12 +103,19 @@ const Transaction = () => {
             <option value="50">50</option>
             <option value="100">100</option>
           </select>
-          <p>entries</p>
         </div>
-        <div className="flex items-center gap-2">
+        <form
+          // onSubmit={SearchOrderById}
+          className="hidden items-center gap-2 md:flex"
+        >
           <p>Search</p>
-          <input type="text" className="input-bordered input" />
-        </div>
+          <input
+            type="text"
+            name="orderId"
+            placeholder="Order Id"
+            className="input-bordered input"
+          />
+        </form>
       </div>
       <div className="overflow-x-auto rounded-xl">
         <table className="table">

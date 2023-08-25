@@ -90,13 +90,13 @@ const ReturnedOrders = () => {
   console.log("selected order ", selectedOrder);
 
   return (
-    <div className="space-y-4">
+    <div className="w-screen p-3 md:w-full md:space-y-4 md:p-0">
       <ModalBox isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen}>
         <div>
           <SingleInvoiceGenerator order={selectedOrder} />
         </div>
       </ModalBox>
-      <div className="flex items-start justify-between border-b px-3">
+      <div className="flex flex-col items-start justify-between border-b px-3 md:flex-row">
         <div>
           <p className="text-xl font-semibold">Returned Orders</p>
           <p>Total Parcels: 1</p>
@@ -105,7 +105,7 @@ const ReturnedOrders = () => {
           <p>Total COD: ৳0.00</p>
           <p>Total Advance: ৳0.00</p>
         </div>
-        <div className="flex items-center gap-4">
+        <div className="mt-3 flex w-full flex-col gap-3 md:mt-0 md:w-auto md:flex-row md:gap-5">
           {selectedOrders?.length > 0 && (
             <Link to="/invoice-generator">
               <button className="btn-primary btn-outline btn">
@@ -134,7 +134,7 @@ const ReturnedOrders = () => {
         </div>
       </div>
       <div className="flex justify-between">
-        <div className="flex items-center gap-2">
+        <div className="my-2 flex items-center gap-2 md:my-0">
           <p>Show</p>
           <select name="page" id="page" className="input-bordered input p-2">
             <option value="10">10</option>
@@ -142,12 +142,19 @@ const ReturnedOrders = () => {
             <option value="50">50</option>
             <option value="100">100</option>
           </select>
-          <p>entries</p>
         </div>
-        <div className="flex items-center gap-2">
+        <form
+          // onSubmit={SearchOrderById}
+          className="hidden items-center gap-2 md:flex"
+        >
           <p>Search</p>
-          <input type="text" className="input-bordered input" />
-        </div>
+          <input
+            type="text"
+            name="orderId"
+            placeholder="Order Id"
+            className="input-bordered input"
+          />
+        </form>
       </div>
 
       <div>
@@ -244,21 +251,6 @@ const ReturnedOrders = () => {
                 </tr>
               ))}
             </tbody>
-            <tfoot className="bg-white">
-              <tr>
-                <th>Showing 1 to 2 of 2 entries</th>
-                <th></th>
-                <th></th>
-                {/* <th></th> */}
-                <th className="flex justify-end">
-                  <div className="join">
-                    <button className="join-item btn">Previous</button>
-                    <button className="btn-primary join-item btn">1</button>
-                    <button className="join-item btn ">Next</button>
-                  </div>
-                </th>
-              </tr>
-            </tfoot>
           </table>
         </div>
       </div>

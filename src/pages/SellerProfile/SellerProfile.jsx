@@ -237,7 +237,7 @@ const SellerProfile = () => {
 
   return (
     <div>
-      <div className="flex flex-col gap-5 py-5">
+      <div className="w-screen p-3 md:w-full md:space-y-4 md:p-0">
         {/* <div>
           <div className="flex flex-col items-center gap-2 rounded-xl bg-white p-5 text-center shadow-lg">
             <img

@@ -249,7 +249,7 @@ const Products = () => {
     );
   } else
     return (
-      <div className="space-y-4">
+      <div className="w-screen p-3 md:w-full md:space-y-4 md:p-0">
         <EditProductModal
           setIsEditModalOpen={setIsEditModalOpen}
           isEditModalOpen={isEditModalOpen}
@@ -262,7 +262,7 @@ const Products = () => {
           selectedProduct={selectedProduct}
           refetchProducts={refetchProducts}
         />
-        <div className="grid grid-cols-3 gap-5">
+        <div className="flex grid-cols-3 flex-col gap-5 md:grid">
           <div className="rounded-lg border bg-white p-2">
             <p className="text-xl font-semibold">Product Stock Info</p>
             <p>Total Available</p>
@@ -300,7 +300,7 @@ const Products = () => {
             </div>
           </div>
         </div>
-        <div className="flex justify-between border-b py-3">
+        <div className="flex items-center justify-between border-b py-3">
           <p className="text-xl font-semibold">Products List</p>
 
           <div className="flex items-center gap-4">
@@ -461,7 +461,7 @@ const Products = () => {
             </ModalBox>
           </div>
         </div>
-        <div className="flex justify-between">
+        <div className="my-2 flex justify-between md:my-0">
           <div className="flex items-center gap-2">
             <p>Show</p>
             <select name="page" id="page" className="input-bordered input p-2">
@@ -470,7 +470,6 @@ const Products = () => {
               <option value="50">50</option>
               <option value="100">100</option>
             </select>
-            <p>entries</p>
           </div>
           <div className="flex items-center gap-2">
             <p>Search</p>

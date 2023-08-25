@@ -71,7 +71,7 @@ const Couriers = () => {
   };
 
   return (
-    <div className="space-y-5">
+    <div className="w-screen space-y-3 p-3 md:w-full md:space-y-4 md:p-0">
       <EditCourierModal
         isEditCourierModalOpen={isEditCourierModalOpen}
         setIsEditCourierModalOpen={setIsEditCourierModalOpen}
@@ -79,7 +79,7 @@ const Couriers = () => {
         refetch={refetch}
       ></EditCourierModal>
       <ModalBox isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen}>
-        <div className="space-y-5 p-5">
+        <div className="w-full space-y-5 p-5">
           <p>Courier Information</p>
           <form onSubmit={handleCourierSubmit} className="flex flex-col gap-3">
             <input
@@ -141,17 +141,6 @@ const Couriers = () => {
               <option value="50">50</option>
               <option value="100">100</option>
             </select>
-            <p>entries</p>
-          </div>
-          <div className="flex items-center gap-2">
-            <p>Search</p>
-            <form>
-              <input
-                name="search-key"
-                type="text"
-                className="input-bordered input"
-              />
-            </form>
           </div>
         </div>
 

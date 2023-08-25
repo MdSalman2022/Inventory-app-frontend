@@ -322,7 +322,7 @@ const OrderProcessing = () => {
         </div>
       </div>
       <div className="flex justify-between">
-        <div className="flex items-center gap-2">
+        <div className="my-2 flex items-center gap-2 md:my-0">
           <p>Show</p>
           <select name="page" id="page" className="input-bordered input p-2">
             <option value="10">10</option>
@@ -514,21 +514,6 @@ const OrderProcessing = () => {
                 )
               )}
             </tbody>
-            <tfoot className="bg-white">
-              <tr>
-                <th>Showing 1 to 2 of 2 entries</th>
-                <th></th>
-                <th></th>
-                {/* <th></th> */}
-                <th className="flex justify-end">
-                  <div className="join">
-                    <button className="join-item btn">Previous</button>
-                    <button className="btn-primary join-item btn">1</button>
-                    <button className="join-item btn ">Next</button>
-                  </div>
-                </th>
-              </tr>
-            </tfoot>
           </table>
         </div>
       </div>

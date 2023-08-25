@@ -32,13 +32,13 @@ const Store = () => {
   console.log(isEditModalOpen);
 
   return (
-    <div className="space-y-5">
+    <div className="w-screen space-y-3 p-3 md:w-full md:space-y-4 md:p-0">
       <AddStoreModal
         isAddModalOpen={isAddModalOpen}
         setIsAddModalOpen={setIsAddModalOpen}
       />
       <div className="flex w-full justify-between">
-        <p>Stores</p>
+        <p className="text-3xl font-semibold">Stores</p>
         <button
           onClick={() => setIsAddModalOpen(!isAddModalOpen)}
           className="btn-primary btn-outline btn"
@@ -71,22 +71,11 @@ const Store = () => {
               <option value="50">50</option>
               <option value="100">100</option>
             </select>
-            <p>entries</p>
-          </div>
-          <div className="flex items-center gap-2">
-            <p>Search</p>
-            <form>
-              <input
-                name="search-key"
-                type="text"
-                className="input-bordered input"
-              />
-            </form>
           </div>
         </div>
 
         {stores?.length > 0 ? (
-          <div className="h-full  rounded-lg bg-white">
+          <div className="h-full  overflow-x-auto rounded-lg bg-white">
             <table className="table h-full rounded-lg bg-white">
               {/* head */}
               <thead>

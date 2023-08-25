@@ -76,8 +76,8 @@ const CustomerProfile = () => {
   };
 
   return (
-    <div>
-      <div className="grid grid-cols-4 gap-5">
+    <div className="mt-5 w-screen space-y-3 p-3 md:w-full md:space-y-4 md:p-0">
+      <div className="grid-cols-4 gap-5 space-y-3 md:grid">
         <div>
           <div className="flex flex-col items-center gap-2 text-center">
             <p className="font-bold">{customer?.customer_details?.name}</p>
@@ -92,7 +92,6 @@ const CustomerProfile = () => {
               {/* {formatTimestamp(customer?.purchase?.last_purchase)} */}
             </p>
             <button className="btn-info btn w-full">Start Order</button>
-            <button className="btn-primary btn w-full">Back</button>
           </div>
         </div>
         <div className="col-span-3">

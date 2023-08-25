@@ -7,8 +7,10 @@ import { useQuery } from "react-query";
 import { TbCurrencyTaka } from "react-icons/tb";
 import { StateContext } from "../../contexts/StateProvider/StateProvider";
 import { useNavigate } from "react-router-dom";
+import { AuthContext } from "@/contexts/AuthProvider/AuthProvider";
 
 const Dashboard = () => {
+  const { user } = useContext(AuthContext);
   const { userInfo } = useContext(StateContext);
 
   // console.log("userinfo", userInfo);
@@ -25,31 +27,42 @@ const Dashboard = () => {
     isError,
     error,
     refetch,
-  } = useQuery("orders", async () => {
-    const response = await fetch(
-      `${import.meta.env.VITE_SERVER_URL}/order/get-orders?sellerId=${
-        userInfo?.role === "Admin" ? userInfo?._id : userInfo?.sellerId
-      }&filter=all`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
+  } = useQuery(
+    ["orders", user, userInfo],
+    async () => {
+      const response = await fetch(
+        `${import.meta.env.VITE_SERVER_URL}/order/get-orders?sellerId=${
+          userInfo?.role === "Admin" ? userInfo?._id : userInfo?.sellerId
+        }&filter=all`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch customers");
       }
-    );
 
-    if (!response.ok) {
-      throw new Error("Failed to fetch customers");
+      return response.json().then((data) => data.orders);
+    },
+    {
+      cacheTime: 5 * 60 * 1000, // Cache data for 10 minutes
+      staleTime: 1 * 60 * 1000, // Consider data fresh for 5 minutes
     }
+  );
 
-    return response.json().then((data) => data.orders);
-  });
+  console.log("isLoading", isLoading);
 
   console.log("all orders ", orders);
 
   const orderInProcess = orders?.filter(
     (order) => order.orderStatus === "processing"
   );
+
+  console.log("process ", orderInProcess);
 
   const orderCashInProcess = orderInProcess?.reduce(
     (acc, order) => acc + parseInt(order.total),

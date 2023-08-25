@@ -312,7 +312,7 @@ const AllReadyOrders = () => {
   console.log("orders ", orders);
 
   return (
-    <div className="space-y-4">
+    <div className="w-screen p-3 md:w-full md:space-y-4 md:p-0">
       <EditOrderModal
         isEditModalOpen={isEditModalOpen}
         setIsEditModalOpen={setIsEditModalOpen}
@@ -332,7 +332,7 @@ const AllReadyOrders = () => {
         selectedOrder={selectedOrder}
         refetch={refetch}
       />
-      <div className="flex items-start justify-between border-b px-3">
+      <div className="flex flex-col items-start justify-between border-b px-3 md:flex-row">
         <div>
           <p className="text-xl font-semibold">All Ready Orders</p>
           <p>Total Parcels: 1</p>
@@ -341,7 +341,7 @@ const AllReadyOrders = () => {
           <p>Total COD: ৳0.00</p>
           <p>Total Advance: ৳0.00</p>
         </div>
-        <div className="flex items-center gap-4">
+        <div className="mt-3 flex w-full flex-col gap-3 md:mt-0 md:w-auto md:flex-row md:gap-5">
           {selectedOrders?.length > 0 && (
             <Link to="/invoice-generator">
               <button className="btn-primary btn-outline btn">
@@ -371,7 +371,7 @@ const AllReadyOrders = () => {
         </div>
       </div>
       <div className="flex justify-between">
-        <div className="flex items-center gap-2">
+        <div className="my-2 flex items-center gap-2">
           <p>Show</p>
           <select name="page" id="page" className="input-bordered input p-2">
             <option value="10">10</option>
@@ -379,9 +379,11 @@ const AllReadyOrders = () => {
             <option value="50">50</option>
             <option value="100">100</option>
           </select>
-          <p>entries</p>
         </div>
-        <form onSubmit={SearchOrderById} className="flex items-center gap-2">
+        <form
+          onSubmit={SearchOrderById}
+          className="hidden items-center gap-2 md:flex"
+        >
           <p>Search</p>
           <input
             type="text"
