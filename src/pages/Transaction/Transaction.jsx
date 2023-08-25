@@ -61,11 +61,11 @@ const Transaction = () => {
   }, 0);
 
   return (
-    <div className="w-screen space-y-3 p-3 md:w-full md:space-y-4 md:p-0">
+    <div className="w-screen space-y-3 p-3 md:w-full md:space-y-4">
       <ModalBox isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen}>
         <InvoiceGenerator order={selectedOrder} />
       </ModalBox>
-      <div className="flex justify-between">
+      <div className="mt-3 flex justify-between">
         <div>
           <p className="flex items-center gap-2 text-xl font-bold">
             {" "}
@@ -140,7 +140,7 @@ const Transaction = () => {
                 <th>{index + 1}</th>
                 <td>{formatStockDate(order.timestamp)} </td>
                 <td>
-                  <div className="flex flex-col">
+                  <div className="flex w-44 flex-col">
                     <p>COD pending from {order.courier}</p>
                     <p>
                       Inv#:{" "}

@@ -62,8 +62,8 @@ const LossProfitPage = () => {
   console.log(TotalProfit);
 
   return (
-    <div className="w-screen p-3 md:w-full md:space-y-4 md:p-0">
-      <div className="flex flex-col gap-5 md:flex-row">
+    <div className="w-screen p-3 md:w-full md:space-y-4">
+      <div className="mt-3 flex flex-col gap-5 md:flex-row">
         <input
           type="text"
           className="input-bordered input"

@@ -77,7 +77,7 @@ const Users = () => {
   };
 
   return (
-    <div className="w-screen p-3 md:w-full md:space-y-4 md:p-0">
+    <div className="w-screen p-3 md:w-full md:space-y-4">
       <div className="flex justify-between">
         <p className="text-xl font-bold">Employees</p>
         {/* <button

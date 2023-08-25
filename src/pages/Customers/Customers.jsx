@@ -23,6 +23,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import StartOrderModal from "@/components/Main/StartOrder/StartOrderModal";
+import { BsThreeDots } from "react-icons/bs";
 
 const Customers = () => {
   const { userInfo, couriers } = useContext(StateContext);
@@ -249,7 +250,7 @@ const Customers = () => {
   console.log("new order modal open ", isStartNewOrderOpen);
 
   return (
-    <div className="w-screen p-3 md:w-full md:space-y-4 md:p-0">
+    <div className="w-screen space-y-3 p-3 md:w-full">
       <EditCustomerModal
         setIsEditModalOpen={setIsEditModalOpen}
         isEditModalOpen={isEditModalOpen}
@@ -431,14 +432,15 @@ const Customers = () => {
       </div>
 
       <div>
-        <div className="overflow-x-auto">
-          <table className="table">
+        <div className="h-[70vh] overflow-auto">
+          <table className="table-pin-rows table-pin-cols table">
             {/* head */}
-            <thead className="bg-primary text-white">
+            <thead className=" text-white">
               <tr>
-                <th>Customer Details</th>
-                <th>Purchase</th>
-                <th>Orders</th>
+                <th className="rounded-tl-lg bg-primary">Customer Details</th>
+                <th className="bg-primary">Purchase</th>
+                <th className="bg-primary">Orders</th>
+                <th className="rounded-tr-lg bg-primary">Action</th>
               </tr>
             </thead>
             <tbody className="bg-white">
@@ -546,18 +548,6 @@ const Customers = () => {
                     <tr key={index}>
                       <td className="flex flex-col gap-1">
                         <div className="flex items-center space-x-3">
-                          {/* <div className="avatar">
-                            <div className="mask mask-squircle h-12 w-12">
-                              <img
-                                src={
-                                  customer?.customer_details?.image ||
-                                  avatarIcon
-                                }
-                                alt="image"
-                                className="rounded-full border-2 border-primary p-1"
-                              />
-                            </div>
-                          </div> */}
                           <div>
                             <Link
                               to={`/customer/profile/${customer?._id}`}
@@ -572,39 +562,6 @@ const Customers = () => {
                               {customer?.customer_details?.address}
                             </div>
                           </div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <span
-                            onClick={() => {
-                              if (couriers && couriers.length > 0) {
-                                setSelectedCustomer(customer);
-                                setIsStartNewOrderOpen(true);
-                              } else {
-                                toast.error("Please add a courier first!!");
-                              }
-                            }}
-                            className="cursor-pointer rounded-full border border-gray-500 p-1 text-2xl text-success"
-                          >
-                            <AiOutlineShoppingCart />
-                          </span>
-                          <span
-                            onClick={() => {
-                              setIsEditModalOpen(true);
-                              setSelectedCustomer(customer);
-                            }}
-                            className="cursor-pointer rounded-full border border-gray-500 p-1 text-2xl text-info"
-                          >
-                            <AiOutlineEdit />
-                          </span>
-                          <span
-                            onClick={() => {
-                              setIsDeleteModalOpen(true);
-                              setSelectedCustomer(customer);
-                            }}
-                            className="cursor-pointer rounded-full border border-gray-500 p-1 text-2xl text-error"
-                          >
-                            <RiDeleteBin6Line />
-                          </span>
                         </div>
                       </td>
                       <td>
@@ -639,22 +596,58 @@ const Customers = () => {
                           )}
                         </div>
                       </td>
+                      <td>
+                        <div className="dropdown-left dropdown">
+                          <label tabIndex={0} className="btn m-1">
+                            <BsThreeDots size={18} />
+                          </label>
+                          <ul
+                            tabIndex={0}
+                            className="dropdown-content menu rounded-box z-[1] w-40 gap-1  bg-base-100 shadow"
+                          >
+                            <li
+                              onClick={() => {
+                                if (couriers && couriers.length > 0) {
+                                  setSelectedCustomer(customer);
+                                  setIsStartNewOrderOpen(true);
+                                } else {
+                                  toast.error("Please add a courier first!!");
+                                }
+                              }}
+                              className="flex w-full cursor-pointer justify-center rounded-lg bg-green-100 "
+                            >
+                              <span className="flex justify-center">
+                                <AiOutlineShoppingCart className="text-2xl text-success " />
+                              </span>
+                            </li>
+                            <li
+                              onClick={() => {
+                                setIsEditModalOpen(true);
+                                setSelectedCustomer(customer);
+                              }}
+                              className="flex w-full cursor-pointer justify-center rounded-lg  bg-yellow-100"
+                            >
+                              <span className="flex justify-center">
+                                <AiOutlineEdit className="text-2xl text-warning " />
+                              </span>
+                            </li>
+                            <li
+                              onClick={() => {
+                                setIsDeleteModalOpen(true);
+                                setSelectedCustomer(customer);
+                              }}
+                              className="flex w-full cursor-pointer justify-center rounded-lg bg-red-100"
+                            >
+                              <span className="flex justify-center">
+                                <RiDeleteBin6Line className="text-2xl text-error  " />
+                              </span>
+                            </li>
+                          </ul>
+                        </div>
+                      </td>
                     </tr>
                   ))}
             </tbody>
-            <tfoot className="bg-white">
-              <tr>
-                <th>Showing 1 to 2 of 2 entries</th>
-                <th></th>
-                <th className="flex justify-end">
-                  <div className="join">
-                    <button className="join-item btn">Previous</button>
-                    <button className="btn-primary join-item btn">1</button>
-                    <button className="join-item btn ">Next</button>
-                  </div>
-                </th>
-              </tr>
-            </tfoot>
           </table>
         </div>
       </div>

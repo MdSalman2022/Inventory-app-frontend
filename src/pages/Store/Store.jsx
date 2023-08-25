@@ -38,7 +38,7 @@ const Store = () => {
         setIsAddModalOpen={setIsAddModalOpen}
       />
       <div className="flex w-full justify-between">
-        <p className="text-3xl font-semibold">Stores</p>
+        <p className="text-xl font-bold">Stores</p>
         <button
           onClick={() => setIsAddModalOpen(!isAddModalOpen)}
           className="btn-primary btn-outline btn"
@@ -75,18 +75,18 @@ const Store = () => {
         </div>
 
         {stores?.length > 0 ? (
-          <div className="h-full  overflow-x-auto rounded-lg bg-white">
-            <table className="table h-full rounded-lg bg-white">
+          <div className="h-[70vh] overflow-x-auto rounded-lg bg-white">
+            <table className="table rounded-lg bg-white">
               {/* head */}
               <thead>
                 <tr>
-                  <th className="w-5"></th>
-                  <th>Store</th>
-                  <th>Phone</th>
-                  <th>Address</th>
-                  <th>Status</th>
-                  <th>Time</th>
-                  <th>Action</th>
+                  <th className="w-5 bg-primary text-white"></th>
+                  <th className="bg-primary text-white">Store</th>
+                  <th className="bg-primary text-white">Phone</th>
+                  <th className="bg-primary text-white">Address</th>
+                  <th className="bg-primary text-white">Status</th>
+                  <th className="bg-primary text-white">Time</th>
+                  <th className="bg-primary text-white">Action</th>
                 </tr>
               </thead>
               <tbody>
@@ -105,7 +105,6 @@ const Store = () => {
                       )}
                     </td>
                     <td>{formatTimestamp(user?.timestamp)}</td>
-                    <td></td>
                     <td>
                       <div className="dropdown-left dropdown">
                         <label tabIndex={0} className="btn m-1">

@@ -73,7 +73,7 @@ const Marchants = () => {
   };
 
   return (
-    <div className="space-y-5 p-5">
+    <div className="w-screen space-y-3 p-3 md:w-full md:space-y-4 ">
       <div className="flex justify-between">
         <p className="text-xl font-bold">Marchants</p>
         {/* <button
@@ -104,42 +104,47 @@ const Marchants = () => {
           refetch={refetch}
         />
 
-        <div className="flex justify-between">
+        <div className="flex flex-col items-start justify-between border-b px-3 md:flex-row">
           <div className="flex items-center gap-2">
             <p>Show</p>
-            <select name="page" id="page" className="input-bordered input p-2">
+            <select
+              name="page"
+              id="page"
+              className="input-bordered input my-2 p-2 "
+            >
               <option value="10">10</option>
               <option value="25">25</option>
               <option value="50">50</option>
               <option value="100">100</option>
             </select>
-            <p>entries</p>
           </div>
-          <div className="flex items-center gap-2">
+          <form
+            // onSubmit={SearchOrderById}
+            className="hidden items-center gap-2 md:flex"
+          >
             <p>Search</p>
-            <form>
-              <input
-                name="search-key"
-                type="text"
-                className="input-bordered input"
-              />
-            </form>
-          </div>
+            <input
+              type="text"
+              name="orderId"
+              placeholder="Order Id"
+              className="input-bordered input"
+            />
+          </form>
         </div>
 
-        <div className="h-full bg-white">
-          <table className="table h-full bg-white ">
+        <div className="h-[70vh] overflow-auto bg-white">
+          <table className="table-pin-rows table bg-white">
             {/* head */}
             <thead>
-              <tr>
-                <th className="w-5"></th>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Role</th>
-                <th>Status</th>
-                <th>Verified</th>
-                <th>Last Login</th>
-                <th>Action</th>
+              <tr className="text-white">
+                <th className="w-5 bg-primary"></th>
+                <th className="bg-primary">Name</th>
+                <th className="bg-primary">Email</th>
+                <th className="bg-primary">Role</th>
+                <th className="bg-primary">Status</th>
+                <th className="bg-primary">Verified</th>
+                <th className="bg-primary">Last Login</th>
+                <th className="bg-primary">Action</th>
               </tr>
             </thead>
             <tbody>
@@ -191,7 +196,6 @@ const Marchants = () => {
                     )}
                   </td>
                   <td>{formatTimestamp(user?.timestamp)}</td>
-                  <td></td>
                   <td>
                     <div className="dropdown-left dropdown">
                       <label tabIndex={0} className="btn m-1">

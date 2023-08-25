@@ -312,7 +312,7 @@ const AllReadyOrders = () => {
   console.log("orders ", orders);
 
   return (
-    <div className="w-screen p-3 md:w-full md:space-y-4 md:p-0">
+    <div className="w-screen space-y-3 p-3 md:w-full">
       <EditOrderModal
         isEditModalOpen={isEditModalOpen}
         setIsEditModalOpen={setIsEditModalOpen}
@@ -332,7 +332,7 @@ const AllReadyOrders = () => {
         selectedOrder={selectedOrder}
         refetch={refetch}
       />
-      <div className="flex flex-col items-start justify-between border-b px-3 md:flex-row">
+      <div className="flex flex-col items-start justify-between border-b md:flex-row">
         <div>
           <p className="text-xl font-semibold">All Ready Orders</p>
           <p>Total Parcels: 1</p>
@@ -544,7 +544,7 @@ const AllReadyOrders = () => {
                     </div>
                   </td> */}
                     <td className="w-96">
-                      <div className="flex flex-col">
+                      <div className="flex w-32 flex-col">
                         <p className="badge badge-info">
                           {order?.courier}: {order?.deliveryCharge}
                         </p>

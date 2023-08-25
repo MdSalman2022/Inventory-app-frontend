@@ -29,9 +29,9 @@ const SupplierPage = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   return (
-    <div className="w-screen space-y-3 p-3 md:w-full md:space-y-4 md:p-0 ">
+    <div className="w-screen space-y-3 p-3 md:w-full md:space-y-4">
       <div className="flex w-full items-center justify-between">
-        <p>Suppliers</p>
+        <p className="text-xl font-bold">Suppliers</p>
         <button
           onClick={() => setIsAddModalOpen(!isAddModalOpen)}
           className="btn-primary btn"
@@ -41,7 +41,7 @@ const SupplierPage = () => {
       </div>
       <hr />
 
-      <div className="space-y-5">
+      <div className="mt-3 space-y-5">
         <AddSupplier
           setIsAddModalOpen={setIsAddModalOpen}
           isAddModalOpen={isAddModalOpen}

@@ -208,8 +208,8 @@ const CourierPage = () => {
   console.log(selectedOrder);
 
   return (
-    <div className="w-screen p-3 md:w-full md:space-y-4 md:p-0">
-      <div className="flex flex-col items-start justify-between border-b px-3 md:flex-row">
+    <div className="w-screen space-y-3 p-3 md:w-full">
+      <div className="mt-3 flex flex-col items-start justify-between border-b md:flex-row">
         <ModalBox isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen}>
           <div>
             <SingleInvoiceGenerator order={selectedOrder} />
@@ -412,7 +412,7 @@ const CourierPage = () => {
                       : ordersStatus[index]?.delivery_status}
                   </td>
                   <td>
-                    <div className="flex flex-col">
+                    <div className="flex w-32 flex-col">
                       <p className="badge badge-info">
                         {order?.courier}: {order?.deliveryCharge}
                       </p>

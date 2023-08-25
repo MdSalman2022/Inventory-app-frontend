@@ -315,7 +315,7 @@ const Dashboard = () => {
 
   return (
     <div className="w-screen space-y-3 p-3 md:w-full">
-      <p className="text-xl">Order Summary</p>
+      <p className="flex items-center text-xl font-semibold">Order Summary</p>
       <div className="grid w-full grid-cols-1 gap-5 md:grid-cols-4">
         {orderSummary.map((order, index) => (
           <StatCard key={index}>

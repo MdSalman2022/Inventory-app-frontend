@@ -237,7 +237,7 @@ const SellerProfile = () => {
 
   return (
     <div>
-      <div className="w-screen p-3 md:w-full md:space-y-4 md:p-0">
+      <div className="w-screen p-3 md:w-full md:space-y-4 md:py-5">
         {/* <div>
           <div className="flex flex-col items-center gap-2 rounded-xl bg-white p-5 text-center shadow-lg">
             <img
@@ -280,6 +280,47 @@ const SellerProfile = () => {
         </div> */}
         <div className="col-span-3 w-full rounded-lg">
           <div className="flex flex-col gap-5">
+            {stores?.length === 0 && (
+              <div className="relative flex flex-col items-center gap-2 rounded-lg bg-gray-200 p-5 text-center">
+                <button
+                  onClick={() => handleExportClick()}
+                  className="btn-primary btn absolute right-5 top-5"
+                >
+                  Download
+                </button>
+                <div className="flex w-full flex-col items-center">
+                  <p className="text-xl">
+                    <span className="font-semibold">Store Name:</span>{" "}
+                  </p>
+                  <p className="text-lg">
+                    <span className="font-semibold">Email:</span>{" "}
+                    {seller?.email}
+                  </p>
+                </div>
+                <div className="flex items-center gap-5">
+                  <p>Number Of Products: 0</p>
+                  <p>Number Of Orders: 0</p>
+                </div>
+                <div className="flex w-full items-center justify-between gap-5">
+                  {ordersCategory?.map((category, index) => (
+                    <span
+                      onClick={() => setSelectedCategory(category)}
+                      className={`w-full rounded-lg px-3 py-2 font-semibold transition-all duration-300 hover:bg-gray-400 ${
+                        category === selectedCategory
+                          ? "bg-gray-400"
+                          : "bg-gray-300 "
+                      }
+                      cursor-pointer
+                      `}
+                      key={index}
+                    >
+                      {category}
+                    </span>
+                  ))}
+                </div>
+                <div className="w-full">No Orders</div>
+              </div>
+            )}
             {stores?.map((store, index) => {
               const ordersForCurrentStore = selectedOrders?.filter(
                 (order) => order?.storeId === store?.storeId

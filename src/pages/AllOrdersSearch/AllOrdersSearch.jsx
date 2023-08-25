@@ -229,7 +229,7 @@ const AllOrdersSearch = () => {
   };
 
   return (
-    <div className="space-y-3">
+    <div className="w-screen space-y-3 p-3 md:w-full">
       <EditOrderModal
         isEditModalOpen={isEditModalOpen}
         setIsEditModalOpen={setIsEditModalOpen}
@@ -249,12 +249,12 @@ const AllOrdersSearch = () => {
         selectedOrder={selectedOrder}
         refetch={refetchSearch}
       />
-      <div className="flex justify-between">
+      <div className="flex flex-col items-start justify-between border-b md:flex-row">
         <p className="text-xl">
           Search result for:{" "}
           <span className="font-semibold">{searchParam}</span>
         </p>
-        <div className="flex gap-3">
+        <div className="mt-3 flex w-full flex-col gap-3 md:mt-0 md:w-auto md:flex-row md:gap-5">
           {selectedOrders?.length > 0 && (
             <Link to="/invoice-generator">
               <button className="btn-primary btn-outline btn">
@@ -480,7 +480,7 @@ const AllOrdersSearch = () => {
                     </div>
                   </td> */}
                   <td className="w-96">
-                    <div className="flex flex-col">
+                    <div className="flex w-44 flex-col">
                       <p className="badge badge-info">
                         {order?.courier}: {order?.deliveryCharge}
                       </p>
