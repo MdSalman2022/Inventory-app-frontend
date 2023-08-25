@@ -237,7 +237,7 @@ const SellerProfile = () => {
 
   return (
     <div>
-      <div className="w-screen p-3 md:w-full md:space-y-4 md:py-5">
+      <div className="w-screen p-3 md:w-full md:space-y-4">
         {/* <div>
           <div className="flex flex-col items-center gap-2 rounded-xl bg-white p-5 text-center shadow-lg">
             <img
@@ -281,13 +281,7 @@ const SellerProfile = () => {
         <div className="col-span-3 w-full rounded-lg">
           <div className="flex flex-col gap-5">
             {stores?.length === 0 && (
-              <div className="relative flex flex-col items-center gap-2 rounded-lg bg-gray-200 p-5 text-center">
-                <button
-                  onClick={() => handleExportClick()}
-                  className="btn-primary btn absolute right-5 top-5"
-                >
-                  Download
-                </button>
+              <div className="flex flex-col items-center gap-2 rounded-lg bg-gray-200 p-5 text-center md:relative">
                 <div className="flex w-full flex-col items-center">
                   <p className="text-xl">
                     <span className="font-semibold">Store Name:</span>{" "}
@@ -301,7 +295,7 @@ const SellerProfile = () => {
                   <p>Number Of Products: 0</p>
                   <p>Number Of Orders: 0</p>
                 </div>
-                <div className="flex w-full items-center justify-between gap-5">
+                <div className="flex w-full flex-col items-center justify-between gap-5 md:flex-row">
                   {ordersCategory?.map((category, index) => (
                     <span
                       onClick={() => setSelectedCategory(category)}
@@ -332,7 +326,7 @@ const SellerProfile = () => {
                 >
                   <button
                     onClick={() => handleExportClick()}
-                    className="btn-primary btn absolute right-5 top-5"
+                    className="btn-primary btn right-5 top-5 md:absolute"
                   >
                     Download
                   </button>
@@ -352,7 +346,7 @@ const SellerProfile = () => {
                     </p>
                     <p>Number Of Orders: {ordersByStore[index]?.length || 0}</p>
                   </div>
-                  <div className="flex w-full items-center justify-between gap-5">
+                  <div className="flex w-full flex-col items-center justify-between gap-5 md:flex-row">
                     {ordersCategory?.map((category, index) => (
                       <span
                         onClick={() => setSelectedCategory(category)}
