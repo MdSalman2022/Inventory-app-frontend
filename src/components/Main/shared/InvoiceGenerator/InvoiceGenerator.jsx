@@ -5,9 +5,15 @@ import QRCode from "react-qr-code";
 import { StateContext } from "@/contexts/StateProvider/StateProvider";
 
 const InvoiceGenerator = () => {
-  const { selectedOrders } = useContext(StateContext);
+  const { selectedOrders, stores, userInfo } = useContext(StateContext);
+
+  const storeInfo = stores[0];
+
+  const { address, area, district, name, phone, zip } = storeInfo;
 
   const componentRef = useRef(null);
+
+  console.log("stores", stores);
 
   function formatStockDate(isoTimestamp) {
     const date = new Date(isoTimestamp);
@@ -69,8 +75,12 @@ const InvoiceGenerator = () => {
                     fontSize: "12px",
                   }}
                 >
-                  <span>Momley.com, 2/2 Arambag Motijheel, Dhaka-1000</span>
-                  <span>Phone: 01700000000, Email: admin@momley.com</span>
+                  <span>
+                    {name}, {address}, {district}, {zip}
+                  </span>
+                  <span>
+                    Phone: {phone}, Email: {userInfo?.email}
+                  </span>
                 </div>
               </div>
               <div

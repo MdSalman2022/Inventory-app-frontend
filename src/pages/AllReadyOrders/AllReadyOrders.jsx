@@ -16,6 +16,7 @@ import { GrDeliver } from "react-icons/gr";
 import EditOrderModal from "../../components/Main/Orders/EditOrderModal";
 import { StateContext } from "@/contexts/StateProvider/StateProvider";
 import SingleInvoiceGenerator from "@/components/Main/shared/InvoiceGenerator/SingleInvoiceGenerator";
+import { BsThreeDots } from "react-icons/bs";
 
 const AllReadyOrders = () => {
   const { userInfo, selectedOrders, setSelectedOrders } =
@@ -395,12 +396,12 @@ const AllReadyOrders = () => {
       </div>
 
       <div>
-        <div className="overflow-x-auto">
-          <table className="table">
+        <div className="h-[70vh] overflow-auto">
+          <table className="table-pin-rows table-pin-cols table">
             {/* head */}
             <thead className="bg-primary text-white">
               <tr>
-                <td className="w-5">
+                <td className="w-5 bg-primary text-white">
                   <input
                     type="checkbox"
                     defaultChecked={false}
@@ -415,10 +416,11 @@ const AllReadyOrders = () => {
                     className="checkbox border border-white"
                   />
                 </td>
-                <th className="w-10">#</th>
-                <th className="w-10">Invoice</th>
-                <th className="w-96">Name</th>
-                <th className="w-96">Price</th>
+                <th className="w-10 bg-primary text-white">#</th>
+                <th className="w-10 bg-primary text-white">Invoice</th>
+                <th className="w-96 bg-primary text-white">Name</th>
+                <th className="w-96 bg-primary text-white">Price</th>
+                <th className="w-96 bg-primary text-white">Action</th>
               </tr>
             </thead>
             <tbody className="bg-white">
@@ -457,17 +459,8 @@ const AllReadyOrders = () => {
                         <TbFileInvoice />
                       </span>
                     </td>
-                    <td className="flex w-96 flex-col gap-1">
+                    <td className="">
                       <div className="flex items-center space-x-3">
-                        {/* <div className="avatar">
-                        <div className="mask mask-squircle h-12 w-12">
-                          <img
-                            src={order?.image || avatarIcon}
-                            alt="image"
-                            className="rounded-full border-2 border-primary p-1"
-                          />
-                        </div>
-                      </div> */}
                         <div>
                           <div className="font-bold">{order.name}</div>
                           <div className="text-sm opacity-50">
@@ -480,56 +473,6 @@ const AllReadyOrders = () => {
                             </div>
                           )}
                         </div>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span
-                          onClick={() => {
-                            setSelectedOrder(order);
-                            setIsEditModalOpen(!isEditModalOpen);
-                          }}
-                          className="cursor-pointer rounded-full border border-gray-500 p-1 text-2xl text-neutral"
-                        >
-                          <AiOutlineEdit />
-                        </span>
-                        <span
-                          onClick={() => {
-                            handleOrderStatus(order._id, "completed");
-                          }}
-                          className="tooltip cursor-pointer rounded-full border border-gray-500 p-1 text-2xl text-info"
-                          data-tip="Complete"
-                        >
-                          <FaCheck className="text-lg" />
-                        </span>
-                        {(!order?.courierStatus ||
-                          order?.courierStatus === "returned") && (
-                          <span
-                            onClick={() => {
-                              sendToCourier(order);
-                            }}
-                            className="tooltip cursor-pointer rounded-full border border-gray-500 p-1 text-2xl text-info"
-                            data-tip={`Send to ${order?.courier} `}
-                          >
-                            <GrDeliver className="text-lg" />
-                          </span>
-                        )}
-                        <span
-                          onClick={() => {
-                            handleOrderStatus(order._id, "processing");
-                          }}
-                          className="tooltip cursor-pointer rounded-full border border-gray-500 p-1 text-2xl text-error"
-                          data-tip="Back to Processing"
-                        >
-                          <RiArrowGoBackLine className="text-lg" />
-                        </span>
-                        <span
-                          onClick={() => {
-                            handleOrderStatus(order._id, "cancelled");
-                          }}
-                          className="tooltip cursor-pointer rounded-full border border-gray-500 p-1 text-2xl text-error"
-                          data-tip="Cancel Order"
-                        >
-                          <FcCancel className="text-lg" />
-                        </span>
                       </div>
                     </td>
                     {/* <td>
@@ -560,6 +503,81 @@ const AllReadyOrders = () => {
                         </p>
                         <p className="">Advance: {order?.advance} Tk</p>
                         <p className="">COD: {order?.cash} Tk</p>
+                      </div>
+                    </td>
+                    <td>
+                      <div className="dropdown-left dropdown">
+                        <label tabIndex={0} className="btn-sm btn m-1">
+                          <BsThreeDots size={18} />
+                        </label>
+                        <ul
+                          tabIndex={0}
+                          className="dropdown-content menu rounded-box z-[1] w-40 gap-1  bg-base-100 shadow"
+                        >
+                          <li
+                            onClick={() => {
+                              setSelectedOrder(order);
+                              setIsEditModalOpen(!isEditModalOpen);
+                            }}
+                            className="flex w-full cursor-pointer justify-center rounded-lg bg-green-100  "
+                          >
+                            <span className="flex cursor-pointer justify-center">
+                              <AiOutlineEdit className="text-xl text-success " />
+                            </span>
+                          </li>
+                          <li
+                            onClick={() => {
+                              handleOrderStatus(order._id, "completed");
+                            }}
+                            className="flex w-full cursor-pointer justify-center rounded-lg  bg-yellow-100 "
+                          >
+                            <div
+                              className="tooltip flex cursor-pointer justify-center"
+                              data-tip="Complete"
+                            >
+                              <FaCheck className="text-lg text-success " />
+                            </div>
+                          </li>
+                          <li
+                            onClick={() => {
+                              sendToCourier(order);
+                            }}
+                            className="flex w-full cursor-pointer justify-center rounded-lg bg-red-100"
+                          >
+                            <div
+                              className="tooltip flex cursor-pointer justify-center"
+                              data-tip={`Send to ${order?.courier} `}
+                            >
+                              <GrDeliver className="text-xl text-success " />
+                            </div>
+                          </li>
+                          <li
+                            onClick={() => {
+                              handleOrderStatus(order._id, "processing");
+                            }}
+                            className="flex w-full cursor-pointer justify-center rounded-lg bg-red-100"
+                          >
+                            <div
+                              className="tooltip flex cursor-pointer justify-center"
+                              data-tip="Back to Processing"
+                            >
+                              <RiArrowGoBackLine className="text-xl text-success " />
+                            </div>
+                          </li>
+                          <li
+                            onClick={() => {
+                              handleOrderStatus(order._id, "cancelled");
+                            }}
+                            className="flex w-full cursor-pointer justify-center rounded-lg bg-red-100"
+                          >
+                            <div
+                              className="tooltip flex cursor-pointer justify-center"
+                              data-tip="Cancel Order"
+                            >
+                              <FcCancel className="text-xl text-success " />
+                            </div>
+                          </li>
+                        </ul>
                       </div>
                     </td>
                   </tr>

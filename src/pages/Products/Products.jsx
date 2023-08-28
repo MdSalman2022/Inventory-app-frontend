@@ -9,6 +9,7 @@ import DeleteProductModal from "../../components/Main/Products/DeleteProductModa
 import EditProductModal from "../../components/Main/Products/EditProductModal";
 import { StateContext } from "../../contexts/StateProvider/StateProvider";
 import { Link } from "react-router-dom";
+import { BsThreeDots } from "react-icons/bs";
 
 const Products = () => {
   const {
@@ -484,18 +485,21 @@ const Products = () => {
         </div>
 
         <div>
-          <div className="overflow-x-auto">
-            <table className="table">
+          <div className="h-[70vh] overflow-auto">
+            <table className="table-pin-rows table">
               {/* head */}
               <thead className="bg-primary text-white">
                 <tr>
-                  <th className="w-5">#</th>
-                  <th className="max-w-96 w-60 min-w-fit">Product Name</th>
-                  <th>Store</th>
-                  <th>Supplier</th>
-                  <th>Stock</th>
-                  <th>Price</th>
-                  <th>Stock Date</th>
+                  <th className="w-5 bg-primary text-white">#</th>
+                  <th className="max-w-96 w-60 min-w-fit bg-primary text-white">
+                    Product Name
+                  </th>
+                  <th className="bg-primary text-white">Store</th>
+                  <th className="bg-primary text-white">Supplier</th>
+                  <th className="bg-primary text-white">Stock</th>
+                  <th className="bg-primary text-white">Price</th>
+                  <th className="bg-primary text-white">Stock Date</th>
+                  <th className="bg-primary text-white">Action</th>
                 </tr>
               </thead>
               <tbody className="bg-white">
@@ -524,29 +528,6 @@ const Products = () => {
                               </div>
                             </div>
                           </div>
-                          <div className="flex items-center gap-2">
-                            <span className="rounded-full border border-gray-500 p-1 text-2xl text-success">
-                              <AiOutlineShoppingCart />
-                            </span>
-                            <span
-                              onClick={() => {
-                                setIsEditModalOpen(true);
-                                setSelectedProduct(product);
-                              }}
-                              className="cursor-pointer rounded-full border border-gray-500 p-1 text-2xl text-info"
-                            >
-                              <AiOutlineEdit />
-                            </span>
-                            <span
-                              onClick={() => {
-                                setIsDeleteModalOpen(true);
-                                setSelectedProduct(product);
-                              }}
-                              className="cursor-pointer rounded-full border border-gray-500 p-1 text-2xl text-error"
-                            >
-                              <RiDeleteBin6Line />
-                            </span>
-                          </div>
                         </td>
                         <td>
                           <div>{product.store?.name}</div>
@@ -567,6 +548,46 @@ const Products = () => {
                             <p>
                               Processing: {formatStockDate(product.timestamp)}
                             </p>
+                          </div>
+                        </td>
+                        <td>
+                          <div className="dropdown-left dropdown">
+                            <label tabIndex={0} className="btn-sm btn m-1">
+                              <BsThreeDots size={18} />
+                            </label>
+                            <ul
+                              tabIndex={0}
+                              className="dropdown-content menu rounded-box z-[1] w-40 gap-1  bg-base-100 shadow"
+                            >
+                              <li
+                                onClick={() => {
+                                  setIsEditModalOpen(true);
+                                  setSelectedProduct(product);
+                                }}
+                                className="flex w-full cursor-pointer justify-center rounded-lg  bg-yellow-100 "
+                              >
+                                <div
+                                  className="tooltip flex cursor-pointer justify-center"
+                                  data-tip="Ready"
+                                >
+                                  <AiOutlineEdit className="text-lg text-success " />
+                                </div>
+                              </li>
+                              <li
+                                onClick={() => {
+                                  setIsDeleteModalOpen(true);
+                                  setSelectedProduct(product);
+                                }}
+                                className="flex w-full cursor-pointer justify-center rounded-lg bg-red-100"
+                              >
+                                <div
+                                  className="tooltip flex cursor-pointer justify-center"
+                                  data-tip="Delete order"
+                                >
+                                  <RiDeleteBin6Line className="text-xl text-success " />
+                                </div>
+                              </li>
+                            </ul>
                           </div>
                         </td>
                       </tr>
@@ -595,29 +616,6 @@ const Products = () => {
                               </div>
                             </div>
                           </div>
-                          <div className="flex items-center gap-2">
-                            <span className="rounded-full border border-gray-500 p-1 text-2xl text-success">
-                              <AiOutlineShoppingCart />
-                            </span>
-                            <span
-                              onClick={() => {
-                                setIsEditModalOpen(true);
-                                setSelectedProduct(product);
-                              }}
-                              className="rounded-full border border-gray-500 p-1 text-2xl text-info"
-                            >
-                              <AiOutlineEdit />
-                            </span>
-                            <span
-                              onClick={() => {
-                                setIsDeleteModalOpen(true);
-                                setSelectedProduct(product);
-                              }}
-                              className="rounded-full border border-gray-500 p-1 text-2xl text-error"
-                            >
-                              <RiDeleteBin6Line />
-                            </span>
-                          </div>
                         </td>
                         <td>
                           <div>{product.supplier}</div>
@@ -635,6 +633,46 @@ const Products = () => {
                             <p>
                               Processing: {formatStockDate(product.stockDate)}
                             </p>
+                          </div>
+                        </td>
+                        <td>
+                          <div className="dropdown-left dropdown">
+                            <label tabIndex={0} className="btn-sm btn m-1">
+                              <BsThreeDots size={18} />
+                            </label>
+                            <ul
+                              tabIndex={0}
+                              className="dropdown-content menu rounded-box z-[1] w-40 gap-1  bg-base-100 shadow"
+                            >
+                              <li
+                                onClick={() => {
+                                  setIsEditModalOpen(true);
+                                  setSelectedProduct(product);
+                                }}
+                                className="flex w-full cursor-pointer justify-center rounded-lg  bg-yellow-100 "
+                              >
+                                <div
+                                  className="tooltip flex cursor-pointer justify-center"
+                                  data-tip="Ready"
+                                >
+                                  <AiOutlineEdit className="text-lg text-success " />
+                                </div>
+                              </li>
+                              <li
+                                onClick={() => {
+                                  setIsDeleteModalOpen(true);
+                                  setSelectedProduct(product);
+                                }}
+                                className="flex w-full cursor-pointer justify-center rounded-lg bg-red-100"
+                              >
+                                <div
+                                  className="tooltip flex cursor-pointer justify-center"
+                                  data-tip="Delete order"
+                                >
+                                  <RiDeleteBin6Line className="text-xl text-success " />
+                                </div>
+                              </li>
+                            </ul>
                           </div>
                         </td>
                       </tr>

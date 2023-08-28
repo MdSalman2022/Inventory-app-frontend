@@ -37,15 +37,17 @@ const Store = () => {
         isAddModalOpen={isAddModalOpen}
         setIsAddModalOpen={setIsAddModalOpen}
       />
-      <div className="flex w-full justify-between">
-        <p className="text-xl font-bold">Stores</p>
-        <button
-          onClick={() => setIsAddModalOpen(!isAddModalOpen)}
-          className="btn-primary btn-outline btn"
-        >
-          Add Store
-        </button>
-      </div>
+      {stores.length < 1 && (
+        <div className="flex w-full justify-between">
+          <p className="text-xl font-bold">Stores</p>
+          <button
+            onClick={() => setIsAddModalOpen(!isAddModalOpen)}
+            className="btn-primary btn-outline btn"
+          >
+            Add Store
+          </button>
+        </div>
+      )}
       <hr />
 
       <div className="space-y-5">

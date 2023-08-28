@@ -91,7 +91,37 @@ const Register = () => {
       .then((data) => {
         console.log("save user", data);
         CreateUserLog(data?.result?._id);
+        handleAddStore(data?.result?._id, data?.result?.username, data?.result);
       });
+  };
+
+  const handleAddStore = (id, name, data) => {
+    const store = {
+      name: name,
+      sellerId: id,
+      sellerInfo: data,
+      status: true,
+    };
+
+    fetch(`${import.meta.env.VITE_SERVER_URL}/store/create-store`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(store),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        console.log(data);
+        if (data?.store) {
+          toast.success("Store created successfully");
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        toast.error("Failed to add store");
+      });
+    console.log(`store`, store);
   };
 
   return (

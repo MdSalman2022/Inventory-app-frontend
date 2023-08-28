@@ -15,6 +15,7 @@ import InvoiceGenerator from "../../components/Main/shared/InvoiceGenerator/Invo
 import { StateContext } from "@/contexts/StateProvider/StateProvider";
 import SingleInvoiceGenerator from "@/components/Main/shared/InvoiceGenerator/SingleInvoiceGenerator";
 import EditOrderModal from "@/components/Main/Orders/EditOrderModal";
+import { BsThreeDots } from "react-icons/bs";
 
 const OrderProcessing = () => {
   const { userInfo, selectedOrders, setSelectedOrders } =
@@ -381,12 +382,12 @@ const OrderProcessing = () => {
       </div>
 
       <div>
-        <div className="overflow-x-auto">
-          <table className="table">
+        <div className="h-[70vh] overflow-auto">
+          <table className="table-pin-rows table-pin-cols table">
             {/* head */}
             <thead className="bg-primary text-white">
               <tr>
-                <td className="w-5">
+                <td className="w-5 bg-primary text-white">
                   <input
                     type="checkbox"
                     defaultChecked={false}
@@ -401,11 +402,12 @@ const OrderProcessing = () => {
                     className="checkbox border border-white"
                   />
                 </td>
-                <th>#</th>
-                <th>Invoice</th>
-                <th>Name</th>
+                <th className="bg-primary text-white">#</th>
+                <th className="bg-primary text-white">Invoice</th>
+                <th className="bg-primary text-white">Name</th>
                 {/* <th>Prods/Pics</th> */}
-                <th className="w-96">Price</th>
+                <th className="w-96 bg-primary text-white">Price</th>
+                <th className="w-96 bg-primary text-white">Action</th>
               </tr>
             </thead>
             <tbody className="bg-white">
@@ -444,7 +446,7 @@ const OrderProcessing = () => {
                         <TbFileInvoice />
                       </span>
                     </td>
-                    <td className="flex flex-col gap-1">
+                    <td className="">
                       <div className="flex items-center space-x-3">
                         {/* <div className="avatar">
                         <div className="mask mask-squircle h-12 w-12">
@@ -462,36 +464,6 @@ const OrderProcessing = () => {
                           </div>
                         </div>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <span
-                          onClick={() => {
-                            setSelectedOrder(order);
-                            setIsEditModalOpen(!isEditModalOpen);
-                          }}
-                          className="cursor-pointer rounded-full border border-gray-500 p-1 text-2xl text-neutral"
-                        >
-                          <AiOutlineEdit />
-                        </span>
-                        <div
-                          onClick={() => {
-                            handleOrderStatus(order);
-                          }}
-                          className="tooltip cursor-pointer rounded-full border border-gray-500 p-1 text-2xl text-info"
-                          data-tip="Ready"
-                        >
-                          <FaCheck className="text-lg" />
-                        </div>
-                        <div
-                          onClick={() => {
-                            setIsDeleteModalOpen(true);
-                            setSelectedOrder(order);
-                          }}
-                          className="tooltip cursor-pointer rounded-full border border-error p-1 text-2xl text-error"
-                          data-tip="Delete order"
-                        >
-                          <RiDeleteBin6Line />
-                        </div>
-                      </div>
                     </td>
                     <td className="">
                       <div className="flex w-32 flex-col">
@@ -507,6 +479,56 @@ const OrderProcessing = () => {
                         </p>
                         <p className="">Advance: {order?.advance}</p>
                         <p className="">COD: {order?.cash}</p>
+                      </div>
+                    </td>
+                    <td>
+                      <div className="dropdown-left dropdown">
+                        <label tabIndex={0} className="btn-sm btn m-1">
+                          <BsThreeDots size={18} />
+                        </label>
+                        <ul
+                          tabIndex={0}
+                          className="dropdown-content menu rounded-box z-[1] w-40 gap-1  bg-base-100 shadow"
+                        >
+                          <li
+                            onClick={() => {
+                              setSelectedOrder(order);
+                              setIsEditModalOpen(!isEditModalOpen);
+                            }}
+                            className="flex w-full cursor-pointer justify-center rounded-lg bg-green-100  "
+                          >
+                            <span className="flex cursor-pointer justify-center">
+                              <AiOutlineEdit className="text-xl text-success " />
+                            </span>
+                          </li>
+                          <li
+                            onClick={() => {
+                              handleOrderStatus(order);
+                            }}
+                            className="flex w-full cursor-pointer justify-center rounded-lg  bg-yellow-100 "
+                          >
+                            <div
+                              className="tooltip flex cursor-pointer justify-center"
+                              data-tip="Ready"
+                            >
+                              <FaCheck className="text-lg text-success " />
+                            </div>
+                          </li>
+                          <li
+                            onClick={() => {
+                              setIsDeleteModalOpen(true);
+                              setSelectedOrder(order);
+                            }}
+                            className="flex w-full cursor-pointer justify-center rounded-lg bg-red-100"
+                          >
+                            <div
+                              className="tooltip flex cursor-pointer justify-center"
+                              data-tip="Delete order"
+                            >
+                              <RiDeleteBin6Line className="text-xl text-success " />
+                            </div>
+                          </li>
+                        </ul>
                       </div>
                     </td>
                   </tr>

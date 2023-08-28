@@ -120,8 +120,8 @@ const Users = () => {
           </div>
         </div>
 
-        <div className="h-full overflow-x-auto bg-white">
-          <table className="table h-full bg-white ">
+        <div className="h-[70vh]  overflow-auto">
+          <table className="table bg-white ">
             {/* head */}
             <thead>
               <tr>
@@ -185,7 +185,7 @@ const Users = () => {
                       </label>
                       <ul
                         tabIndex={0}
-                        className="dropdown-content menu rounded-box z-[1] w-40 bg-base-100  shadow"
+                        className="dropdown-content menu rounded-box z-[200] w-40 bg-base-100  shadow"
                       >
                         <li>
                           <button
@@ -233,20 +233,6 @@ const Users = () => {
                 </tr>
               ))}
             </tbody>
-            {/* <tfoot className="bg-white">
-              <tr>
-                <th>Showing 1 to 2 of 2 entries</th>
-                <th></th>
-                <th></th>
-                <th className="flex justify-end">
-                  <div className="join">
-                    <button className="join-item btn">Previous</button>
-                    <button className="btn-primary join-item btn">1</button>
-                    <button className="join-item btn ">Next</button>
-                  </div>
-                </th>
-              </tr>
-            </tfoot> */}
           </table>
         </div>
       </div>

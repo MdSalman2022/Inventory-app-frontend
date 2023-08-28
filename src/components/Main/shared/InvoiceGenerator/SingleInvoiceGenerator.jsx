@@ -1,11 +1,19 @@
-import React, { useRef } from "react";
+import React, { useContext, useRef } from "react";
 import ReactToPrint from "react-to-print";
 import Barcode from "react-barcode";
 import QRCode from "react-qr-code";
+import { StateContext } from "@/contexts/StateProvider/StateProvider";
 
 const SingleInvoiceGenerator = ({ order }) => {
-  console.log(order);
+  const { stores, userInfo } = useContext(StateContext);
+  console.log("stores", stores);
   const componentRef = useRef();
+
+  const storeInfo = stores[0];
+
+  const { address, area, district, name, phone, zip } = storeInfo;
+
+  console.log("address", address);
 
   function formatStockDate(isoTimestamp) {
     const date = new Date(isoTimestamp);
@@ -50,12 +58,14 @@ const SingleInvoiceGenerator = ({ order }) => {
             padding: "5px",
           }}
         >
-          <div style={{ display: "flex", alignItems: "center" }}>
-            <img
-              style={{ height: "40px", width: "200px", objectFit: "cover" }}
-              src="https://i.ibb.co/TW8T2kc/logo-momley.png"
-              alt=""
-            />
+          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            {userInfo?.image && (
+              <img
+                style={{ height: "40px", width: "200px", objectFit: "cover" }}
+                src={userInfo?.image}
+                alt=""
+              />
+            )}
             <div
               style={{
                 display: "flex",
@@ -63,8 +73,13 @@ const SingleInvoiceGenerator = ({ order }) => {
                 fontSize: "12px",
               }}
             >
-              <span>Momley.com, 2/2 Arambag Motijheel, Dhaka-1000</span>
-              <span>Phone: 01700000000, Email: admin@momley.com</span>
+              <span>
+                {name || userInfo?.username}, {address || userInfo?.address},{" "}
+                {district || userInfo?.city}, {zip}
+              </span>
+              <span>
+                Phone: {phone || userInfo?.phone}, Email: {userInfo?.email}
+              </span>
             </div>
           </div>
           <div

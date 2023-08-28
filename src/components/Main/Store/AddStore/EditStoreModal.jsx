@@ -75,6 +75,7 @@ const EditStoreModal = ({
                   className="input-bordered input w-full"
                   name="name"
                   defaultValue={selectedStore?.name}
+                  required
                 />
               </label>
               <label>
@@ -84,6 +85,7 @@ const EditStoreModal = ({
                   className="input-bordered input w-full"
                   name="phone"
                   defaultValue={selectedStore?.phone}
+                  required
                 />
               </label>
               <label>
@@ -93,6 +95,7 @@ const EditStoreModal = ({
                   className="input-bordered input w-full"
                   name="address"
                   defaultValue={selectedStore?.address}
+                  required
                 />
               </label>
               <div className="flex gap-5">
@@ -103,6 +106,7 @@ const EditStoreModal = ({
                     className="input-bordered input"
                     name="district"
                     defaultValue={selectedStore?.district}
+                    required
                   />
                 </label>
                 <label className="w-1/2">
@@ -112,6 +116,7 @@ const EditStoreModal = ({
                     className="input-bordered input"
                     name="area"
                     defaultValue={selectedStore?.area}
+                    required
                   />
                 </label>
               </div>

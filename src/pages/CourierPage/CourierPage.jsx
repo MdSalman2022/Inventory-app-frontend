@@ -10,6 +10,7 @@ import { toast } from "react-hot-toast";
 import avatarIcon from "../../assets/shared/avatar.png";
 import { StateContext } from "@/contexts/StateProvider/StateProvider";
 import SingleInvoiceGenerator from "@/components/Main/shared/InvoiceGenerator/SingleInvoiceGenerator";
+import { BsThreeDots } from "react-icons/bs";
 const CourierPage = () => {
   const { userInfo, selectedOrders, setSelectedOrders } =
     useContext(StateContext);
@@ -273,11 +274,11 @@ const CourierPage = () => {
       </div>
       <div>
         <div className="overflow-x-auto">
-          <table className="table">
+          <table className="table-pin-rows table-pin-cols table ">
             {/* head */}
-            <thead className="bg-primary text-white">
+            <thead className="">
               <tr>
-                <td className="w-5">
+                <td className="w-5 bg-primary text-white">
                   <input
                     type="checkbox"
                     defaultChecked={false}
@@ -292,11 +293,12 @@ const CourierPage = () => {
                     className="checkbox border border-white"
                   />
                 </td>
-                <th className="w-10">#</th>
-                <th className="w-10">Invoice</th>
-                <th className="w-96">Name</th>
-                <th className="w-10">Status</th>
-                <th className="w-96">Price</th>
+                <th className="w-10 bg-primary text-white">#</th>
+                <th className="w-10 bg-primary text-white">Invoice</th>
+                <th className="w-96 bg-primary text-white">Name</th>
+                <th className="w-10 bg-primary text-white">Status</th>
+                <th className="w-96 bg-primary text-white">Price</th>
+                <th className="w-96 bg-primary text-white">Action</th>
               </tr>
             </thead>
             <tbody className="bg-white">
@@ -364,48 +366,7 @@ const CourierPage = () => {
                         </div>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <span
-                        onClick={() => {
-                          setIsModalOpen(!isModalOpen);
-                          setSelectedOrder(order);
-                        }}
-                        className="cursor-pointer rounded-full border border-gray-500 p-1 text-2xl text-success"
-                      >
-                        <TbFileInvoice />
-                      </span>
-                      <span
-                        onClick={() => {
-                          handleOrderStatus(order._id, "processing");
-                        }}
-                        className="tooltip cursor-pointer rounded-full border border-gray-500 p-1 text-2xl text-error"
-                        data-tip="Back to Processing"
-                      >
-                        <RiArrowGoBackLine className="text-lg" />
-                      </span>
-                      <div
-                        onClick={() => {
-                          setIsDeleteModalOpen(true);
-                          setSelectedOrder(order);
-                        }}
-                        className="tooltip cursor-pointer rounded-full border border-error p-1 text-2xl text-error"
-                        data-tip="Delete order"
-                      >
-                        <RiDeleteBin6Line />
-                      </div>
-                    </div>
                   </td>
-                  {/* <td>
-                    <div className="avatar-group -space-x-6">
-                      {order?.products?.map((product) => (
-                        <div key={product._id} className="avatar">
-                          <div className="w-12">
-                            <img src={product?.image} />
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </td> */}
                   <td>
                     {isStatusLoading
                       ? "...Loading"
@@ -425,6 +386,56 @@ const CourierPage = () => {
                       </p>
                       <p className="">Advance: {order?.advance}</p>
                       <p className="">COD: {order?.cash}</p>
+                    </div>
+                  </td>
+                  <td>
+                    <div className="dropdown-left dropdown">
+                      <label tabIndex={0} className="btn-sm btn m-1">
+                        <BsThreeDots size={18} />
+                      </label>
+                      <ul
+                        tabIndex={0}
+                        className="dropdown-content menu rounded-box z-[1] w-40 gap-1  bg-base-100 shadow"
+                      >
+                        <li
+                          onClick={() => {
+                            setIsModalOpen(!isModalOpen);
+                            setSelectedOrder(order);
+                          }}
+                          className="flex w-full cursor-pointer justify-center rounded-lg bg-green-100  "
+                        >
+                          <span className="flex cursor-pointer justify-center">
+                            <TbFileInvoice className="text-xl text-success " />
+                          </span>
+                        </li>
+                        <li
+                          onClick={() => {
+                            handleOrderStatus(order._id, "processing");
+                          }}
+                          className="flex w-full cursor-pointer justify-center rounded-lg  bg-yellow-100 "
+                        >
+                          <div
+                            className="tooltip flex cursor-pointer justify-center"
+                            data-tip="Complete"
+                          >
+                            <RiArrowGoBackLine className="text-lg text-success " />
+                          </div>
+                        </li>
+                        <li
+                          onClick={() => {
+                            setIsDeleteModalOpen(true);
+                            setSelectedOrder(order);
+                          }}
+                          className="flex w-full cursor-pointer justify-center rounded-lg bg-red-100"
+                        >
+                          <div
+                            className="tooltip flex cursor-pointer justify-center"
+                            data-tip={`Send to ${order?.courier} `}
+                          >
+                            <RiDeleteBin6Line className="text-xl text-success " />
+                          </div>
+                        </li>
+                      </ul>
                     </div>
                   </td>
                 </tr>

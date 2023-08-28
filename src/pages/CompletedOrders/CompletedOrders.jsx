@@ -16,6 +16,7 @@ import InvoiceGenerator from "../../components/Main/shared/InvoiceGenerator/Invo
 import { StateContext } from "@/contexts/StateProvider/StateProvider";
 import SingleInvoiceGenerator from "@/components/Main/shared/InvoiceGenerator/SingleInvoiceGenerator";
 import { GiReturnArrow } from "react-icons/gi";
+import { BsThreeDots } from "react-icons/bs";
 
 const CompletedOrders = () => {
   const { userInfo, selectedOrders, setSelectedOrders } =
@@ -245,6 +246,7 @@ const CompletedOrders = () => {
                 <th>Name</th>
                 {/* <th>Prods/Pics</th> */}
                 <th>Price</th>
+                <th className="w-96 bg-primary text-white">Action</th>
               </tr>
             </thead>
             <tbody className="bg-white">
@@ -290,17 +292,6 @@ const CompletedOrders = () => {
                         </div>
                       </div>
                     </div>
-                    <div className="mt-1 flex items-center gap-2">
-                      <span
-                        onClick={() => {
-                          handleOrderStatus(order._id, "returned");
-                        }}
-                        className="tooltip cursor-pointer rounded-full border border-gray-500 p-1 text-2xl text-error"
-                        data-tip="Order Return"
-                      >
-                        <GiReturnArrow className="text-lg" />
-                      </span>
-                    </div>
                   </td>
                   <td>
                     <div className="flex w-32 flex-col">
@@ -319,6 +310,29 @@ const CompletedOrders = () => {
                       </p>
                       <p className="">Advance: {order?.advance} Tk</p>
                       <p className="">COD: {order?.cash} Tk</p>
+                    </div>
+                  </td>
+                  <td>
+                    <div className="dropdown-left dropdown">
+                      <label tabIndex={0} className="btn-sm btn m-1">
+                        <BsThreeDots size={18} />
+                      </label>
+                      <ul
+                        tabIndex={0}
+                        className="dropdown-content menu rounded-box z-[1] w-40 gap-1  bg-base-100 shadow"
+                      >
+                        <li
+                          onClick={() => {
+                            handleOrderStatus(order._id, "returned");
+                          }}
+                          className="tooltip flex w-full cursor-pointer justify-center rounded-lg bg-green-100  "
+                          data-tip="Order Return"
+                        >
+                          <span className="flex cursor-pointer justify-center">
+                            <GiReturnArrow className="text-xl text-success " />
+                          </span>
+                        </li>
+                      </ul>
                     </div>
                   </td>
                 </tr>

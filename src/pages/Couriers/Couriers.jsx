@@ -112,7 +112,9 @@ const Couriers = () => {
             </div>
 
             <div className="flex w-full items-center justify-between">
-              <button className="btn-error btn">Cancel</button>
+              <div type="reset" value="reset" className="btn-error btn">
+                Cancel
+              </div>
               <button type="submit" className="btn-primary btn">
                 Save
               </button>
@@ -154,6 +156,7 @@ const Couriers = () => {
                 <th>Name</th>
                 <th>Charge in Dhaka</th>
                 <th>Charge Outside Dhaka</th>
+                <th>API</th>
                 <th>Status</th>
               </tr>
             </thead>
@@ -174,6 +177,14 @@ const Couriers = () => {
                   <td>{courier.name}</td>
                   <td>{courier.chargeInDhaka}</td>
                   <td>{courier.chargeOutsideDhaka}</td>
+                  <td>
+                    {" "}
+                    {courier.api ? (
+                      <button className="badge badge-success">Active</button>
+                    ) : (
+                      <button className="badge badge-error">Inactive</button>
+                    )}
+                  </td>
                   <td>
                     {courier.status ? (
                       <button className="badge badge-success">Active</button>
