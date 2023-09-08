@@ -3,7 +3,10 @@ import ModalBox from "../shared/Modals/ModalBox";
 import { toast } from "react-hot-toast";
 import { StateContext } from "../../../contexts/StateProvider/StateProvider";
 import { useQuery } from "react-query";
-import { RiDeleteBin6Line } from "react-icons/ri";
+import { RiBarcodeLine, RiDeleteBin6Line } from "react-icons/ri";
+import { IoPersonAdd } from "react-icons/io5";
+import { SlCalender } from "react-icons/sl";
+
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,6 +16,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { EditUserLog } from "@/utils/fetchApi";
+import { AiOutlinePlus } from "react-icons/ai";
 
 const StartOrderModal = ({
   isStartNewOrderOpen,
@@ -35,9 +39,28 @@ const StartOrderModal = ({
   );
   const [courier, setCourier] = useState("");
   const [store, setStore] = useState({});
+
+  const setDiscountValue = (productId, value) => {
+    // Parse the input value as a number
+    const numericValue = parseFloat(value);
+
+    if (!isNaN(numericValue)) {
+      const updatedProductList = productList.map((product) => {
+        if (product._id === productId) {
+          return { ...product, discount: numericValue };
+        }
+        return product;
+      });
+
+      setProductList(updatedProductList);
+    }
+  };
+
   console.log("courier ", courier);
 
   console.log("district ", district);
+
+  console.log("couriers", couriers);
 
   useEffect(() => {
     if (selectedCustomer?._id) {
@@ -76,6 +99,44 @@ const StartOrderModal = ({
 
   console.log("product list ", productList);
   console.log("store ", store);
+
+  const [searchResults, setSearchResults] = useState("");
+
+  const handleSearch = (e) => {
+    e.preventDefault(); // prevent page refresh on form submit
+    const form = e.target;
+    const customerSearchKey = form["search-key"].value;
+
+    console.log(customerSearchKey);
+
+    let url = `${
+      import.meta.env.VITE_SERVER_URL
+    }/product/search-product?sellerId=${
+      userInfo?.role === "Admin" ? userInfo?._id : userInfo?.sellerId
+    }&`;
+
+    url += `name=${customerSearchKey}`;
+    console.log(url);
+
+    fetch(url)
+      .then((res) => res.json())
+      .then((data) => {
+        console.log(data);
+        if (data.success) {
+          toast.success("Customer Found!!");
+          setSearchResults(data.products);
+        } else {
+          toast.error("Customer Not Found!!");
+          setSearchResults([]);
+        }
+      })
+      .catch((error) => {
+        console.error("Error searching for customers:", error);
+        setSearchResults([]);
+      });
+  };
+
+  console.log("search ", searchResults);
 
   const handleOrder = (e) => {
     e.preventDefault();
@@ -488,20 +549,25 @@ const StartOrderModal = ({
       });
   };
 
+  let priceList = new Array(productList.length);
+
+  console.log("priceList", priceList);
+
   useEffect(() => {
     if (productList.length > 0) {
       const total = productList.reduce(
         (total, product) => total + product.salePrice * product.quantity,
         0
       );
+
       setTotalPrice(total);
       // const totalAfterDiscount = total - discount;
       // const totalAfterDeliveryCharge =
       // totalAfterDiscount + parseInt(deliveryCharge);
-      console.log("total ", total);
-      console.log("advance ", advance);
-      console.log("discount ", discount);
-      console.log("delivery charge ", deliveryCharge);
+      // console.log("total ", total);
+      // console.log("advance ", advance);
+      // console.log("discount ", discount);
+      // console.log("delivery charge ", deliveryCharge);
       const totalAfterAdvance = total - advance - discount + deliveryCharge;
       console.log(totalAfterAdvance);
       setCashCollect(totalAfterAdvance);
@@ -511,8 +577,8 @@ const StartOrderModal = ({
     }
   }, [productList, discount, deliveryCharge, advance]);
 
-  console.log(cashCollect);
-  console.log(totalPrice);
+  // console.log(cashCollect);
+  // console.log(totalPrice);
 
   const handleSelectedProductList = (product) => {
     const existingProduct = productList.find((p) => p._id === product._id);
@@ -528,9 +594,10 @@ const StartOrderModal = ({
     }
   };
 
-  const handleQuantityChange = (productId, quantity) => {
+  const handleQuantityChange = (productId, quantity, price) => {
+    const totalPrice = parseInt(quantity) * parseInt(price);
     const updatedProductList = productList.map((product) =>
-      product._id === productId ? { ...product, quantity } : product
+      product._id === productId ? { ...product, quantity, totalPrice } : product
     );
     setProductList(updatedProductList);
   };
@@ -539,11 +606,11 @@ const StartOrderModal = ({
     setProductList(productList.filter((product) => product._id !== productId));
   };
 
-  console.log(productList);
+  console.log("productList", productList);
 
   const [error, setError] = useState("");
 
-  console.log(selectedCustomer);
+  // console.log(selectedCustomer);
 
   const handleFormReset = () => {
     setSelectedCustomer(null);
@@ -569,8 +636,396 @@ const StartOrderModal = ({
 
   console.log("couriers ", couriers);
 
+  useEffect(() => {
+    const newDiscounts = productList.map((product) => {
+      const discountValue = parseFloat(product.discount);
+      return !isNaN(discountValue) ? discountValue : 0; // Default to 0 for invalid discounts
+    });
+
+    const totalDiscount = newDiscounts.reduce(
+      (accumulator, currentValue) => accumulator + currentValue,
+      0
+    );
+
+    setDiscount(totalDiscount);
+  }, [productList]);
+
+  console.log("discount", discount);
+
   return (
     <div>
+      <ModalBox isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen}>
+        <div className="flex flex-col">
+          <p className="border-b px-5 py-3 text-xl font-semibold">
+            Start Order
+          </p>
+          <div className="grid grid-cols-3 gap-2 px-5 py-2">
+            <div className="col-span-2 flex w-full flex-col gap-2">
+              <div className="flex flex-col">
+                <label htmlFor="">Customer Name*</label>
+                <div className="join">
+                  <input
+                    type="text"
+                    className="input-bordered input join-item w-full"
+                    placeholder="Name Or Phone Number (any one)"
+                    name="name"
+                    defaultValue={
+                      selectedCustomer?.customer_details?.name || ""
+                    }
+                    required
+                  />
+                  <button className="join-item btn rounded">
+                    <IoPersonAdd className="text-xl" />
+                  </button>
+                </div>
+              </div>
+              <button className="btn">Search</button>
+            </div>
+            <div className="col-span-1 flex flex-col gap-2">
+              <div className="flex flex-col">
+                <label htmlFor="">Sales Date*</label>
+                <div className="join">
+                  <button className="join-item btn rounded">
+                    <SlCalender className="text-xl" />
+                  </button>
+                  <input
+                    type="text"
+                    className="input-bordered input join-item"
+                    placeholder="Name Or Phone Number (any one)"
+                    name="name"
+                    defaultValue={
+                      selectedCustomer?.customer_details?.name || ""
+                    }
+                    required
+                  />
+                </div>
+              </div>
+              <input
+                type="text"
+                className="input-bordered input join-item"
+                placeholder="Reference No."
+                name="name"
+                defaultValue={selectedCustomer?.customer_details?.name || ""}
+                required
+              />
+            </div>
+            <div className="col-span-3 flex flex-col">
+              <div className="join w-full px-10">
+                <button className="join-item btn rounded">
+                  <RiBarcodeLine className="text-3xl" />
+                </button>
+                <form onSubmit={handleSearch} className="w-full">
+                  <input
+                    type="text"
+                    className="input-bordered input join-item w-full"
+                    placeholder="Item name / Barcode / Item code"
+                    name="search-key"
+                    defaultValue={
+                      selectedCustomer?.customer_details?.name || ""
+                    }
+                  />
+                </form>
+              </div>
+            </div>
+          </div>
+          {searchResults?.length > 0 && (
+            <div className="flex flex-col px-5">
+              <table className="table-pin-rows table-pin-cols table-xs table">
+                <thead className="bg-primary text-white">
+                  <tr className="bg-primary text-white">
+                    <th className="bg-primary text-center font-medium text-white">
+                      Item Name
+                    </th>
+                    <th className="bg-primary text-center font-medium text-white">
+                      Quantity
+                    </th>
+                    <th className="bg-primary text-center font-medium text-white">
+                      Unit Price
+                    </th>
+                    <th className="bg-primary text-center font-medium text-white">
+                      Discount
+                    </th>
+                    <th className="bg-primary text-center font-medium text-white">
+                      Total Amount
+                    </th>
+                    <th className="bg-primary text-center font-medium text-white">
+                      Action
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {searchResults?.map((product, index) => (
+                    <tr key={product._id} className="">
+                      <td>{product.name}</td>
+                      <td className="">
+                        <input
+                          type="number"
+                          className="input-bordered input input-sm w-32"
+                          placeholder="Quantity"
+                          min={1}
+                          max={parseInt(product.availableQty)}
+                          value={product.quantity}
+                          onChange={(e) => {
+                            handleQuantityChange(product._id, e.target.value);
+                            setError(
+                              e.target.value > parseInt(product.availableQty)
+                                ? "Quantity can't be more than available quantity"
+                                : ""
+                            );
+                          }}
+                        />
+                      </td>
+                      <td>৳ {product.salePrice}</td>
+                      <td className="">
+                        <input
+                          type="number"
+                          className="input-bordered input input-sm w-32"
+                          placeholder="Discount"
+                          min={1}
+                          max={parseInt(product.availableQty)}
+                          value={product.quantity}
+                          onChange={(e) => {
+                            setError(
+                              e.target.value > parseInt(product.availableQty)
+                                ? "Quantity can't be more than available quantity"
+                                : ""
+                            );
+                          }}
+                        />
+                      </td>
+                      <td className="">
+                        <input
+                          type="number"
+                          className="input-bordered input input-sm w-32"
+                          placeholder="Total Amount"
+                          min={1}
+                          max={parseInt(product.availableQty)}
+                          value={product.quantity}
+                          onChange={(e) => {
+                            setError(
+                              e.target.value > parseInt(product.availableQty)
+                                ? "Quantity can't be more than available quantity"
+                                : ""
+                            );
+                          }}
+                        />
+                      </td>
+
+                      <td
+                        onClick={() => {
+                          if (product.availableQty > 0) {
+                            handleSelectedProductList(product);
+                          } else {
+                            toast.error("Product is out of stock");
+                          }
+                        }}
+                        key={product._id}
+                        disabled={
+                          productList.find((p) => p._id === product._id)
+                            ?.quantity === product.availableQty
+                        }
+                        className="flex items-center text-white"
+                      >
+                        <div className="cursor-pointer rounded-full bg-primary p-1">
+                          {/* <RiDeleteBin6Line /> */}
+                          <AiOutlinePlus className="text-2xl" />
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+          <div className="flex flex-col gap-5 px-5 py-2">
+            <div className="flex flex-col gap-3">
+              <table className="table-sm table">
+                <thead className="bg-primary text-white">
+                  <tr className="">
+                    <th className="text-center font-medium">Item Name</th>
+                    <th className="text-center font-medium">Quantity</th>
+                    <th className="text-center font-medium">Unit Price</th>
+                    <th className="text-center font-medium">Discount</th>
+                    <th className="text-center font-medium">Total Amount</th>
+                    <th className="text-center font-medium">Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {productList?.map((product, index) => (
+                    <tr key={product._id} className="">
+                      <td>{product.name}</td>
+                      {/* quantity */}
+                      <td className="">
+                        <input
+                          type="number"
+                          className="input-bordered input input-sm w-32"
+                          placeholder="Quantity"
+                          min={1}
+                          max={parseInt(product.availableQty)}
+                          value={product.quantity}
+                          onChange={(e) => {
+                            // handleQuantityChange(product._id, e.target.value);
+
+                            handleQuantityChange(
+                              product._id,
+                              e.target.value,
+                              product.salePrice
+                            );
+                            setError(
+                              e.target.value > parseInt(product.availableQty)
+                                ? "Quantity can't be more than available quantity"
+                                : ""
+                            );
+                          }}
+                        />
+                      </td>
+                      <td>৳ {product.salePrice}</td>
+                      {/* discount */}
+                      <td className="">
+                        <input
+                          type="number"
+                          className="input-bordered input input-sm"
+                          placeholder="Discount"
+                          name="discount"
+                          onChange={(e) =>
+                            setDiscountValue(product._id, e.target.value)
+                          }
+                          defaultValue={0}
+                        />
+                      </td>
+                      {/* total */}
+                      <td className="">
+                        <input
+                          type="number"
+                          className="input-bordered input input-sm"
+                          placeholder="Total Bill"
+                          name="totalBill"
+                          value={
+                            product.discount
+                              ? product.totalPrice - product.discount ||
+                                product.salePrice - product.discount
+                              : product.totalPrice || product.salePrice
+                          }
+                          readOnly
+                        />
+                      </td>
+
+                      <td
+                        onClick={() => handleRemoveProduct(product._id)}
+                        className="flex items-center justify-center text-white"
+                      >
+                        <div className="cursor-pointer rounded-full bg-primary p-1">
+                          {/* <RiDeleteBin6Line /> */}
+                          <RiDeleteBin6Line className="text-2xl" />
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <div className="grid w-full grid-cols-2 content-between  gap-32">
+              <div className="flex flex-col">
+                <div className="flex flex-col gap-1">
+                  <div className="flex p-1">
+                    <p className="w-60">Quantity: 01</p>
+                    <p className="w-20">Per %</p>
+                  </div>
+                  <div className="flex flex-col">
+                    <div className="flex">
+                      <div className="input flex w-60 flex-col justify-center rounded-r-none border border-gray-300 bg-white">
+                        <p>Discount On All</p>
+                      </div>
+                      <select className="join-item cursor-pointer rounded-lg rounded-l-none border px-4 outline-none focus-within:outline-none">
+                        <option>Fixed</option>
+                        <option>Fixed</option>
+                        <option>Fixed</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div className="flex flex-col">
+                    <div className="flex">
+                      <div className="input flex w-60 flex-col justify-center rounded-r-none border border-gray-300 bg-white">
+                        <p>Payment type</p>
+                      </div>
+                      <select className="join-item cursor-pointer rounded-lg rounded-l-none border px-2.5 outline-none focus-within:outline-none">
+                        <option>COD</option>
+                        <option>bKash</option>
+                        <option>Nagad</option>
+                        <option>Partial</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div className="flex w-full flex-col">
+                    <div className="flex w-full">
+                      <select
+                        className="h-12 w-[330px] cursor-pointer rounded-lg border px-2.5 outline-none focus-within:outline-none"
+                        name="courier"
+                        onChange={(e) => setCourier(e.target.value)}
+                        required
+                      >
+                        <option value="" disabled selected>
+                          Select Courier
+                        </option>
+
+                        {activeCouriers?.map((courier) => (
+                          <option key={courier._id} value={courier.name}>
+                            {courier.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="flex w-80 flex-col gap-1">
+                <div className="flex justify-between">
+                  <span>Subtotal</span>
+                  <span>{totalPrice} tk</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Delivery Charge</span>
+                  <span>{deliveryCharge} tk</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Discount on All</span>
+                  <span>{discount} tk</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Advance Payment</span>
+                  <span>{advance} tk</span>
+                </div>
+                <div className="flex justify-between font-semibold">
+                  <span className="">Customer Payable</span>
+                  <span>{cashCollect} tk</span>
+                </div>
+              </div>
+            </div>
+            <div className="flex items-center justify-between gap-5">
+              <div className="form-control">
+                <label className="label cursor-pointer gap-3">
+                  <input
+                    type="checkbox"
+                    checked="checked"
+                    className="checkbox-primary checkbox"
+                  />
+                  <span className="label-text">Send SMS to Customer</span>
+                </label>
+              </div>
+              <div className="flex items-center gap-5">
+                <button className="btn-error btn-outline btn w-40">
+                  Cancel
+                </button>
+                <button className="btn-primary btn w-40">Save</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </ModalBox>
+    </div>
+  );
+  {
+    /*   <div>
       <ModalBox isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen}>
         <div className="flex flex-col ">
           <p className="border-b p-5 text-xl font-semibold">
@@ -625,7 +1080,7 @@ const StartOrderModal = ({
               <option value="Rangpur">Rangpur</option>
               <option value="Mymensingh">Mymensingh</option>
             </select>
-            {/* <select
+             <select
               name="store"
               id="store"
               className="input-bordered input col-span-2"
@@ -654,7 +1109,7 @@ const StartOrderModal = ({
                   {store.name}
                 </option>
               ))}
-            </select> */}
+            </select>  
             <div className="col-span-2 flex h-full w-fit flex-col gap-3 rounded bg-gray-100 p-5">
               <p className="text-xl font-semibold">Products</p>
               <DropdownMenu className="w-full">
@@ -687,8 +1142,7 @@ const StartOrderModal = ({
                   ))}
                 </DropdownMenuContent>
               </DropdownMenu>
-
-              {/* selected products  */}
+ 
               <div className="flex flex-col gap-3">
                 <table>
                   <thead>
@@ -818,8 +1272,8 @@ const StartOrderModal = ({
           </form>
         </div>
       </ModalBox>
-    </div>
-  );
+    </div>   */
+  }
 };
 
 export default StartOrderModal;

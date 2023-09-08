@@ -598,7 +598,7 @@ const Customers = () => {
                       </td>
                       <td>
                         <div className="dropdown-left dropdown">
-                          <label tabIndex={0} className="btn m-1">
+                          <label tabIndex={0} className="btn-sm btn m-1">
                             <BsThreeDots size={18} />
                           </label>
                           <ul
