@@ -281,7 +281,7 @@ const SellerProfile = () => {
         <div className="col-span-3 w-full rounded-lg">
           <div className="flex flex-col gap-5">
             {stores?.length === 0 && (
-              <div className="flex flex-col items-center gap-2 rounded-lg bg-gray-200 p-5 text-center md:relative">
+              <div className="flex flex-col items-center gap-2 rounded-lg bg-base-100 p-5 text-center md:relative">
                 <div className="flex w-full flex-col items-center">
                   <p className="text-xl">
                     <span className="font-semibold">Store Name:</span>{" "}
@@ -321,7 +321,7 @@ const SellerProfile = () => {
               );
               return (
                 <div
-                  className="relative flex flex-col items-center gap-2 rounded-lg bg-gray-200 p-5 text-center"
+                  className="relative flex flex-col items-center gap-2 rounded-lg bg-base-100 p-5 text-center"
                   key={index}
                 >
                   <button

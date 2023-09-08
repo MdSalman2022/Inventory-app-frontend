@@ -122,7 +122,6 @@ const Transaction = () => {
           {/* head */}
           <thead className="rounded-lg bg-primary text-white">
             <tr>
-              <th className="w-5"></th>
               <th className="w-5">#</th>
               <th>Date</th>
               <th>Info</th>
@@ -132,11 +131,6 @@ const Transaction = () => {
           <tbody className="bg-white">
             {orders?.map((order, index) => (
               <tr key={index}>
-                <th>
-                  <span className="bg-white">
-                    <RiDeleteBin6Line className="rounded-full border border-primary p-2 text-4xl text-red-500" />
-                  </span>
-                </th>
                 <th>{index + 1}</th>
                 <td>{formatStockDate(order.timestamp)} </td>
                 <td>
@@ -166,21 +160,6 @@ const Transaction = () => {
               </tr>
             ))}
           </tbody>
-          <tfoot className="bg-white">
-            <tr>
-              <th>Showing 1 to 2 of 2 entries</th>
-              <th></th>
-              <th></th>
-              <th></th>
-              <th className="flex justify-end">
-                <div className="join">
-                  <button className="join-item btn">Previous</button>
-                  <button className="btn-primary join-item btn">1</button>
-                  <button className="join-item btn ">Next</button>
-                </div>
-              </th>
-            </tr>
-          </tfoot>
         </table>
       </div>
     </div>

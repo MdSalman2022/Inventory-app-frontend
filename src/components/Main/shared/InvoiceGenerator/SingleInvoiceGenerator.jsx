@@ -17,11 +17,20 @@ const SingleInvoiceGenerator = ({ order }) => {
 
   function formatStockDate(isoTimestamp) {
     const date = new Date(isoTimestamp);
-    const formattedDate = date.toLocaleDateString("en-US", {
-      day: "numeric",
-      month: "short",
-      year: "2-digit",
-    });
+
+    const month = date.toLocaleString("default", { month: "short" });
+    const day = date.getDate();
+    const year = date.getFullYear();
+    const hours = date.getHours();
+    const minutes = date.getMinutes();
+    const ampm = hours >= 12 ? "pm" : "am";
+
+    // Convert hours to 12-hour format
+    const formattedHours = hours % 12 || 12;
+
+    const formattedDate = `${month} ${day}, ${year} ${formattedHours}:${minutes
+      .toString()
+      .padStart(2, "0")}${ampm}`;
 
     return formattedDate;
   }
@@ -105,7 +114,7 @@ const SingleInvoiceGenerator = ({ order }) => {
             <p style={{ fontWeight: "bold" }}>Order Info</p>
             <p>Order ID: {order?.orderId}</p>
             <p>Placed: {formatStockDate(order?.timestamp)}</p>
-            <p>Payment Method: COD:Partial Paid</p>
+            <p>Payment Method: {order?.paymentType || ""}</p>
             <p>Total Product: {order?.quantity || 1}</p>
             <p>Delivery: {order?.courier}</p>
           </div>

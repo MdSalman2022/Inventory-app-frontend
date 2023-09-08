@@ -470,7 +470,7 @@ const StartOrder = () => {
   }, [district, courier, deliveryCharge, activeCouriers, selectedCustomer]);
 
   return (
-    <div className="flex w-screen flex-col gap-3 px-3 md:w-full md:px-0">
+    <div className="flex w-screen flex-col px-4 py-6 md:w-full md:px-2">
       <EditCustomerModal
         setIsEditModalOpen={setIsEditModalOpen}
         isEditModalOpen={isEditModalOpen}
@@ -487,22 +487,22 @@ const StartOrder = () => {
         selectedCustomer={selectedCustomer}
         setSelectedCustomer={setSelectedCustomer}
       />
-      <p className="text-xl font-medium">Start Order</p>
+      <span className="text-xl font-medium">Start Order</span>
       <hr />
-      <div className="flex flex-col">
-        <div className="grid grid-cols-3 gap-2 px-5 py-2">
+      <div className="flex flex-col gap-3">
+        <div className="flex grid-cols-3 flex-col gap-2 py-2 md:grid">
           <div className="col-span-2 flex w-full flex-col gap-2">
             <div className="flex flex-col">
               <label htmlFor="">Customer Name*</label>
               <div className="relative">
                 <form
                   onSubmit={handleSearch}
-                  className="absolute top-0 flex w-full flex-col gap-2"
+                  className="top-0 flex w-full flex-col gap-2 md:absolute"
                 >
                   <div className="join">
                     <input
                       type="text"
-                      className="input-bordered input join-item w-[60%] focus-within:outline-none"
+                      className="input-bordered input join-item w-full focus-within:outline-none md:w-[60%]"
                       placeholder="Name Or Phone Number (any one)"
                       name="searchCustomer"
                       value={selectedCustomer?.customer_details?.name}
@@ -515,13 +515,16 @@ const StartOrder = () => {
                       <IoPersonAdd className="text-xl" />
                     </span>
                   </div>
-                  <button type="submit" className="btn-primary btn w-[60%]">
+                  <button
+                    type="submit"
+                    className="btn-primary btn w-full md:w-[60%]"
+                  >
                     Search
                   </button>
                 </form>
                 {searchCustomerResults.length > 0 && (
-                  <div className="absolute top-12 z-50 flex w-[60%] flex-col rounded-lg border border-primary bg-white p-3 py-0">
-                    {searchCustomerResults?.map((customer) => (
+                  <div className="absolute top-12 z-50 flex flex-col rounded-lg border border-primary bg-white p-3 py-0 md:w-[60%]">
+                    {searchCustomerResults?.slice(0, 5)?.map((customer) => (
                       <div
                         onClick={() => {
                           setSelectedCustomer(customer);
@@ -621,8 +624,8 @@ const StartOrder = () => {
           </div>
         </div>
 
-        <div className="flex flex-col gap-5 px-5 py-2">
-          <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-5  py-2">
+          <div className="flex flex-col gap-3 overflow-x-auto">
             <table className="table-sm table">
               <thead className="bg-primary text-white">
                 <tr className="">
@@ -710,22 +713,22 @@ const StartOrder = () => {
               </tbody>
             </table>
           </div>
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col items-start gap-10 md:flex-row md:items-center md:justify-between md:gap-0">
             <div className="flex flex-col">
               <div className="flex flex-col gap-1">
                 <div className="flex p-1">
-                  <p className="w-60">Quantity: {productList?.length}</p>
+                  <p className="md:w-60">Quantity: {productList?.length}</p>
                 </div>
                 <div className="flex flex-col">
                   <div className="flex items-center gap-3">
-                    <div className="flex items-center gap-3">
+                    <div className="flex flex-col gap-3 md:flex-row md:items-center">
                       <p>Discount on all: </p>
                       <div className="flex">
                         <input
                           type="text"
                           placeholder="Amount"
                           onChange={(e) => setDiscountOnAll(e.target.value)}
-                          className="border-r-none input-primary input w-60 rounded-r-none border border-gray-300 bg-white focus-within:outline-none"
+                          className="border-r-none input-primary input rounded-r-none border border-gray-300 bg-white focus-within:outline-none md:w-60"
                         />
                         <select className="join-item cursor-pointer rounded-lg rounded-l-none border px-3.5 outline-none focus-within:outline-none">
                           <option className="">Fixed</option>
@@ -736,14 +739,14 @@ const StartOrder = () => {
                   </div>
                 </div>
                 <div className="flex flex-col">
-                  <div className="flex items-center gap-4">
+                  <div className="flex flex-col gap-1 md:flex-row md:items-center md:gap-4">
                     <p>Payment Type: </p>
                     <div className="flex">
                       <input
                         type="text"
                         placeholder="Amount"
                         onChange={(e) => setAdvance(e.target.value)}
-                        className="border-r-none input-primary input w-60 rounded-r-none border border-gray-300 bg-white focus-within:outline-none"
+                        className="border-r-none input-primary input rounded-r-none border border-gray-300 bg-white focus-within:outline-none md:w-60"
                       />
                       <select
                         onChange={(e) => setPaymentType(e.target.value)}
@@ -758,11 +761,11 @@ const StartOrder = () => {
                   </div>
                 </div>
                 <div className="flex w-full flex-col">
-                  <div className="flex w-full items-center gap-4">
+                  <div className="flex flex-col gap-1 md:flex-row md:items-center md:gap-4">
                     <p>Select Courier: </p>
                     <div className="flex">
                       <select
-                        className="h-12 w-[330px] cursor-pointer rounded-lg border px-2.5 outline-none focus-within:outline-none"
+                        className="h-12 w-full cursor-pointer rounded-lg border px-2.5 outline-none focus-within:outline-none md:w-[330px]"
                         name="courier"
                         onChange={(e) => setCourier(e.target.value)}
                         required

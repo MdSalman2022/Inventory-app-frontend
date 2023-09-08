@@ -250,7 +250,7 @@ const Customers = () => {
   console.log("new order modal open ", isStartNewOrderOpen);
 
   return (
-    <div className="w-screen space-y-3 p-3 md:w-full">
+    <div className="w-screen space-y-3 px-3 md:w-full">
       <EditCustomerModal
         setIsEditModalOpen={setIsEditModalOpen}
         isEditModalOpen={isEditModalOpen}
@@ -437,7 +437,8 @@ const Customers = () => {
             {/* head */}
             <thead className=" text-white">
               <tr>
-                <th className="rounded-tl-lg bg-primary">Customer Details</th>
+                <th className="rounded-tl-lg bg-primary">#</th>
+                <th className=" bg-primary">Customer Details</th>
                 <th className="bg-primary">Purchase</th>
                 <th className="bg-primary">Orders</th>
                 <th className="rounded-tr-lg bg-primary">Action</th>
@@ -447,6 +448,7 @@ const Customers = () => {
               {searchResults.length > 0
                 ? searchResults.map((customer, index) => (
                     <tr key={index}>
+                      <td>{index + 1}</td>
                       <td className="flex flex-col gap-1">
                         <div className="flex items-center space-x-3">
                           {/* <div className="avatar">
@@ -546,6 +548,7 @@ const Customers = () => {
                   ))
                 : customers?.map((customer, index) => (
                     <tr key={index}>
+                      <td>{index + 1}</td>
                       <td className="flex flex-col gap-1">
                         <div className="flex items-center space-x-3">
                           <div>
@@ -597,13 +600,13 @@ const Customers = () => {
                         </div>
                       </td>
                       <td>
-                        <div className="dropdown-left dropdown">
+                        <div className="dropdown-bottom dropdown">
                           <label tabIndex={0} className="btn-sm btn m-1">
                             <BsThreeDots size={18} />
                           </label>
                           <ul
                             tabIndex={0}
-                            className="dropdown-content menu rounded-box z-[1] w-40 gap-1  bg-base-100 shadow"
+                            className="dropdown-content rounded-box z-[1] flex w-full items-center justify-center gap-1 bg-base-100  p-1 shadow"
                           >
                             <li
                               onClick={() => {
@@ -614,7 +617,7 @@ const Customers = () => {
                                   toast.error("Please add a courier first!!");
                                 }
                               }}
-                              className="flex w-full cursor-pointer justify-center rounded-lg bg-green-100 "
+                              className="flex w-full cursor-pointer justify-center rounded-lg bg-green-100 px-3 "
                             >
                               <span className="flex justify-center">
                                 <AiOutlineShoppingCart className="text-2xl text-success " />
@@ -625,7 +628,7 @@ const Customers = () => {
                                 setIsEditModalOpen(true);
                                 setSelectedCustomer(customer);
                               }}
-                              className="flex w-full cursor-pointer justify-center rounded-lg  bg-yellow-100"
+                              className="flex w-full cursor-pointer justify-center rounded-lg bg-yellow-100  px-3"
                             >
                               <span className="flex justify-center">
                                 <AiOutlineEdit className="text-2xl text-warning " />
@@ -636,7 +639,7 @@ const Customers = () => {
                                 setIsDeleteModalOpen(true);
                                 setSelectedCustomer(customer);
                               }}
-                              className="flex w-full cursor-pointer justify-center rounded-lg bg-red-100"
+                              className="flex w-full cursor-pointer justify-center rounded-lg bg-red-100 px-3"
                             >
                               <span className="flex justify-center">
                                 <RiDeleteBin6Line className="text-2xl text-error  " />

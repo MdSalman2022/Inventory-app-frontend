@@ -89,7 +89,7 @@ const CancelledOrders = () => {
   // console.log(isModalOpen);
 
   return (
-    <div className="w-screen p-3 md:w-full md:space-y-4">
+    <div className="w-screen p-3 md:w-full md:space-y-3">
       <ModalBox isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen}>
         <div>
           <SingleInvoiceGenerator order={selectedOrder} />

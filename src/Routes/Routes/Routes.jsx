@@ -30,12 +30,13 @@ import Marchants from "@/pages/Marchants/Marchants";
 import SellerProfile from "@/pages/SellerProfile/SellerProfile";
 import InvoiceGenerator from "@/components/Main/shared/InvoiceGenerator/InvoiceGenerator";
 import AllOrdersSearch from "@/pages/AllOrdersSearch/AllOrdersSearch";
+import ErrorPage from "@/layout/Main/ErrorPage";
 
 export const router = createBrowserRouter([
   {
     path: "/",
     element: <Main></Main>,
-    // errorElement: <ErrorPage />,
+    errorElement: <ErrorPage />,
     children: [
       {
         path: "/register",
