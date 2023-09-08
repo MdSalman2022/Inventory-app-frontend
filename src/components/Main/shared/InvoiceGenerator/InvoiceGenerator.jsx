@@ -59,15 +59,17 @@ const InvoiceGenerator = () => {
               }}
             >
               <div style={{ display: "flex", alignItems: "center" }}>
-                <img
-                  style={{
-                    height: "40px",
-                    width: "200px",
-                    objectFit: "cover",
-                  }}
-                  src="https://i.ibb.co/TW8T2kc/logo-momley.png"
-                  alt=""
-                />
+                {userInfo?.image && (
+                  <img
+                    style={{
+                      height: "40px",
+                      width: "200px",
+                      objectFit: "cover",
+                    }}
+                    src={userInfo?.image}
+                    alt=""
+                  />
+                )}
                 <div
                   style={{
                     display: "flex",
@@ -305,11 +307,13 @@ const InvoiceGenerator = () => {
                   alignItems: "center",
                 }}
               >
-                <p style={{ fontWeight: "bold" }}>
+                <p style={{ fontWeight: "bold", marginTop: "20px" }}>
                   IF YOU HAVE ANY QUESTION CONCERNING THIS INVOICE. CONTACT OUR
                   CARE
                 </p>
-                <p>DEPARTMENT AT CARE@MOMLEY.COM Thank you for your order</p>
+                <p>
+                  {/* DEPARTMENT AT CARE@MOMLEY.COM */} Thank you for your order
+                </p>
               </div>
             </div>
           </div>

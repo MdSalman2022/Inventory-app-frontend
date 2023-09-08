@@ -62,7 +62,7 @@ const OrdersTable = ({ orders, selectedOrders, setSelectedOrders }) => {
       <div className="max-h-[600px] overflow-x-auto">
         <table className="table-pin-rows table-sm table">
           <thead>
-            <tr className="bg-[#B8B8B8] text-black">
+            <tr className="bg-primary text-white">
               <th>
                 <label>
                   <input type="checkbox" className="checkbox" checked={false} />
@@ -80,7 +80,7 @@ const OrdersTable = ({ orders, selectedOrders, setSelectedOrders }) => {
           <tbody>
             {orders?.length > 0 &&
               orders?.map((order, index) => (
-                <tr key={index} className="odd:bg-gray-300">
+                <tr key={index} className="odd:bg-gray-100">
                   <th>
                     <label>
                       <input

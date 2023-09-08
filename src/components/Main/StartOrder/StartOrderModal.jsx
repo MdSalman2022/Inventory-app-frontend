@@ -24,1256 +24,136 @@ const StartOrderModal = ({
   selectedCustomer,
   setSelectedCustomer,
 }) => {
-  const { products, refetchProducts, couriers, stores, userInfo } =
-    useContext(StateContext);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [productList, setProductList] = useState([]);
-  const [totalPrice, setTotalPrice] = useState(0);
-  const [cashCollect, setCashCollect] = useState(0);
-  const [advance, setAdvance] = useState(0);
-  const [discount, setDiscount] = useState(0);
-  const [deliveryCharge, setDeliveryCharge] = useState(0);
-  const [newCustomerId, setNewCustomerId] = useState("");
-  const [district, setDistrict] = useState(
-    selectedCustomer?.customer_details?.location ?? ""
-  );
-  const [courier, setCourier] = useState("");
-  const [store, setStore] = useState({});
+  const { userInfo } = useContext(StateContext);
 
-  const setDiscountValue = (productId, value) => {
-    // Parse the input value as a number
-    const numericValue = parseFloat(value);
-
-    if (!isNaN(numericValue)) {
-      const updatedProductList = productList.map((product) => {
-        if (product._id === productId) {
-          return { ...product, discount: numericValue };
-        }
-        return product;
-      });
-
-      setProductList(updatedProductList);
-    }
-  };
-
-  console.log("courier ", courier);
-
-  console.log("district ", district);
-
-  console.log("couriers", couriers);
-
-  useEffect(() => {
-    if (selectedCustomer?._id) {
-      setDistrict(selectedCustomer?.customer_details?.location);
-    }
-  }, [selectedCustomer]);
-
-  const formRef = useRef(null);
-
-  const activeCouriers =
-    couriers?.filter((courier) => courier?.status === true) ?? [];
-  console.log(activeCouriers);
-
-  useEffect(() => {
-    if (district && courier) {
-      const courierInfo = activeCouriers.find((c) => c?.name === courier);
-      console.log("courier info ", courierInfo);
-      setDeliveryCharge(
-        district === "Dhaka"
-          ? courierInfo?.chargeInDhaka
-          : courierInfo?.chargeOutsideDhaka
-      );
-      console.log(deliveryCharge);
-    }
-  }, [district, courier, deliveryCharge, activeCouriers]);
-
-  useEffect(() => {
-    setIsModalOpen(isStartNewOrderOpen);
-  }, [isStartNewOrderOpen]);
-
-  useEffect(() => {
-    if (!isModalOpen) {
-      setIsStartNewOrderOpen(isModalOpen);
-    }
-  }, [isModalOpen]);
-
-  console.log("product list ", productList);
-  console.log("store ", store);
-
-  const [searchResults, setSearchResults] = useState("");
-
-  const handleSearch = (e) => {
-    e.preventDefault(); // prevent page refresh on form submit
-    const form = e.target;
-    const customerSearchKey = form["search-key"].value;
-
-    console.log(customerSearchKey);
-
-    let url = `${
-      import.meta.env.VITE_SERVER_URL
-    }/product/search-product?sellerId=${
-      userInfo?.role === "Admin" ? userInfo?._id : userInfo?.sellerId
-    }&`;
-
-    url += `name=${customerSearchKey}`;
-    console.log(url);
-
-    fetch(url)
-      .then((res) => res.json())
-      .then((data) => {
-        console.log(data);
-        if (data.success) {
-          toast.success("Customer Found!!");
-          setSearchResults(data.products);
-        } else {
-          toast.error("Customer Not Found!!");
-          setSearchResults([]);
-        }
-      })
-      .catch((error) => {
-        console.error("Error searching for customers:", error);
-        setSearchResults([]);
-      });
-  };
-
-  console.log("search ", searchResults);
-
-  const handleOrder = (e) => {
+  const handleCreateCustomer = (e) => {
     e.preventDefault();
     const form = e.target;
+
     const name = form.name.value;
     const phone = form.phone.value;
     const address = form.address.value;
+    const thana = form.thana.value;
     const district = form.district.value;
-    const courier = form.courier.value;
-    const deliveryCharge = parseInt(form.deliveryCharge.value);
-    const discount = parseInt(form.discount.value);
-    const total = parseInt(form.totalBill.value);
-    const advance = parseInt(form.advance.value);
-    const cash = parseInt(form.cashCollect.value);
-    const instruction = form.instruction.value;
-    const image = form?.image?.files[0];
 
-    // console.log(store.name);
-    if (image) {
-      const formData = new FormData();
-      formData.append("image", image);
-      const url = `https://api.imgbb.com/1/upload?key=${
-        import.meta.env.VITE_IMGBB_KEY
-      }`;
-      if (!selectedCustomer._id) {
-        const customerInfo = {
-          name,
-          phone,
-          address,
-          location: district,
-          sellerId:
-            userInfo?.role === "Admin" ? userInfo?._id : userInfo?.sellerId,
-          storeId: stores[0]?.storeId,
-        };
+    const customerInfo = {
+      name,
+      phone,
+      address,
+      thana,
+      location: district,
+      sellerId: userInfo?.role === "Admin" ? userInfo?._id : userInfo?.sellerId,
+    };
 
-        fetch(`${import.meta.env.VITE_SERVER_URL}/customer/create-customer`, {
-          method: "POST",
-          headers: {
-            "content-type": "application/json",
-          },
-          body: JSON.stringify(customerInfo),
-        })
-          .then((res) => res.json())
-          .then((result) => {
-            console.log("new customer info", result);
-            if (result.success) {
-              console.log("inserted id", result?.result?._id);
-              setNewCustomerId(result?.result?._id);
-              toast.success(`${customerInfo.name} is added successfully`);
-              fetch(url, {
-                method: "POST",
-                body: formData,
-              })
-                .then((res) => res.json())
-                .then((imgUpload) => {
-                  if (imgUpload.success) {
-                    console.log("new customer id", result?.result?._id);
-
-                    const order = {
-                      image: imgUpload.data.url,
-                      customerId: result?.result?._id,
-                      name,
-                      phone,
-                      address,
-                      district,
-                      sellerId:
-                        userInfo?.role === "Admin"
-                          ? userInfo?._id
-                          : userInfo?.sellerId,
-                      storeId: stores[0]?.storeId,
-                      store: stores[0],
-                      products: productList,
-                      quantity: productList.length,
-                      courier,
-                      deliveryCharge,
-                      discount,
-                      total,
-                      advance,
-                      cash,
-                      instruction,
-                      timestamp: new Date().toISOString(),
-                    };
-                    const customerInfo = {
-                      id: result?.result?._id,
-                      image: "",
-                      name,
-                      phone,
-                      address,
-                      location: district,
-                      total: 0 + total + deliveryCharge - discount,
-                      order,
-                      processingCount: 1,
-                      readyCount: 0,
-                      completedCount: 0,
-                      returnedCount: 0,
-                    };
-
-                    console.log("customer info ", customerInfo);
-                    console.log("order info ", order);
-                    addOrder(order);
-                    updateCustomer(customerInfo);
-                  }
-                })
-                .catch((err) => {
-                  console.log(err);
-                  toast.error(
-                    "Something went wrong with creating order with new customer"
-                  );
-                });
-              setIsModalOpen(false);
-            } else {
-              toast.error("Something went wrong with customer creation");
-            }
-          })
-          .catch((err) => {
-            console.log(err);
-            toast.error("Customer could not be added");
-          });
-      } else {
-        // if customer is already exist and image is uploaded
-        fetch(url, {
-          method: "POST",
-          body: formData,
-        })
-          .then((res) => res.json())
-          .then((imgUpload) => {
-            if (imgUpload.success) {
-              const order = {
-                image: imgUpload.data.url,
-                customerId: selectedCustomer?._id,
-                name,
-                phone,
-                address,
-                district,
-                sellerId:
-                  userInfo?.role === "Admin"
-                    ? userInfo?._id
-                    : userInfo?.sellerId,
-                storeId: stores[0]?.storeId,
-                store: stores[0],
-                products: productList,
-                quantity: productList.length,
-                courier,
-                deliveryCharge,
-                discount,
-                total,
-                advance,
-                cash,
-                instruction,
-                timestamp: new Date().toISOString(),
-              };
-              const customerInfo = {
-                id: selectedCustomer?._id,
-                image: selectedCustomer?.image || "",
-                name,
-                phone,
-                address,
-                location: district,
-                total:
-                  parseInt(selectedCustomer?.purchase?.total) +
-                  total +
-                  deliveryCharge -
-                  discount,
-                order,
-                processingCount: selectedCustomer?.orders?.processing + 1,
-                readyCount: selectedCustomer?.orders?.ready,
-                completedCount: selectedCustomer?.orders?.completed,
-                returnedCount: selectedCustomer?.orders?.returned,
-              };
-
-              console.log(order);
-              addOrder(order);
-              updateCustomer(customerInfo);
-            }
-          })
-          .catch((err) => {
-            console.log(err);
-            toast.error(
-              "Something went wrong creating order with existing customer"
-            );
-          });
-        setIsModalOpen(false);
-      }
-    } else {
-      // if image is not uploaded
-
-      if (!selectedCustomer?._id) {
-        const customerInfo = {
-          name,
-          phone,
-          address,
-          location: district,
-          sellerId:
-            userInfo?.role === "Admin" ? userInfo?._id : userInfo?.sellerId,
-        };
-
-        fetch(`${import.meta.env.VITE_SERVER_URL}/customer/create-customer`, {
-          method: "POST",
-          headers: {
-            "content-type": "application/json",
-          },
-          body: JSON.stringify(customerInfo),
-        })
-          .then((res) => res.json())
-          .then((result) => {
-            console.log(result);
-            if (result.success) {
-              EditUserLog(userInfo?._id, "Added a customer", `${name} added`);
-              console.log(result?.result?._id);
-              const order = {
-                image: "",
-                customerId: result?.result?._id,
-                name,
-                phone,
-                address,
-                district,
-                sellerId:
-                  userInfo?.role === "Admin"
-                    ? userInfo?._id
-                    : userInfo?.sellerId,
-                storeId: stores[0]?.storeId,
-                store: stores[0],
-                products: productList,
-                quantity: productList.length,
-                courier,
-                deliveryCharge,
-                discount,
-                total,
-                advance,
-                cash,
-                instruction,
-                timestamp: new Date().toISOString(),
-              };
-              const customerInfo = {
-                id: result?.result?._id,
-                image: "",
-                name,
-                phone,
-                address,
-                sellerId:
-                  userInfo?.role === "Admin"
-                    ? userInfo?._id
-                    : userInfo?.sellerId,
-                storeId: stores[0]?.storeId,
-                location: district,
-                total: 0 + total + deliveryCharge - discount,
-                order,
-                processingCount: 1,
-                readyCount: 0,
-                completedCount: 0,
-                returnedCount: 0,
-              };
-
-              console.log(
-                "order for if image is not uploaded but selected customer false",
-                order,
-                customerInfo
-              );
-
-              addOrder(order);
-              updateCustomer(customerInfo);
-            }
-          });
-      } else {
-        const order = {
-          image: "",
-          customerId: selectedCustomer?._id,
-          name,
-          phone,
-          address,
-          district,
-          sellerId:
-            userInfo?.role === "Admin" ? userInfo?._id : userInfo?.sellerId,
-          storeId: stores[0]?._id,
-          store: stores[0],
-          products: productList,
-          quantity: productList.length,
-          courier,
-          deliveryCharge,
-          discount,
-          total,
-          advance,
-          cash,
-          instruction,
-          createdBy: userInfo?.username,
-          createdById: userInfo?._id,
-          timestamp: new Date().toISOString(),
-        };
-        const customerInfo = {
-          id: selectedCustomer?._id,
-          image: selectedCustomer?.image || "",
-          name,
-          phone,
-          address,
-          location: district,
-          total:
-            parseInt(selectedCustomer?.purchase?.total) +
-            total +
-            deliveryCharge -
-            discount,
-          order,
-          storeId: stores[0]?.storeId,
-          processingCount: selectedCustomer?.orders?.processing + 1,
-          readyCount: selectedCustomer?.orders?.ready,
-          completedCount: selectedCustomer?.orders?.completed,
-          returnedCount: selectedCustomer?.orders?.returned,
-        };
-
-        console.log(
-          "order for if image is not uploaded but selected customer true",
-          order,
-          customerInfo
-        );
-
-        addOrder(order);
-        updateCustomer(customerInfo);
-      }
-    }
-  };
-
-  const addOrder = (order) => {
-    fetch(`${import.meta.env.VITE_SERVER_URL}/order/create-order`, {
+    fetch(`${import.meta.env.VITE_SERVER_URL}/customer/create-customer`, {
       method: "POST",
       headers: {
         "content-type": "application/json",
       },
-      body: JSON.stringify(order),
+      body: JSON.stringify(customerInfo),
     })
       .then((res) => res.json())
       .then((result) => {
-        console.log("added order info", result);
-
-        if (result.success) {
-          const allProducts = order.products;
-
-          toast.success(`${order.name} is added successfully`);
-          EditUserLog(
-            userInfo?._id,
-            "Created an order",
-            `${result?.orderId} order created`
-          );
-          fetch(
-            `${
-              import.meta.env.VITE_SERVER_URL
-            }/product/put-update-available-stock`,
-            {
-              method: "PUT",
-              headers: {
-                "content-type": "application/json",
-              },
-              body: JSON.stringify({ allProducts }),
-            }
-          )
-            .then((res) => res.json())
-            .then((result) => {
-              console.log(result);
-              if (result.success) {
-                refetchProducts();
-                toast.success("Stock is updated successfully");
-              } else {
-                console.log("Something went wrong stock update");
-                toast.error("Something went wrong stock update");
-              }
-            })
-            .catch((err) => {
-              console.log(err);
-              toast.error(
-                "Something went wrong with creating order in steadfast"
-              );
-            });
-          setIsModalOpen(false);
-        } else {
-          toast.error("Something went wrong adding order");
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-        toast.error("Something went wrong adding order function");
-      });
-  };
-  const updateCustomer = (customer) => {
-    console.log("customer ", customer);
-    console.log(customer?._id);
-    fetch(
-      `${import.meta.env.VITE_SERVER_URL}/customer/edit-customer-info?id=${
-        customer?.id
-      }`,
-      {
-        method: "PUT",
-        headers: {
-          "content-type": "application/json",
-        },
-        body: JSON.stringify(customer),
-      }
-    )
-      .then((res) => res.json())
-      .then((result) => {
         console.log(result);
-        console.log(customer);
         if (result.success) {
-          toast.success(`${customer.name} is updated successfully`);
-          setIsModalOpen(false);
+          EditUserLog(userInfo?._id, "Added a customer", `${name} added`);
+
+          console.log(result?.result?._id);
+          toast.success("created new customer");
+          setSelectedCustomer(result?.result);
+          setIsStartNewOrderOpen(false);
         } else {
-          toast.error("Something went wrong");
+          toast.error("failed to create customer");
         }
-      })
-      .catch((err) => {
-        console.log(err);
-        toast.error("Something went wrong");
       });
   };
 
-  let priceList = new Array(productList.length);
-
-  console.log("priceList", priceList);
-
-  useEffect(() => {
-    if (productList.length > 0) {
-      const total = productList.reduce(
-        (total, product) => total + product.salePrice * product.quantity,
-        0
-      );
-
-      setTotalPrice(total);
-      // const totalAfterDiscount = total - discount;
-      // const totalAfterDeliveryCharge =
-      // totalAfterDiscount + parseInt(deliveryCharge);
-      // console.log("total ", total);
-      // console.log("advance ", advance);
-      // console.log("discount ", discount);
-      // console.log("delivery charge ", deliveryCharge);
-      const totalAfterAdvance = total - advance - discount + deliveryCharge;
-      console.log(totalAfterAdvance);
-      setCashCollect(totalAfterAdvance);
-    } else {
-      setTotalPrice(0);
-      setCashCollect(0);
-    }
-  }, [productList, discount, deliveryCharge, advance]);
-
-  // console.log(cashCollect);
-  // console.log(totalPrice);
-
-  const handleSelectedProductList = (product) => {
-    const existingProduct = productList.find((p) => p._id === product._id);
-
-    if (existingProduct) {
-      const updatedProductList = productList.map((p) =>
-        p._id === product._id ? { ...p, quantity: p.quantity + 1 } : p
-      );
-      setProductList(updatedProductList);
-    } else {
-      const newProduct = { ...product, quantity: 1 };
-      setProductList([...productList, newProduct]);
-    }
-  };
-
-  const handleQuantityChange = (productId, quantity, price) => {
-    const totalPrice = parseInt(quantity) * parseInt(price);
-    const updatedProductList = productList.map((product) =>
-      product._id === productId ? { ...product, quantity, totalPrice } : product
-    );
-    setProductList(updatedProductList);
-  };
-
-  const handleRemoveProduct = (productId) => {
-    setProductList(productList.filter((product) => product._id !== productId));
-  };
-
-  console.log("productList", productList);
-
-  const [error, setError] = useState("");
-
-  // console.log(selectedCustomer);
-
-  const handleFormReset = () => {
-    setSelectedCustomer(null);
-    setProductList([]);
-    setAdvance(0);
-    setCashCollect(0);
-    setCourier("");
-    setDeliveryCharge(0);
-    setDiscount(0);
-    setDistrict("");
-    setNewCustomerId("");
-    setStore({});
-    setTotalPrice(0);
-    setError("");
-    formRef?.current?.reset();
-  };
-
-  useEffect(() => {
-    if (!isModalOpen) {
-      handleFormReset();
-    }
-  }, [isModalOpen]);
-
-  console.log("couriers ", couriers);
-
-  useEffect(() => {
-    const newDiscounts = productList.map((product) => {
-      const discountValue = parseFloat(product.discount);
-      return !isNaN(discountValue) ? discountValue : 0; // Default to 0 for invalid discounts
-    });
-
-    const totalDiscount = newDiscounts.reduce(
-      (accumulator, currentValue) => accumulator + currentValue,
-      0
-    );
-
-    setDiscount(totalDiscount);
-  }, [productList]);
-
-  console.log("discount", discount);
+  const inputBox = "input-primary input h-10 w-80 focus-within:outline-none";
 
   return (
     <div>
-      <ModalBox isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen}>
+      <ModalBox
+        isModalOpen={isStartNewOrderOpen}
+        setIsModalOpen={setIsStartNewOrderOpen}
+      >
         <div className="flex flex-col">
-          <p className="border-b px-5 py-3 text-xl font-semibold">
-            Start Order
-          </p>
-          <div className="grid grid-cols-3 gap-2 px-5 py-2">
-            <div className="col-span-2 flex w-full flex-col gap-2">
-              <div className="flex flex-col">
-                <label htmlFor="">Customer Name*</label>
-                <div className="join">
-                  <input
-                    type="text"
-                    className="input-bordered input join-item w-full"
-                    placeholder="Name Or Phone Number (any one)"
-                    name="name"
-                    defaultValue={
-                      selectedCustomer?.customer_details?.name || ""
-                    }
-                    required
-                  />
-                  <button className="join-item btn rounded">
-                    <IoPersonAdd className="text-xl" />
-                  </button>
-                </div>
-              </div>
-              <button className="btn">Search</button>
-            </div>
-            <div className="col-span-1 flex flex-col gap-2">
-              <div className="flex flex-col">
-                <label htmlFor="">Sales Date*</label>
-                <div className="join">
-                  <button className="join-item btn rounded">
-                    <SlCalender className="text-xl" />
-                  </button>
-                  <input
-                    type="text"
-                    className="input-bordered input join-item"
-                    placeholder="Name Or Phone Number (any one)"
-                    name="name"
-                    defaultValue={
-                      selectedCustomer?.customer_details?.name || ""
-                    }
-                    required
-                  />
-                </div>
-              </div>
+          <p className="border-b p-4 text-xl font-bold">Customer Information</p>
+          <form
+            onSubmit={handleCreateCustomer}
+            className="flex flex-col gap-4 px-10 py-4"
+          >
+            <label className="flex flex-col items-start gap-3">
               <input
                 type="text"
-                className="input-bordered input join-item"
-                placeholder="Reference No."
-                name="name"
-                defaultValue={selectedCustomer?.customer_details?.name || ""}
+                className={inputBox}
+                placeholder="Mobile No."
+                name="phone"
                 required
               />
+            </label>
+            <label className="flex flex-col items-start gap-3">
+              <input
+                type="text"
+                className={inputBox}
+                placeholder="Customer Name"
+                name="name"
+                required
+              />
+            </label>
+            <label className="flex flex-col items-start gap-3">
+              <input
+                type="text"
+                className={inputBox}
+                placeholder="Road / Flat No. / Village"
+                name="address"
+                required
+              />
+            </label>
+            <label className="flex flex-col items-start gap-3">
+              <input
+                type="text"
+                className={inputBox}
+                placeholder="Police Station / Thana"
+                name="thana"
+                required
+              />
+            </label>
+            <label className="flex flex-col items-start gap-3">
+              <input
+                type="text"
+                className={inputBox}
+                placeholder="District"
+                name="district"
+                required
+              />
+            </label>
+            <label className="flex flex-col items-start gap-3">
+              <input
+                type="text"
+                className={inputBox}
+                placeholder="Bangladesh"
+                value="Bangladesh"
+                name="country"
+                readOnly
+              />
+            </label>
+            <div className="flex w-full justify-between gap-5">
+              <button
+                onClick={() => setIsStartNewOrderOpen(false)}
+                type="reset"
+                className=" btn-error btn-outline btn w-36"
+              >
+                Cancel
+              </button>
+              <button type="submit" className=" btn-primary btn w-36">
+                Save
+              </button>
             </div>
-            <div className="col-span-3 flex flex-col">
-              <div className="join w-full px-10">
-                <button className="join-item btn rounded">
-                  <RiBarcodeLine className="text-3xl" />
-                </button>
-                <form onSubmit={handleSearch} className="w-full">
-                  <input
-                    type="text"
-                    className="input-bordered input join-item w-full"
-                    placeholder="Item name / Barcode / Item code"
-                    name="search-key"
-                    defaultValue={
-                      selectedCustomer?.customer_details?.name || ""
-                    }
-                  />
-                </form>
-              </div>
-            </div>
-          </div>
-          {searchResults?.length > 0 && (
-            <div className="flex flex-col px-5">
-              <table className="table-pin-rows table-pin-cols table-xs table">
-                <thead className="bg-primary text-white">
-                  <tr className="bg-primary text-white">
-                    <th className="bg-primary text-center font-medium text-white">
-                      Item Name
-                    </th>
-                    <th className="bg-primary text-center font-medium text-white">
-                      Quantity
-                    </th>
-                    <th className="bg-primary text-center font-medium text-white">
-                      Unit Price
-                    </th>
-                    <th className="bg-primary text-center font-medium text-white">
-                      Discount
-                    </th>
-                    <th className="bg-primary text-center font-medium text-white">
-                      Total Amount
-                    </th>
-                    <th className="bg-primary text-center font-medium text-white">
-                      Action
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {searchResults?.map((product, index) => (
-                    <tr key={product._id} className="">
-                      <td>{product.name}</td>
-                      <td className="">
-                        <input
-                          type="number"
-                          className="input-bordered input input-sm w-32"
-                          placeholder="Quantity"
-                          min={1}
-                          max={parseInt(product.availableQty)}
-                          value={product.quantity}
-                          onChange={(e) => {
-                            handleQuantityChange(product._id, e.target.value);
-                            setError(
-                              e.target.value > parseInt(product.availableQty)
-                                ? "Quantity can't be more than available quantity"
-                                : ""
-                            );
-                          }}
-                        />
-                      </td>
-                      <td>৳ {product.salePrice}</td>
-                      <td className="">
-                        <input
-                          type="number"
-                          className="input-bordered input input-sm w-32"
-                          placeholder="Discount"
-                          min={1}
-                          max={parseInt(product.availableQty)}
-                          value={product.quantity}
-                          onChange={(e) => {
-                            setError(
-                              e.target.value > parseInt(product.availableQty)
-                                ? "Quantity can't be more than available quantity"
-                                : ""
-                            );
-                          }}
-                        />
-                      </td>
-                      <td className="">
-                        <input
-                          type="number"
-                          className="input-bordered input input-sm w-32"
-                          placeholder="Total Amount"
-                          min={1}
-                          max={parseInt(product.availableQty)}
-                          value={product.quantity}
-                          onChange={(e) => {
-                            setError(
-                              e.target.value > parseInt(product.availableQty)
-                                ? "Quantity can't be more than available quantity"
-                                : ""
-                            );
-                          }}
-                        />
-                      </td>
-
-                      <td
-                        onClick={() => {
-                          if (product.availableQty > 0) {
-                            handleSelectedProductList(product);
-                          } else {
-                            toast.error("Product is out of stock");
-                          }
-                        }}
-                        key={product._id}
-                        disabled={
-                          productList.find((p) => p._id === product._id)
-                            ?.quantity === product.availableQty
-                        }
-                        className="flex items-center text-white"
-                      >
-                        <div className="cursor-pointer rounded-full bg-primary p-1">
-                          {/* <RiDeleteBin6Line /> */}
-                          <AiOutlinePlus className="text-2xl" />
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-          <div className="flex flex-col gap-5 px-5 py-2">
-            <div className="flex flex-col gap-3">
-              <table className="table-sm table">
-                <thead className="bg-primary text-white">
-                  <tr className="">
-                    <th className="text-center font-medium">Item Name</th>
-                    <th className="text-center font-medium">Quantity</th>
-                    <th className="text-center font-medium">Unit Price</th>
-                    <th className="text-center font-medium">Discount</th>
-                    <th className="text-center font-medium">Total Amount</th>
-                    <th className="text-center font-medium">Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {productList?.map((product, index) => (
-                    <tr key={product._id} className="">
-                      <td>{product.name}</td>
-                      {/* quantity */}
-                      <td className="">
-                        <input
-                          type="number"
-                          className="input-bordered input input-sm w-32"
-                          placeholder="Quantity"
-                          min={1}
-                          max={parseInt(product.availableQty)}
-                          value={product.quantity}
-                          onChange={(e) => {
-                            // handleQuantityChange(product._id, e.target.value);
-
-                            handleQuantityChange(
-                              product._id,
-                              e.target.value,
-                              product.salePrice
-                            );
-                            setError(
-                              e.target.value > parseInt(product.availableQty)
-                                ? "Quantity can't be more than available quantity"
-                                : ""
-                            );
-                          }}
-                        />
-                      </td>
-                      <td>৳ {product.salePrice}</td>
-                      {/* discount */}
-                      <td className="">
-                        <input
-                          type="number"
-                          className="input-bordered input input-sm"
-                          placeholder="Discount"
-                          name="discount"
-                          onChange={(e) =>
-                            setDiscountValue(product._id, e.target.value)
-                          }
-                          defaultValue={0}
-                        />
-                      </td>
-                      {/* total */}
-                      <td className="">
-                        <input
-                          type="number"
-                          className="input-bordered input input-sm"
-                          placeholder="Total Bill"
-                          name="totalBill"
-                          value={
-                            product.discount
-                              ? product.totalPrice - product.discount ||
-                                product.salePrice - product.discount
-                              : product.totalPrice || product.salePrice
-                          }
-                          readOnly
-                        />
-                      </td>
-
-                      <td
-                        onClick={() => handleRemoveProduct(product._id)}
-                        className="flex items-center justify-center text-white"
-                      >
-                        <div className="cursor-pointer rounded-full bg-primary p-1">
-                          {/* <RiDeleteBin6Line /> */}
-                          <RiDeleteBin6Line className="text-2xl" />
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            <div className="grid w-full grid-cols-2 content-between  gap-32">
-              <div className="flex flex-col">
-                <div className="flex flex-col gap-1">
-                  <div className="flex p-1">
-                    <p className="w-60">Quantity: 01</p>
-                    <p className="w-20">Per %</p>
-                  </div>
-                  <div className="flex flex-col">
-                    <div className="flex">
-                      <div className="input flex w-60 flex-col justify-center rounded-r-none border border-gray-300 bg-white">
-                        <p>Discount On All</p>
-                      </div>
-                      <select className="join-item cursor-pointer rounded-lg rounded-l-none border px-4 outline-none focus-within:outline-none">
-                        <option>Fixed</option>
-                        <option>Fixed</option>
-                        <option>Fixed</option>
-                      </select>
-                    </div>
-                  </div>
-                  <div className="flex flex-col">
-                    <div className="flex">
-                      <div className="input flex w-60 flex-col justify-center rounded-r-none border border-gray-300 bg-white">
-                        <p>Payment type</p>
-                      </div>
-                      <select className="join-item cursor-pointer rounded-lg rounded-l-none border px-2.5 outline-none focus-within:outline-none">
-                        <option>COD</option>
-                        <option>bKash</option>
-                        <option>Nagad</option>
-                        <option>Partial</option>
-                      </select>
-                    </div>
-                  </div>
-                  <div className="flex w-full flex-col">
-                    <div className="flex w-full">
-                      <select
-                        className="h-12 w-[330px] cursor-pointer rounded-lg border px-2.5 outline-none focus-within:outline-none"
-                        name="courier"
-                        onChange={(e) => setCourier(e.target.value)}
-                        required
-                      >
-                        <option value="" disabled selected>
-                          Select Courier
-                        </option>
-
-                        {activeCouriers?.map((courier) => (
-                          <option key={courier._id} value={courier.name}>
-                            {courier.name}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div className="flex w-80 flex-col gap-1">
-                <div className="flex justify-between">
-                  <span>Subtotal</span>
-                  <span>{totalPrice} tk</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Delivery Charge</span>
-                  <span>{deliveryCharge} tk</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Discount on All</span>
-                  <span>{discount} tk</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Advance Payment</span>
-                  <span>{advance} tk</span>
-                </div>
-                <div className="flex justify-between font-semibold">
-                  <span className="">Customer Payable</span>
-                  <span>{cashCollect} tk</span>
-                </div>
-              </div>
-            </div>
-            <div className="flex items-center justify-between gap-5">
-              <div className="form-control">
-                <label className="label cursor-pointer gap-3">
-                  <input
-                    type="checkbox"
-                    checked="checked"
-                    className="checkbox-primary checkbox"
-                  />
-                  <span className="label-text">Send SMS to Customer</span>
-                </label>
-              </div>
-              <div className="flex items-center gap-5">
-                <button className="btn-error btn-outline btn w-40">
-                  Cancel
-                </button>
-                <button className="btn-primary btn w-40">Save</button>
-              </div>
-            </div>
-          </div>
+          </form>
         </div>
       </ModalBox>
     </div>
   );
-  {
-    /*   <div>
-      <ModalBox isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen}>
-        <div className="flex flex-col ">
-          <p className="border-b p-5 text-xl font-semibold">
-            Order Information
-          </p>
-          <form
-            ref={formRef}
-            onSubmit={handleOrder}
-            className="grid h-[800px] grid-cols-2 gap-5  overflow-y-scroll p-5"
-          >
-            <input
-              type="text"
-              className="input-bordered input"
-              placeholder="Facebook Name"
-              name="name"
-              defaultValue={selectedCustomer?.customer_details?.name || ""}
-              required
-            />
-            <input
-              type="text"
-              className="input-bordered input"
-              placeholder="Phone"
-              name="phone"
-              defaultValue={selectedCustomer?.customer_details?.phone || ""}
-              required
-            />
-            <input
-              type="text"
-              className="input-bordered input col-span-2"
-              placeholder="Address"
-              name="address"
-              defaultValue={selectedCustomer?.customer_details?.address || ""}
-              required
-            />
-            <select
-              name="district"
-              id="district"
-              className="input-bordered input col-span-2"
-              onChange={(e) => setDistrict(e.target.value)}
-              defaultValue={district || ""}
-              required
-            >
-              <option value="" disabled selected>
-                Select Location
-              </option>
-              <option value="Dhaka">Dhaka</option>
-              <option value="Chittagong">Chittagong</option>
-              <option value="Rajshahi">Rajshahi</option>
-              <option value="Khulna">Khulna</option>
-              <option value="Barishal">Barishal</option>
-              <option value="Sylhet">Sylhet</option>
-              <option value="Rangpur">Rangpur</option>
-              <option value="Mymensingh">Mymensingh</option>
-            </select>
-             <select
-              name="store"
-              id="store"
-              className="input-bordered input col-span-2"
-              onChange={(e) => setStore(JSON.parse(e.target.value))}
-              required
-            >
-              <option value="" disabled selected>
-                Select Store
-              </option>
-              {stores?.map((store) => (
-                <option
-                  key={store._id}
-                  value={JSON.stringify({
-                    _id: store._id,
-                    name: store.name,
-                    phone: store.phone,
-                    district: store.district,
-                    address: store.address,
-                    sellerId: store.sellerId,
-                    storeId: store.storeId,
-                    area: store.area,
-                    zip: store.zip,
-                    status: store.status,
-                  })}
-                >
-                  {store.name}
-                </option>
-              ))}
-            </select>  
-            <div className="col-span-2 flex h-full w-fit flex-col gap-3 rounded bg-gray-100 p-5">
-              <p className="text-xl font-semibold">Products</p>
-              <DropdownMenu className="w-full">
-                <DropdownMenuTrigger className="btn m-1 w-full bg-primary text-white">
-                  {" "}
-                  Select Product
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-full">
-                  {products?.map((product) => (
-                    <DropdownMenuItem
-                      className="w-full cursor-pointer"
-                      onClick={() => {
-                        if (product.availableQty > 0) {
-                          handleSelectedProductList(product);
-                        } else {
-                          toast.error("Product is out of stock");
-                        }
-                      }}
-                      key={product._id}
-                      disabled={
-                        productList.find((p) => p._id === product._id)
-                          ?.quantity === product.availableQty
-                      }
-                    >
-                      <a>
-                        {product.name} - ৳ {product.salePrice} -{" "}
-                        {product.availableQty} available products
-                      </a>
-                    </DropdownMenuItem>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
- 
-              <div className="flex flex-col gap-3">
-                <table>
-                  <thead>
-                    <tr className="grid grid-cols-4 gap-5">
-                      <th className="text-start">Product Name</th>
-                      <th className="text-start">Price</th>
-                      <th className="text-start">Qty</th>
-                      <th className="text-start">Action</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {productList?.map((product) => (
-                      <tr key={product._id} className="grid grid-cols-4 gap-5">
-                        <td>{product.name}</td>
-                        <td>৳ {product.salePrice}</td>
-                        <td>
-                          <input
-                            type="number"
-                            className="input-bordered input input-sm w-24"
-                            placeholder="Quantity"
-                            min={1}
-                            max={parseInt(product.availableQty)}
-                            value={product.quantity}
-                            onChange={(e) => {
-                              handleQuantityChange(product._id, e.target.value);
-                              setError(
-                                e.target.value > parseInt(product.availableQty)
-                                  ? "Quantity can't be more than available quantity"
-                                  : ""
-                              );
-                            }}
-                          />
-                        </td>
-                        <td
-                          onClick={() => handleRemoveProduct(product._id)}
-                          className="jus flex items-center text-red-600"
-                        >
-                          <RiDeleteBin6Line />
-                        </td>
-                      </tr>
-                    ))}
-                    <tr>
-                      <p>{error}</p>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-            <select
-              className="select-bordered select col-span-1 w-full"
-              name="courier"
-              onChange={(e) => setCourier(e.target.value)}
-              required
-            >
-              <option value="" disabled selected>
-                Select Courier
-              </option>
-
-              {activeCouriers?.map((courier) => (
-                <option key={courier._id} value={courier.name}>
-                  {courier.name}
-                </option>
-              ))}
-            </select>
-            <input
-              type="number"
-              className="input-bordered input"
-              placeholder="Delivery Charge"
-              name="deliveryCharge"
-              onChange={(e) => {
-                setDeliveryCharge(e.target.value);
-              }}
-              value={deliveryCharge || 0}
-              readOnly
-            />
-            <input
-              type="number"
-              className="input-bordered input"
-              placeholder="Discount"
-              name="discount"
-              onChange={(e) => setDiscount(e.target.value)}
-              defaultValue={0}
-            />
-            <input
-              type="number"
-              className="input-bordered input"
-              placeholder="Total Bill"
-              name="totalBill"
-              value={totalPrice || 0}
-            />
-            <input
-              type="number"
-              className="input-bordered input"
-              placeholder="Advance"
-              name="advance"
-              min={0}
-              defaultValue={0}
-              onChange={(e) => setAdvance(e.target.value)}
-              required
-            />
-            <input
-              type="number"
-              className="input-bordered input"
-              placeholder="Cash Collect"
-              name="cashCollect"
-              value={cashCollect || 0}
-            />
-            <input
-              type="text"
-              className="input-bordered input col-span-2"
-              placeholder="Exchange/special instruction"
-              name="instruction"
-            />
-            <button
-              onClick={() => {
-                setIsModalOpen(false);
-                handleFormReset();
-              }}
-              type="button"
-              className="btn-error btn-outline btn"
-            >
-              Cancel
-            </button>
-            <button type="submit" className="btn-primary btn">
-              Save
-            </button>
-          </form>
-        </div>
-      </ModalBox>
-    </div>   */
-  }
 };
 
 export default StartOrderModal;

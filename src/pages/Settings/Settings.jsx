@@ -228,12 +228,15 @@ const Settings = () => {
               </div>
             )}
           </div>
-          <input
-            type="file"
-            name="image"
-            className="file-input-bordered file-input w-full max-w-xs"
-            onChange={handleImageChange} // Add this event handler
-          />
+          <div className="flex flex-col items-center">
+            <input
+              type="file"
+              name="image"
+              className="file-input-bordered file-input w-full max-w-xs"
+              onChange={handleImageChange} // Add this event handler
+            />
+            <span className="text-xs">Max File Size 40 x 200 pixels</span>
+          </div>
         </div>
         <button type="submit" className="btn-primary btn">
           Save

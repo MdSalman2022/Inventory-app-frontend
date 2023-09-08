@@ -154,7 +154,7 @@ const CustomerProfile = () => {
 
   return (
     <div className="mt-5 w-screen space-y-3 p-3 md:w-full md:space-y-4 md:p-0">
-      <div className="relative flex flex-col items-center gap-2 rounded-lg bg-gray-200 p-5 text-center">
+      <div className="relative flex flex-col items-center gap-2 rounded-lg bg-base-100 p-5 text-center">
         <div className="right-5 top-5 flex gap-3 md:absolute">
           {selectedOrders?.length > 0 && (
             <Link to="/invoice-generator">

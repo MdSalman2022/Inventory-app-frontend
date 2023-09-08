@@ -294,10 +294,12 @@ const SingleInvoiceGenerator = ({ order }) => {
               alignItems: "center",
             }}
           >
-            <p style={{ fontWeight: "bold" }}>
+            <p style={{ fontWeight: "bold", marginTop: "20px" }}>
               IF YOU HAVE ANY QUESTION CONCERNING THIS INVOICE. CONTACT OUR CARE
             </p>
-            <p>DEPARTMENT AT CARE@MOMLEY.COM Thank you for your order</p>
+            <p>
+              {/* DEPARTMENT AT CARE@MOMLEY.COM */} Thank you for your order
+            </p>
           </div>
         </div>
       </div>

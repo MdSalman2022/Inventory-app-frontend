@@ -33,7 +33,7 @@ const SideBar = ({ children }) => {
       route: "/customers",
     },
     {
-      name: "start-order",
+      name: "Create order",
       icon: <AiOutlineShoppingCart />,
       route: "/start-order",
     },
