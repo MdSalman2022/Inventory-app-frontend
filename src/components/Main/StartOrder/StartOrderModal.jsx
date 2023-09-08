@@ -127,6 +127,9 @@ const StartOrderModal = ({
                 onChange={handleCityChange}
                 value={selectedCity}
               >
+                <option value="" disabled>
+                  Select an District
+                </option>
                 {allCities.map((city, index) => (
                   <option key={index} value={city.City}>
                     {city.City}
@@ -142,7 +145,9 @@ const StartOrderModal = ({
                 onChange={(e) => setSelectedArea(e.target.value)}
                 disabled={selectedCity === ""}
               >
-                <option value="">Select an Area</option>
+                <option value="" disabled>
+                  Select an Thana
+                </option>
                 {selectedAreas.map((area, index) => (
                   <option key={index} value={area}>
                     {area}

@@ -755,6 +755,7 @@ const StartOrder = () => {
                         <option value="COD">COD</option>
                         <option value="bKash">bKash</option>
                         <option value="Nagad">Nagad</option>
+                        <option value="Rocket">Rocket</option>
                         <option value="Partial">Partial</option>
                       </select>
                     </div>
