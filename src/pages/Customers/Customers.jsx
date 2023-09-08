@@ -26,7 +26,7 @@ import StartOrderModal from "@/components/Main/StartOrder/StartOrderModal";
 import { BsThreeDots } from "react-icons/bs";
 
 const Customers = () => {
-  const { userInfo, couriers } = useContext(StateContext);
+  const { userInfo, couriers, allCities } = useContext(StateContext);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState({});
 
@@ -115,7 +115,8 @@ const Customers = () => {
     const form = event.target;
     const name = form.name.value;
     const phone = form.phone.value;
-    const district = form.district.value;
+    const district = selectedCity;
+    const thana = selectedArea;
     const address = form.address.value;
     const link = form.link.value;
     const image = form?.image?.files[0];
@@ -136,6 +137,7 @@ const Customers = () => {
               name,
               phone,
               district,
+              thana,
               address,
               link,
               sellerId:
@@ -249,6 +251,29 @@ const Customers = () => {
 
   console.log("new order modal open ", isStartNewOrderOpen);
 
+  const [selectedCity, setSelectedCity] = useState("");
+  const [selectedAreas, setSelectedAreas] = useState([]);
+  const [selectedArea, setSelectedArea] = useState([]);
+
+  // Function to handle city selection
+  const handleCityChange = (e) => {
+    const selectedCityName = e.target.value;
+    setSelectedCity(selectedCityName);
+
+    const cityObject = allCities.find((city) => city.City === selectedCityName);
+
+    if (cityObject) {
+      setSelectedAreas(cityObject.Area);
+    } else {
+      setSelectedAreas([]);
+    }
+  };
+
+  console.log("selectedCity", selectedCity);
+  console.log("selectedArea", selectedArea);
+
+  const inputBox = "input-bordered input focus-within:outline-none";
+
   return (
     <div className="w-screen space-y-3 px-3 md:w-full">
       <EditCustomerModal
@@ -300,19 +325,19 @@ const Customers = () => {
                   className="flex flex-col gap-3 p-5"
                 >
                   <input
-                    className="input-bordered input "
+                    className={inputBox}
                     type="text"
                     name="name"
                     placeholder="Facebook Name"
                   />
                   <input
-                    className="input-bordered input "
+                    className={inputBox}
                     type="text"
                     name="phone"
                     placeholder="Phone"
                   />
                   <input
-                    className="input-bordered input "
+                    className={inputBox}
                     type="text"
                     name="address"
                     placeholder="Address"
@@ -320,30 +345,36 @@ const Customers = () => {
 
                   <div className="flex gap-3">
                     <select
+                      className="select-bordered select h-10 w-full max-w-xs focus-within:outline-none"
                       name="district"
-                      id="district"
-                      className="input-bordered input w-full"
+                      onChange={handleCityChange}
+                      value={selectedCity}
                     >
-                      <option value="" disabled>
-                        Select Location
-                      </option>
-                      <option value="Dhaka">Dhaka</option>
-                      <option value="Chittagong">Chittagong</option>
-                      <option value="Rajshahi">Rajshahi</option>
-                      <option value="Khulna">Khulna</option>
-                      <option value="Barishal">Barishal</option>
-                      <option value="Sylhet">Sylhet</option>
-                      <option value="Rangpur">Rangpur</option>
-                      <option value="Mymensingh">Mymensingh</option>
+                      {allCities.map((city, index) => (
+                        <option key={index} value={city.City}>
+                          {city.City}
+                        </option>
+                      ))}
                     </select>
-                    {/* <input
-                      type="file"
-                      name="image"
-                      className="file-input-bordered file-input-primary file-input w-full max-w-xs"
-                    /> */}
+                  </div>
+                  <div className="flex gap-3">
+                    <select
+                      className="select-bordered select h-10 w-full max-w-xs focus-within:outline-none"
+                      name="thana"
+                      value={selectedArea}
+                      onChange={(e) => setSelectedArea(e.target.value)}
+                      disabled={selectedCity === ""}
+                    >
+                      <option value="">Select an Area</option>
+                      {selectedAreas.map((area, index) => (
+                        <option key={index} value={area}>
+                          {area}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                   <input
-                    className="input-bordered input "
+                    className={inputBox}
                     type="text"
                     name="link"
                     placeholder="Facebook inbox link"
