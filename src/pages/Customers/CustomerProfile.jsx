@@ -5,7 +5,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import React from "react";
+import React, { useState, useEffect, useContext } from "react";
 import {
   Table,
   TableBody,
@@ -17,9 +17,14 @@ import {
 } from "@/components/ui/table";
 import { useQuery } from "react-query";
 import { useParams } from "react-router-dom";
+import OrdersTable from "../SellerProfile/OrdersTable";
+import { StateContext } from "@/contexts/StateProvider/StateProvider";
 
 const CustomerProfile = () => {
   const { id } = useParams();
+  const { userInfo } = useContext(StateContext);
+
+  const [selectedOrders, setSelectedOrders] = useState([]);
   const {
     data: customer,
     isLoading,
@@ -75,232 +80,141 @@ const CustomerProfile = () => {
     return formattedDate;
   };
 
+  const ordersCategory = [
+    "All",
+    "Processing Orders",
+    "Ready Orders",
+    "Completed Orders",
+    "Returned Orders",
+  ];
+
+  console.log("orders", orders);
+
+  const [selectedCategory, setSelectedCategory] = useState("All");
+
+  useEffect(() => {
+    if (selectedCategory === "All") {
+      setSelectedOrders(orders?.orders);
+    } else if (selectedCategory === "Processing Orders") {
+      setSelectedOrders(orders.processing);
+    } else if (selectedCategory === "Ready Orders") {
+      setSelectedOrders(orders?.ready);
+    } else if (selectedCategory === "Completed Orders") {
+      setSelectedOrders(orders.completed);
+    } else if (selectedCategory === "Returned Orders") {
+      setSelectedOrders(orders?.returned);
+    } else if (selectedCategory === "Cancelled Orders") {
+      setSelectedOrders(orders?.cancelled);
+    }
+  }, [selectedCategory, userInfo, orders]);
+
+  const handleExportClick = () => {
+    const selectedOrdersIds = selectedOrders.map((order) => order._id);
+    console.log("selectedOrdersIds", selectedOrdersIds);
+
+    fetch(
+      `${import.meta.env.VITE_SERVER_URL}/order/order-export?sellerId=${
+        userInfo?.role === "Admin" ? userInfo?._id : userInfo?.sellerId
+      }&orderIds=${selectedOrdersIds}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    )
+      .then((res) => res.blob())
+      .then((blob) => {
+        // Create a temporary URL for the blob
+        const url = window.URL.createObjectURL(blob);
+
+        // Create a link element
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = "exported_data.csv";
+
+        // Append the link to the document body
+        document.body.appendChild(link);
+
+        // Simulate a click on the link to trigger the download
+        link.click();
+
+        // Remove the link from the document body
+        document.body.removeChild(link);
+
+        // Release the temporary URL
+        window.URL.revokeObjectURL(url);
+      })
+      .catch((error) => {
+        console.error("Error exporting data:", error);
+        // Handle error appropriately
+      });
+  };
+
   return (
     <div className="mt-5 w-screen space-y-3 p-3 md:w-full md:space-y-4 md:p-0">
-      <div className="grid-cols-4 gap-5 space-y-3 md:grid">
-        <div>
-          <div className="flex flex-col items-center gap-2 text-center">
-            <p className="font-bold">{customer?.customer_details?.name}</p>
-            <p>{customer?.customer_details?.phone}</p>
-            <p className="text-xs">{customer?.customer_details?.location}</p>
-            <p className="text-xs">{customer?.customer_details?.address}</p>
-            <p className="text-xs">
-              Total Purchase: {customer?.purchase?.total}
-            </p>
-            <p className="text-xs">
-              Last Purchase Date:{" "}
-              {/* {formatTimestamp(customer?.purchase?.last_purchase)} */}
-            </p>
-            <button className="btn-info btn w-full">Start Order</button>
+      <div className="relative flex flex-col items-center gap-2 rounded-lg bg-gray-200 p-5 text-center">
+        <button
+          onClick={() => handleExportClick()}
+          className="btn-primary btn right-5 top-5 md:absolute"
+        >
+          Download
+        </button>
+        <div className="flex w-full flex-col items-center">
+          <p className="text-xl">
+            <span className="font-semibold">Store Name:</span>{" "}
+            {customer?.customer_details?.name}
+          </p>
+          <p className="text-lg">
+            <span className="font-semibold">Phone:</span>{" "}
+            {customer?.customer_details?.phone}
+          </p>
+          <div>
+            <span className="font-semibold">Location:</span>{" "}
+            {customer?.customer_details?.location}
+          </div>
+          <div>
+            <span className="font-semibold">Address:</span>{" "}
+            {customer?.customer_details?.address}
+          </div>
+          <div className="">
+            <span className="font-semibold">Total Purchase:</span>{" "}
+            {customer?.purchase?.total}
           </div>
         </div>
-        <div className="col-span-3">
-          <Accordion type="single" collapsible className="w-full">
-            <AccordionItem value="item-1">
-              <AccordionTrigger className="w-full rounded-t-lg border bg-base-100 p-3 text-start">
-                Processing Orders: {orders?.processing?.length}
-              </AccordionTrigger>
-              <AccordionContent className="w-full border p-3 text-start">
-                {orders?.processing?.length > 0 ? (
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead className="w-[50px]"></TableHead>
-                        <TableHead>Invoice</TableHead>
-                        <TableHead className="text-right">Price</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {orders?.processing?.map((order, index) => (
-                        <TableRow key={order._id}>
-                          <TableCell className="font-medium">
-                            {index + 1}
-                          </TableCell>
-                          <TableCell>{order?.orderId}</TableCell>
-                          <TableCell className="text-right">
-                            <div className="flex flex-col items-end">
-                              <p className="badge badge-info">
-                                {order?.courier}: {order?.deliveryCharge} Tk
-                              </p>
-                              <p>Quantity: {order?.quantity}</p>
-                              <p className="">Price: {order?.total} Tk</p>
-                              <p className="">
-                                Total Bill:{" "}
-                                {parseInt(order?.total) +
-                                  parseInt(order?.deliveryCharge)}{" "}
-                                Tk
-                              </p>
-                              <p>Discount: {order?.discount} Tk</p>
-                              <p className="">Advance: {order?.advance} Tk</p>
-                              <p className="">COD: {order?.cash} Tk</p>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                ) : (
-                  <div className="flex items-center justify-center">
-                    <p className="text-2xl text-gray-400">
-                      No Processing Orders
-                    </p>
-                  </div>
-                )}
-              </AccordionContent>
-            </AccordionItem>
-            <AccordionItem value="item-2">
-              <AccordionTrigger className="w-full  border bg-base-100 p-3 text-start">
-                Ready Orders: {orders?.ready?.length}
-              </AccordionTrigger>
-              <AccordionContent className="w-full border p-3 text-start">
-                {orders?.ready?.length > 0 ? (
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead className="w-[50px]"></TableHead>
-                        <TableHead>Invoice</TableHead>
-                        <TableHead className="text-right">Price</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {orders?.ready?.map((order, index) => (
-                        <TableRow key={order._id}>
-                          <TableCell className="font-medium">
-                            {index + 1}
-                          </TableCell>
-                          <TableCell>{order?.orderId}</TableCell>
-                          <TableCell className="text-right">
-                            <div className="flex flex-col items-end">
-                              <p className="badge badge-info">
-                                {order?.courier}: {order?.deliveryCharge} Tk
-                              </p>
-                              <p>Quantity: {order?.quantity}</p>
-                              <p className="">Price: {order?.total} Tk</p>
-                              <p className="">
-                                Total Bill:{" "}
-                                {parseInt(order?.total) +
-                                  parseInt(order?.deliveryCharge)}{" "}
-                                Tk
-                              </p>
-                              <p>Discount: {order?.discount} Tk</p>
-                              <p className="">Advance: {order?.advance} Tk</p>
-                              <p className="">COD: {order?.cash} Tk</p>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                ) : (
-                  <div className="flex items-center justify-center">
-                    <p className="text-2xl text-gray-400">No Ready Orders</p>
-                  </div>
-                )}
-              </AccordionContent>
-            </AccordionItem>
-            <AccordionItem value="item-3">
-              <AccordionTrigger className="w-full  border bg-base-100 p-3 text-start">
-                Completed Orders: {orders?.completed?.length}
-              </AccordionTrigger>
-              <AccordionContent className="w-full border p-3 text-start">
-                {orders?.completed?.length > 0 ? (
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead className="w-[50px]"></TableHead>
-                        <TableHead>Invoice</TableHead>
-                        <TableHead className="text-right">Price</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {orders?.completed?.map((order, index) => (
-                        <TableRow key={order._id}>
-                          <TableCell className="font-medium">
-                            {index + 1}
-                          </TableCell>
-                          <TableCell>{order?.orderId}</TableCell>
-                          <TableCell className="text-right">
-                            <div className="flex flex-col items-end">
-                              <p className="badge badge-info">
-                                {order?.courier}: {order?.deliveryCharge} Tk
-                              </p>
-                              <p>Quantity: {order?.quantity}</p>
-                              <p className="">Price: {order?.total} Tk</p>
-                              <p className="">
-                                Total Bill:{" "}
-                                {parseInt(order?.total) +
-                                  parseInt(order?.deliveryCharge)}{" "}
-                                Tk
-                              </p>
-                              <p>Discount: {order?.discount} Tk</p>
-                              <p className="">Advance: {order?.advance} Tk</p>
-                              <p className="">COD: {order?.cash} Tk</p>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                ) : (
-                  <div className="flex items-center justify-center">
-                    <p className="text-2xl text-gray-400">
-                      No Completed Orders
-                    </p>
-                  </div>
-                )}
-              </AccordionContent>
-            </AccordionItem>
-            <AccordionItem value="item-4">
-              <AccordionTrigger className="w-full  border bg-base-100 p-3 text-start">
-                Returned Orders: {orders?.returned?.length}
-              </AccordionTrigger>
-              <AccordionContent className="w-full border p-3 text-start">
-                {orders?.returned?.length > 0 ? (
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead className="w-[50px]"></TableHead>
-                        <TableHead>Invoice</TableHead>
-                        <TableHead className="text-right">Price</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {orders?.returned?.map((order, index) => (
-                        <TableRow key={order._id}>
-                          <TableCell className="font-medium">
-                            {index + 1}
-                          </TableCell>
-                          <TableCell>{order?.orderId}</TableCell>
-                          <TableCell className="text-right">
-                            <div className="flex flex-col items-end">
-                              <p className="badge badge-info">
-                                {order?.courier}: {order?.deliveryCharge} Tk
-                              </p>
-                              <p>Quantity: {order?.quantity}</p>
-                              <p className="">Price: {order?.total} Tk</p>
-                              <p className="">
-                                Total Bill:{" "}
-                                {parseInt(order?.total) +
-                                  parseInt(order?.deliveryCharge)}{" "}
-                                Tk
-                              </p>
-                              <p>Discount: {order?.discount} Tk</p>
-                              <p className="">Advance: {order?.advance} Tk</p>
-                              <p className="">COD: {order?.cash} Tk</p>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                ) : (
-                  <div className="flex items-center justify-center">
-                    <p className="text-2xl text-gray-400">No Returned Orders</p>
-                  </div>
-                )}
-              </AccordionContent>
-            </AccordionItem>
-          </Accordion>
+        <div className="flex w-full flex-col items-center justify-between gap-5 md:flex-row">
+          {ordersCategory?.map((category, index) => (
+            <span
+              onClick={() => setSelectedCategory(category)}
+              className={`w-full rounded-lg px-3 py-2 font-semibold transition-all duration-300 hover:bg-gray-400 ${
+                category === selectedCategory ? "bg-gray-400" : "bg-gray-300 "
+              }
+                      cursor-pointer
+                      `}
+              key={index}
+            >
+              {category}
+            </span>
+          ))}
+        </div>
+        <div className="w-full">
+          {
+            <OrdersTable
+              orders={
+                selectedCategory === "All"
+                  ? orders.orders
+                  : selectedCategory === "Processing Orders"
+                  ? orders?.processing
+                  : selectedCategory === "Ready Orders"
+                  ? orders?.ready
+                  : selectedCategory === "Completed Orders"
+                  ? orders?.completed
+                  : selectedCategory === "Returned Orders"
+                  ? orders?.returned
+                  : null
+              }
+            />
+          }
         </div>
       </div>
     </div>
