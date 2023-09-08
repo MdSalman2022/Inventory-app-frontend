@@ -16,15 +16,16 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useQuery } from "react-query";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import OrdersTable from "../SellerProfile/OrdersTable";
 import { StateContext } from "@/contexts/StateProvider/StateProvider";
 
 const CustomerProfile = () => {
   const { id } = useParams();
-  const { userInfo } = useContext(StateContext);
+  const { userInfo, selectedOrders, setSelectedOrders } =
+    useContext(StateContext);
 
-  const [selectedOrders, setSelectedOrders] = useState([]);
+  // const [selectedOrders, setSelectedOrders] = useState([]);
   const {
     data: customer,
     isLoading,
@@ -154,12 +155,21 @@ const CustomerProfile = () => {
   return (
     <div className="mt-5 w-screen space-y-3 p-3 md:w-full md:space-y-4 md:p-0">
       <div className="relative flex flex-col items-center gap-2 rounded-lg bg-gray-200 p-5 text-center">
-        <button
-          onClick={() => handleExportClick()}
-          className="btn-primary btn right-5 top-5 md:absolute"
-        >
-          Download
-        </button>
+        <div className="right-5 top-5 flex gap-3 md:absolute">
+          {selectedOrders?.length > 0 && (
+            <Link to="/invoice-generator">
+              <button className="btn-primary btn-outline btn w-full md:w-52">
+                Print Selected
+              </button>
+            </Link>
+          )}
+          <button
+            onClick={() => handleExportClick()}
+            className="btn-primary btn"
+          >
+            Download
+          </button>
+        </div>
         <div className="flex w-full flex-col items-center">
           <p className="text-xl">
             <span className="font-semibold">Store Name:</span>{" "}
@@ -201,9 +211,7 @@ const CustomerProfile = () => {
           {
             <OrdersTable
               orders={
-                selectedCategory === "All"
-                  ? orders.orders
-                  : selectedCategory === "Processing Orders"
+                selectedCategory === "Processing Orders"
                   ? orders?.processing
                   : selectedCategory === "Ready Orders"
                   ? orders?.ready
@@ -211,8 +219,10 @@ const CustomerProfile = () => {
                   ? orders?.completed
                   : selectedCategory === "Returned Orders"
                   ? orders?.returned
-                  : null
+                  : orders?.orders
               }
+              setSelectedOrders={setSelectedOrders}
+              selectedOrders={selectedOrders}
             />
           }
         </div>

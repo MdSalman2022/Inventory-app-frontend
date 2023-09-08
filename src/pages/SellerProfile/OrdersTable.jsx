@@ -16,7 +16,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-const OrdersTable = ({ orders }) => {
+const OrdersTable = ({ orders, selectedOrders, setSelectedOrders }) => {
   function formatTimestamp(timestamp) {
     const date = new Date(timestamp);
 
@@ -65,7 +65,7 @@ const OrdersTable = ({ orders }) => {
             <tr className="bg-[#B8B8B8] text-black">
               <th>
                 <label>
-                  <input type="checkbox" className="checkbox" />
+                  <input type="checkbox" className="checkbox" checked={false} />
                 </label>
               </th>
               <th>#</th>
@@ -83,7 +83,25 @@ const OrdersTable = ({ orders }) => {
                 <tr key={index} className="odd:bg-gray-300">
                   <th>
                     <label>
-                      <input type="checkbox" className="checkbox" />
+                      <input
+                        type="checkbox"
+                        defaultChecked={false}
+                        checked={selectedOrders?.includes(order)}
+                        onClick={(e) => {
+                          if (e.target.checked) {
+                            setSelectedOrders([...selectedOrders, order]);
+                          } else {
+                            setSelectedOrders(
+                              selectedOrders?.filter(
+                                (selectedOrder) =>
+                                  selectedOrder._id !== order._id
+                              )
+                            );
+                          }
+                        }}
+                        className="checkbox border border-black"
+                      />
+                      {/* <input type="checkbox" className="checkbox" /> */}
                     </label>
                   </th>
                   <th> {index + 1}</th>
