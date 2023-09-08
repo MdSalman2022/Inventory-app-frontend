@@ -88,7 +88,8 @@ const StartOrderModal = ({
       });
   };
 
-  const inputBox = "input-primary input h-10 w-80 focus-within:outline-none";
+  const inputBox =
+    "input-primary input h-10 w-[270px] md:w-80 focus-within:outline-none";
 
   return (
     <div>
@@ -100,7 +101,7 @@ const StartOrderModal = ({
           <p className="border-b p-4 text-xl font-bold">Customer Information</p>
           <form
             onSubmit={handleCreateCustomer}
-            className="flex flex-col gap-4 px-10 py-4"
+            className="flex flex-col items-center gap-4 px-10 py-4"
           >
             <label className="flex flex-col items-start gap-3">
               <input
@@ -120,9 +121,9 @@ const StartOrderModal = ({
                 required
               />
             </label>
-            <label className="flex flex-col items-start gap-3">
+            <label className="flex w-full flex-col items-start gap-3">
               <select
-                className="select-primary select select-sm h-10 w-full max-w-xs focus-within:outline-none"
+                className="select-primary select select-sm h-10 w-[270px] max-w-xs focus-within:outline-none md:w-full"
                 name="district"
                 onChange={handleCityChange}
                 value={selectedCity}
@@ -137,9 +138,9 @@ const StartOrderModal = ({
                 ))}
               </select>
             </label>
-            <label className="flex flex-col items-start gap-3">
+            <label className="flex w-full flex-col items-start gap-3">
               <select
-                className="select-primary select select-sm h-10 w-full max-w-xs focus-within:outline-none"
+                className="select-primary select select-sm h-10 w-[270px] max-w-xs focus-within:outline-none md:w-full"
                 name="thana"
                 value={selectedArea}
                 onChange={(e) => setSelectedArea(e.target.value)}
@@ -179,11 +180,11 @@ const StartOrderModal = ({
               <button
                 onClick={() => setIsStartNewOrderOpen(false)}
                 type="reset"
-                className=" btn-error btn-outline btn w-36"
+                className=" btn-error btn-outline btn md:w-36"
               >
                 Cancel
               </button>
-              <button type="submit" className=" btn-primary btn w-36">
+              <button type="submit" className=" btn-primary btn md:w-36">
                 Save
               </button>
             </div>
