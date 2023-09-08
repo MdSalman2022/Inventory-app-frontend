@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { useQuery } from "react-query";
 import { AuthContext } from "../AuthProvider/AuthProvider";
+import inputArray from "@/assets/data";
 
 export const StateContext = createContext();
 
@@ -176,6 +177,8 @@ const StateProvider = ({ children }) => {
 
   console.log("orders ", searchOrders);
 
+  const allCities = inputArray;
+
   const stateInfo = {
     products,
     refetchProducts,
@@ -196,6 +199,7 @@ const StateProvider = ({ children }) => {
     setSearchName,
     userInfoIsFetched,
     userRefetch,
+    allCities,
   };
 
   return (

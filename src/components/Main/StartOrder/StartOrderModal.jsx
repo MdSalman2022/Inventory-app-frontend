@@ -24,7 +24,27 @@ const StartOrderModal = ({
   selectedCustomer,
   setSelectedCustomer,
 }) => {
-  const { userInfo } = useContext(StateContext);
+  const { userInfo, allCities } = useContext(StateContext);
+  const [selectedCity, setSelectedCity] = useState("");
+  const [selectedAreas, setSelectedAreas] = useState([]);
+  const [selectedArea, setSelectedArea] = useState([]);
+
+  // Function to handle city selection
+  const handleCityChange = (e) => {
+    const selectedCityName = e.target.value;
+    setSelectedCity(selectedCityName);
+
+    const cityObject = allCities.find((city) => city.City === selectedCityName);
+
+    if (cityObject) {
+      setSelectedAreas(cityObject.Area);
+    } else {
+      setSelectedAreas([]);
+    }
+  };
+
+  console.log("selectedCity", selectedCity);
+  console.log("selectedArea", selectedArea);
 
   const handleCreateCustomer = (e) => {
     e.preventDefault();
@@ -33,8 +53,8 @@ const StartOrderModal = ({
     const name = form.name.value;
     const phone = form.phone.value;
     const address = form.address.value;
-    const thana = form.thana.value;
-    const district = form.district.value;
+    const thana = selectedArea;
+    const district = selectedCity;
 
     const customerInfo = {
       name,
@@ -101,6 +121,36 @@ const StartOrderModal = ({
               />
             </label>
             <label className="flex flex-col items-start gap-3">
+              <select
+                className="select-primary select select-sm h-10 w-full max-w-xs focus-within:outline-none"
+                name="district"
+                onChange={handleCityChange}
+                value={selectedCity}
+              >
+                {allCities.map((city, index) => (
+                  <option key={index} value={city.City}>
+                    {city.City}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="flex flex-col items-start gap-3">
+              <select
+                className="select-primary select select-sm h-10 w-full max-w-xs focus-within:outline-none"
+                name="thana"
+                value={selectedArea}
+                onChange={(e) => setSelectedArea(e.target.value)}
+                disabled={selectedCity === ""}
+              >
+                <option value="">Select an Area</option>
+                {selectedAreas.map((area, index) => (
+                  <option key={index} value={area}>
+                    {area}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="flex flex-col items-start gap-3">
               <input
                 type="text"
                 className={inputBox}
@@ -109,24 +159,7 @@ const StartOrderModal = ({
                 required
               />
             </label>
-            <label className="flex flex-col items-start gap-3">
-              <input
-                type="text"
-                className={inputBox}
-                placeholder="Police Station / Thana"
-                name="thana"
-                required
-              />
-            </label>
-            <label className="flex flex-col items-start gap-3">
-              <input
-                type="text"
-                className={inputBox}
-                placeholder="District"
-                name="district"
-                required
-              />
-            </label>
+
             <label className="flex flex-col items-start gap-3">
               <input
                 type="text"
