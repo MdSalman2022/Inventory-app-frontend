@@ -17,6 +17,8 @@ import { SlCalender } from "react-icons/sl";
 import { IoPersonAdd } from "react-icons/io5";
 import { EditUserLog } from "@/utils/fetchApi";
 import { FaMinus } from "react-icons/fa";
+import { GrPowerReset } from "react-icons/gr";
+import { RxCross2 } from "react-icons/rx";
 
 const StartOrder = () => {
   const { userInfo, couriers } = useContext(StateContext);
@@ -230,6 +232,7 @@ const StartOrder = () => {
         paymentType,
         address: selectedCustomer?.customer_details?.address,
         district: selectedCustomer?.customer_details?.location,
+        thana: selectedCustomer?.customer_details?.thana,
         sellerId:
           userInfo?.role === "Admin" ? userInfo?._id : userInfo?.sellerId,
         storeId: stores[0]?._id,
@@ -281,6 +284,7 @@ const StartOrder = () => {
   };
 
   const addOrder = (order) => {
+    console.log("order", order);
     fetch(`${import.meta.env.VITE_SERVER_URL}/order/create-order`, {
       method: "POST",
       headers: {
@@ -469,6 +473,8 @@ const StartOrder = () => {
     }
   }, [district, courier, deliveryCharge, activeCouriers, selectedCustomer]);
 
+  const inputRef = useRef();
+
   return (
     <div className="flex w-screen flex-col px-4 py-6 md:w-full md:px-2">
       <EditCustomerModal
@@ -499,15 +505,27 @@ const StartOrder = () => {
                   onSubmit={handleSearch}
                   className="top-0 flex w-full flex-col gap-2 md:absolute"
                 >
-                  <div className="join">
+                  <div className="join relative">
                     <input
                       type="text"
                       className="input-bordered input join-item w-full focus-within:outline-none md:w-[60%]"
                       placeholder="Name Or Phone Number (any one)"
                       name="searchCustomer"
                       value={selectedCustomer?.customer_details?.name}
+                      ref={inputRef}
                       required
                     />
+                    {(selectedCustomer?.customer_details?.name ||
+                      inputRef?.current?.value) && (
+                      <RxCross2
+                        onClick={() => {
+                          setSelectedCustomer({});
+                          inputRef.current.value = "";
+                          inputRef.current.focus();
+                        }}
+                        className="absolute right-[42%] top-3.5 cursor-pointer rounded-full bg-base-200 p-1 text-2xl"
+                      />
+                    )}
                     <span
                       onClick={() => setIsStartNewOrderOpen(true)}
                       className="join-item btn rounded "
@@ -726,9 +744,9 @@ const StartOrder = () => {
                       <div className="flex">
                         <input
                           type="text"
-                          placeholder="Amount"
+                          placeholder="Discount Amount"
                           onChange={(e) => setDiscountOnAll(e.target.value)}
-                          className="border-r-none input-primary input rounded-r-none border border-gray-300 bg-white focus-within:outline-none md:w-60"
+                          className="border-r-none input-primary input rounded-r-none border border-gray-300 bg-white focus-within:outline-none md:w-[238px]"
                         />
                         <select className="join-item cursor-pointer rounded-lg rounded-l-none border px-3.5 outline-none focus-within:outline-none">
                           <option className="">Fixed</option>
@@ -744,7 +762,7 @@ const StartOrder = () => {
                     <div className="flex">
                       <input
                         type="text"
-                        placeholder="Amount"
+                        placeholder="Advance Amount"
                         onChange={(e) => setAdvance(e.target.value)}
                         className="border-r-none input-primary input rounded-r-none border border-gray-300 bg-white focus-within:outline-none md:w-60"
                       />

@@ -109,6 +109,7 @@ const StartOrderModal = ({
                 className={inputBox}
                 placeholder="Mobile No."
                 name="phone"
+                defaultValue={selectedCustomer?.customer_details?.phone}
                 required
               />
             </label>
@@ -118,6 +119,7 @@ const StartOrderModal = ({
                 className={inputBox}
                 placeholder="Customer Name"
                 name="name"
+                defaultValue={selectedCustomer?.customer_details?.name}
                 required
               />
             </label>

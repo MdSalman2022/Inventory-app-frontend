@@ -1,6 +1,8 @@
 import { StateContext } from "@/contexts/StateProvider/StateProvider";
 import React, { useContext, useState } from "react";
 import { toast } from "react-hot-toast";
+import { BiImageAlt } from "react-icons/bi";
+import { BsArrowsFullscreen } from "react-icons/bs";
 import { GoCopy } from "react-icons/go";
 
 const Settings = () => {
@@ -210,9 +212,14 @@ const Settings = () => {
         /> */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-10">
+            {!userInfo?.image && !previewImage && (
+              <div className="flex h-[50px] w-[100px] flex-col items-center justify-center border border-gray-500 bg-gray-200">
+                <BiImageAlt className="text-3xl" />
+              </div>
+            )}
             {userInfo?.image && (
               <img
-                className="h-20 w-20 rounded-full"
+                className="h-[50px] w-[100px] object-cover"
                 src={userInfo?.image}
                 alt=""
               />
@@ -220,7 +227,7 @@ const Settings = () => {
             {previewImage && (
               <div className="flex flex-col items-center gap-2">
                 <img
-                  className="h-20 w-20 rounded-full"
+                  className="h-[50px] w-[100px] object-cover"
                   src={previewImage}
                   alt=""
                 />
@@ -235,7 +242,7 @@ const Settings = () => {
               className="file-input-bordered file-input w-full max-w-xs"
               onChange={handleImageChange} // Add this event handler
             />
-            <span className="text-xs">Max File Size 40 x 200 pixels</span>
+            <span className="text-xs">Max File Size 50 x 100 pixels</span>
           </div>
         </div>
         <button type="submit" className="btn-primary btn">

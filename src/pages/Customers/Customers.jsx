@@ -37,6 +37,10 @@ const Customers = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
 
+  const [selectedCity, setSelectedCity] = useState("");
+  const [selectedAreas, setSelectedAreas] = useState([]);
+  const [selectedArea, setSelectedArea] = useState([]);
+
   const navigate = useNavigate();
 
   if (userInfo?.role !== "Admin") {
@@ -136,7 +140,7 @@ const Customers = () => {
               image: imgUpload.data.url,
               name,
               phone,
-              district,
+              location: district,
               thana,
               address,
               link,
@@ -157,19 +161,21 @@ const Customers = () => {
         image: "", // Set empty string for image
         name,
         phone,
-        district,
+        location: district,
+        thana,
         address,
         link,
         sellerId:
           userInfo?.role === "Admin" ? userInfo?._id : userInfo?.sellerId,
       };
 
-      console.log(customer);
+      console.log("customer", customer);
       addCustomer(customer);
     }
   };
 
   const addCustomer = (customer) => {
+    console.log("customer", customer);
     fetch(`${import.meta.env.VITE_SERVER_URL}/customer/create-customer`, {
       method: "POST",
       headers: {
@@ -251,13 +257,10 @@ const Customers = () => {
 
   console.log("new order modal open ", isStartNewOrderOpen);
 
-  const [selectedCity, setSelectedCity] = useState("");
-  const [selectedAreas, setSelectedAreas] = useState([]);
-  const [selectedArea, setSelectedArea] = useState([]);
-
   // Function to handle city selection
   const handleCityChange = (e) => {
     const selectedCityName = e.target.value;
+    console.log("selectedCityName", selectedCityName);
     setSelectedCity(selectedCityName);
 
     const cityObject = allCities.find((city) => city.City === selectedCityName);
@@ -487,18 +490,6 @@ const Customers = () => {
                       <td>{index + 1}</td>
                       <td className="flex flex-col gap-1">
                         <div className="flex items-center space-x-3">
-                          {/* <div className="avatar">
-                            <div className="mask mask-squircle h-12 w-12">
-                              <img
-                                src={
-                                  customer?.customer_details?.image ||
-                                  avatarIcon
-                                }
-                                alt="image"
-                                className="rounded-full border-2 border-primary p-1"
-                              />
-                            </div>
-                          </div> */}
                           <div>
                             <Link
                               to={`/customer/profile/${customer?._id}`}

@@ -70,8 +70,8 @@ const InvoiceGenerator = () => {
                 {userInfo?.image && (
                   <img
                     style={{
-                      height: "40px",
-                      width: "200px",
+                      height: "50px",
+                      width: "100px",
                       objectFit: "cover",
                     }}
                     src={userInfo?.image}
@@ -137,7 +137,13 @@ const InvoiceGenerator = () => {
               <div style={{ display: "flex", flexDirection: "column" }}>
                 <p style={{ fontWeight: "bold" }}>Delivery Address</p>
                 <p>Name: {order?.name}</p>
-                <p>Address: {order?.address}</p>
+
+                <p>
+                  Address: {order?.address ? order.address + ", " : ""}
+                  {order?.thana ? order.thana + ", " : ""}
+                  {order?.district ? order.district : ""}
+                </p>
+
                 <p>Phone: {order?.phone}</p>
                 <p>Email: {order?.email}</p>
               </div>
@@ -290,7 +296,7 @@ const InvoiceGenerator = () => {
                     width: "300px",
                   }}
                 >
-                  <span>Cash Payment: </span>
+                  <span>Advance Payment: </span>
                   <span style={{ textAlign: "end" }}>{order?.advance} Tk</span>
                 </div>
                 <div
