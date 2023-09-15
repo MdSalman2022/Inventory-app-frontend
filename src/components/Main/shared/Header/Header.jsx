@@ -21,6 +21,7 @@ import { GiReturnArrow } from "react-icons/gi";
 import { RiDeleteBin5Line } from "react-icons/ri";
 import { CgDatabase } from "react-icons/cg";
 import { FaExchangeAlt } from "react-icons/fa";
+import logo from "../../../../assets/logo.png";
 
 const Header = () => {
   const {
@@ -231,21 +232,13 @@ const Header = () => {
 
           <div className="flex">
             <a className="btn border-0 bg-base-100 text-xl normal-case hover:bg-base-100">
-              <img
-                className="h-10 w-full object-cover"
-                src="https://i.ibb.co/TW8T2kc/logo-momley.png"
-                alt=""
-              />
+              <img className="h-10 w-full object-cover" src={logo} alt="" />
             </a>
           </div>
         </div>
         <div className="hidden md:flex md:flex-1">
           <a className="btn border-0 bg-base-100 text-xl normal-case hover:bg-base-100">
-            <img
-              className="h-10 w-full object-cover"
-              src="https://i.ibb.co/TW8T2kc/logo-momley.png"
-              alt=""
-            />
+            <img className="h-10 w-full object-cover" src={logo} alt="" />
           </a>
         </div>
         <div className="flex items-center">
@@ -294,7 +287,13 @@ const Header = () => {
 
               {user?.uid && (
                 <li>
-                  <div onClick={logOut} className="hover:bg-base-200">
+                  <div
+                    onClick={() => {
+                      logOut();
+                      window.location.reload();
+                    }}
+                    className="hover:bg-base-200"
+                  >
                     Logout
                   </div>
                 </li>

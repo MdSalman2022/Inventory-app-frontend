@@ -133,7 +133,7 @@ const SellerProfile = () => {
     return response.json().then((data) => data?.orders);
   });
 
-  // console.log("orders ", orders);
+  console.log("all orders ", orders);
 
   const processingOrders = orders?.filter(
     (order) => order?.orderStatus === "processing"
@@ -149,7 +149,7 @@ const SellerProfile = () => {
     (order) => order?.orderStatus === "cancelled"
   );
 
-  console.log("stores", stores);
+  console.log("processingOrders", processingOrders);
   console.log("orders", orders);
   console.log("seller", seller);
 
@@ -316,9 +316,9 @@ const SellerProfile = () => {
               </div>
             )}
             {stores?.map((store, index) => {
-              const ordersForCurrentStore = selectedOrders?.filter(
-                (order) => order?.storeId === store?.storeId
-              );
+              // const ordersForCurrentStore = selectedOrders?.filter(
+              //   (order) => order?.storeId === store?.storeId
+              // );
               return (
                 <div
                   className="relative flex flex-col items-center gap-2 rounded-lg bg-base-100 p-5 text-center"
@@ -364,7 +364,7 @@ const SellerProfile = () => {
                     ))}
                   </div>
                   <div className="w-full">
-                    {<OrdersTable orders={ordersForCurrentStore} />}
+                    {<OrdersTable orders={selectedOrders} />}
                   </div>
                 </div>
               );
