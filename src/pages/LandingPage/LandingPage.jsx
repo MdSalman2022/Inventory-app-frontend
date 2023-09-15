@@ -1,10 +1,16 @@
-import React from "react";
-import hero from "../../assets/heroimg.webp";
+import React, { useContext } from "react";
+import hero from "../../assets/hero.webp";
+// import hero from "../../assets/heroimg.webp";
 import clockImg from "../../assets/clock.png";
 import freeImg from "../../assets/free.png";
 import { MdOutlineManageAccounts } from "react-icons/md";
+import { Link } from "react-router-dom";
+import { AuthContext } from "@/contexts/AuthProvider/AuthProvider";
+import { FaPlayCircle } from "react-icons/fa";
 
 const LandingPage = () => {
+  const { user } = useContext(AuthContext);
+
   const faqs = [
     {
       question: "What is online courier & accounting software?",
@@ -30,11 +36,38 @@ const LandingPage = () => {
 
   return (
     <div className="bg-white">
-      <img
-        className="object-top-right h-full w-full object-contain md:h-[92vh] md:object-cover"
-        src={hero}
-        alt=""
-      />
+      <div className="relative">
+        <img
+          className="object-top-right h-screen w-screen object-none object-center brightness-75 md:object-cover  md:brightness-100"
+          src={hero}
+          alt=""
+        />
+        <div className="absolute top-0 flex h-full flex-col justify-center gap-8 px-3 text-white md:justify-center md:gap-3 md:px-10">
+          <p className="flex flex-col text-5xl font-bold md:text-6xl">
+            <span>Smart, simple</span>
+            <span> online Courier & accounting</span>
+            <span>software for small business</span>
+          </p>
+          <p className="text-4xl italic">
+            Track Courier orders, invoices, reports and <br /> even more all
+            from one place.
+          </p>
+          <div className="flex items-center gap-5">
+            <Link
+              to={user ? "/inventory/overview" : "/register"}
+              className="w-fit"
+            >
+              <button className="btn-success btn w-fit border-none bg-[#0FD46C] text-black md:btn-md">
+                Register For Free
+              </button>
+            </Link>
+            <div className="flex w-fit cursor-pointer items-center gap-2">
+              <FaPlayCircle className="text-xl" />
+              See how it works
+            </div>
+          </div>
+        </div>
+      </div>
       <div className="container flex flex-col items-center gap-10 py-10 md:py-20">
         <div className="flex w-full flex-col items-center justify-between gap-5 rounded-lg bg-[#0D333F] p-5 text-white md:mb-20 md:h-[238px] md:flex-row md:gap-0 md:px-[54px]">
           <div className="space-y-4 md:space-y-0">
@@ -46,9 +79,11 @@ const LandingPage = () => {
               business clearer
             </p>
           </div>
-          <button className="btn-success btn border-none bg-[#2CA01C] text-white">
-            Register For Free
-          </button>
+          <Link to={user ? "/inventory/overview" : "/register"}>
+            <button className="btn-success btn w-fit border-none bg-[#0FD46C] text-black md:btn-md">
+              Register For Free
+            </button>
+          </Link>
         </div>
         <div className="flex flex-col justify-center gap-20 md:h-[70vh]">
           <div className="flex flex-col items-center gap-5">
@@ -70,9 +105,11 @@ const LandingPage = () => {
                 always have what you need when you need it.
               </p>
 
-              <button className="btn-success btn border-none bg-[#2CA01C] text-white">
-                Register For Free
-              </button>
+              <Link to={user ? "/inventory/overview" : "/register"}>
+                <button className="btn-success btn w-fit border-none bg-[#0FD46C] text-black md:btn-md">
+                  Register For Free
+                </button>
+              </Link>
             </div>
             <div className="flex flex-col items-center justify-between gap-5 rounded-lg bg-[#E0EEEE] p-10">
               <img className="h-10 w-10" src={freeImg} alt="" />
@@ -83,9 +120,11 @@ const LandingPage = () => {
                 save your time and money.
               </p>
 
-              <button className="btn-success btn border-none bg-[#2CA01C] text-white">
-                Register For Free
-              </button>
+              <Link to={user ? "/inventory/overview" : "/register"}>
+                <button className="btn-success btn w-fit border-none bg-[#0FD46C] text-black md:btn-md">
+                  Register For Free
+                </button>
+              </Link>
             </div>
             <div className="flex flex-col items-center justify-between gap-5 rounded-lg bg-[#E0EEEE] p-10">
               <MdOutlineManageAccounts className="text-4xl" />
@@ -96,9 +135,11 @@ const LandingPage = () => {
                 duplicate order, print invoice, manage multiple-courier.
               </p>
 
-              <button className="btn-success btn border-none bg-[#2CA01C] text-white">
-                Register For Free
-              </button>
+              <Link to={user ? "/inventory/overview" : "/register"}>
+                <button className="btn-success btn w-fit border-none bg-[#0FD46C] text-black md:btn-md">
+                  Register For Free
+                </button>
+              </Link>
             </div>
           </div>
         </div>
@@ -110,7 +151,7 @@ const LandingPage = () => {
           {faqs.map((faq, index) => (
             <div key={index} className="join-vertical join w-full">
               <div className="collapse-arrow join-item collapse rounded-none border border-x-0 border-b-0 border-gray-200">
-                <input type="radio" name="my-accordion-4" checked="checked" />
+                <input type="radio" name="my-accordion-4" />
                 <div className="collapse-title text-xl font-medium">
                   {faq.question}
                 </div>

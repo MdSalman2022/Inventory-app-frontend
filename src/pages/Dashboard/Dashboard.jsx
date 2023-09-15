@@ -21,7 +21,7 @@ const Dashboard = () => {
   const navigate = useNavigate();
 
   if (userInfo?.role !== "Admin") {
-    navigate("inventory/start-order");
+    navigate("/inventory/start-order");
   }
 
   const {
