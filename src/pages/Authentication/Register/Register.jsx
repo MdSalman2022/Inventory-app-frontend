@@ -153,11 +153,11 @@ const Register = () => {
               className="flex flex-col gap-5 rounded-lg rounded-t-none bg-white p-5"
             >
               <label>
-                <p>Shop Name</p>
+                <p>Name</p>
                 <input
                   type="text"
                   name="username"
-                  placeholder="Your Shop Name"
+                  placeholder="Your Name"
                   className="input-bordered input w-full"
                 />
               </label>

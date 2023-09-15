@@ -14,15 +14,15 @@ const Dashboard = () => {
   const { userInfo } = useContext(StateContext);
 
   // console.log("userinfo", userInfo);
-  // if (!user) {
-  //   navigate("/inventory/login");
-  // }
+  if (!user) {
+    navigate("/inventory/login");
+  }
 
   const navigate = useNavigate();
 
-  // if (userInfo?.role !== "Admin") {
-  //   navigate("/start-order");
-  // }
+  if (userInfo?.role !== "Admin") {
+    navigate("inventory/start-order");
+  }
 
   const {
     data: orders,

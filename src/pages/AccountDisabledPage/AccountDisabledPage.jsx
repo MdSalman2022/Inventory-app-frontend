@@ -10,8 +10,7 @@ const AccountDisabledPage = () => {
             <MdInfoOutline size={24} />
           </div>
           <div>
-            <p className="font-semibold">Account Disabled</p>
-            <p>Sorry you are deactivated by Admin</p>
+            <p className="font-semibold">Account Not Approved Yet</p>
             <p>Contact Admin to know more.</p>
           </div>
         </div>
