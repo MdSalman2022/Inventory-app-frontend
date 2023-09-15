@@ -109,12 +109,12 @@ const Login = () => {
             console.log("user info in login", userInfo);
             toast.success(`Welcome ${user.displayName}`);
             EditUserLog(userInfo?._id, "Login", "User Login");
-            navigate(from, { replace: true });
+            navigate("/inventory/overview");
           } else if (user.emailVerified && !userInfo?.verified) {
             await EditUserVerification(user, true);
             toast.success(`Welcome ${user.displayName}`);
             EditUserLog(userInfo?._id, "Login", "User Login");
-            navigate(from, { replace: true });
+            navigate("/inventory/overview");
           } else if (!user.emailVerified && !userInfo?.verified) {
             toast.error("Please verify your email");
             handleSendVerification(user);

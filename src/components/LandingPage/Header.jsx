@@ -21,7 +21,7 @@ const Header = () => {
             to={user ? "/inventory/overview" : "/login"}
             className="btn-success btn border-none bg-[#2CA01C] text-white"
           >
-            Login / Register
+            {user ? "Dashboard" : "Login / Register"}
           </Link>
         </div>
       </div>
