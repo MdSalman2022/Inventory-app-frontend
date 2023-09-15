@@ -31,24 +31,37 @@ import SellerProfile from "@/pages/SellerProfile/SellerProfile";
 import InvoiceGenerator from "@/components/Main/shared/InvoiceGenerator/InvoiceGenerator";
 import AllOrdersSearch from "@/pages/AllOrdersSearch/AllOrdersSearch";
 import ErrorPage from "@/layout/Main/ErrorPage";
+import LandingPageLayout from "@/layout/LandingPageLayout";
+import LandingPage from "@/pages/LandingPage/LandingPage";
 
 export const router = createBrowserRouter([
   {
     path: "/",
+    element: <LandingPageLayout />,
+    errorElement: <ErrorPage />,
+    children: [
+      {
+        path: "/",
+        element: <LandingPage />,
+      },
+    ],
+  },
+  {
+    path: "/inventory/",
     element: <Main></Main>,
     errorElement: <ErrorPage />,
     children: [
       {
-        path: "/register",
+        path: "/inventory/register",
         element: <Register />,
       },
       {
-        path: "/login",
+        path: "/inventory/login",
         element: <Login />,
       },
 
       {
-        path: "/",
+        path: "/inventory/",
         element: (
           <PrivateRoute>
             <Dashboard></Dashboard>
@@ -56,7 +69,7 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: "/customers",
+        path: "/inventory/customers",
         element: (
           <PrivateRoute>
             <Customers />
@@ -64,15 +77,15 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: "/customer/profile/:id",
+        path: "/inventory/customer/profile/:id",
         element: <CustomerProfile />,
       },
       {
-        path: "/seller/profile/:id",
+        path: "/inventory/seller/profile/:id",
         element: <SellerProfile />,
       },
       {
-        path: "/start-order",
+        path: "/inventory/start-order",
         element: (
           <PrivateRoute>
             <StartOrder />
@@ -80,7 +93,7 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: "/products",
+        path: "/inventory/products",
         element: (
           <PrivateRoute>
             <Products />
@@ -88,7 +101,7 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: "/orders-processing",
+        path: "/inventory/orders-processing",
         element: (
           <PrivateRoute>
             <OrderProcessing />
@@ -96,7 +109,7 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: "/orders-processing/import-csv",
+        path: "/inventory/orders-processing/import-csv",
         element: (
           <PrivateRoute>
             <ImportBulkOrders />
@@ -104,7 +117,7 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: "/all-ready-orders",
+        path: "/inventory/all-ready-orders",
         element: (
           <PrivateRoute>
             <AllReadyOrders />
@@ -112,7 +125,7 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: "/completed-orders",
+        path: "/inventory/completed-orders",
         element: (
           <PrivateRoute>
             <CompletedOrders />
@@ -120,7 +133,7 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: "/returned-orders",
+        path: "/inventory/returned-orders",
         element: (
           <PrivateRoute>
             <ReturnedOrders />
@@ -128,7 +141,7 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: "/cancelled-orders",
+        path: "/inventory/cancelled-orders",
         element: (
           <PrivateRoute>
             <CancelledOrders />
@@ -136,7 +149,7 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: "/loss-profit",
+        path: "/inventory/loss-profit",
         element: (
           <PrivateRoute>
             <LossProfitPage />
@@ -144,7 +157,7 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: "/transactions",
+        path: "/inventory/transactions",
         element: (
           <PrivateRoute>
             <Transaction />
@@ -152,7 +165,7 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: "/profile",
+        path: "/inventory/profile",
         element: (
           <PrivateRoute>
             <Settings />
@@ -160,7 +173,7 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: "/users",
+        path: "/inventory/users",
         element: (
           <PrivateRoute>
             <Users />
@@ -168,7 +181,7 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: "/marchants",
+        path: "/inventory/marchants",
         element: (
           <PrivateRoute>
             <Marchants />
@@ -176,7 +189,7 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: "/couriers",
+        path: "/inventory/couriers",
         element: (
           <PrivateRoute>
             <Couriers />
@@ -184,7 +197,7 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: "/couriers/:name",
+        path: "/inventory/couriers/:name",
         element: (
           <PrivateRoute>
             <CourierPage />
@@ -192,7 +205,7 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: "/stores",
+        path: "/inventory/stores",
         element: (
           <PrivateRoute>
             <Store />
@@ -200,7 +213,7 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: "/supplier",
+        path: "/inventory/supplier",
         element: (
           <PrivateRoute>
             <SupplierPage />
@@ -208,7 +221,7 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: "/invoice-generator",
+        path: "/inventory/invoice-generator",
         element: (
           <PrivateRoute>
             <InvoiceGenerator />
@@ -216,7 +229,7 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: "/orders/all",
+        path: "/inventory/orders/all",
         element: (
           <PrivateRoute>
             <AllOrdersSearch />
