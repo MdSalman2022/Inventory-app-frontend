@@ -113,35 +113,35 @@ const Header = () => {
   const menus = [
     {
       name: "Settings",
-      path: "/profile",
+      path: "profile",
     },
 
     {
       name: "Users",
-      path: "/users",
+      path: "users",
     },
     {
       name: "Couriers",
-      path: "/couriers",
+      path: "couriers",
     },
     {
       name: "Stores",
-      path: "/stores",
+      path: "stores",
     },
     {
       name: "Products",
-      path: "/products",
+      path: "products",
     },
     {
       name: "Suppliers",
-      path: "/supplier",
+      path: "supplier",
     },
   ];
 
   const masterMenus = [
     {
       name: "Marchants",
-      path: "/marchants",
+      path: "marchants",
     },
   ];
 
@@ -160,7 +160,7 @@ const Header = () => {
       await fetchOrderByName(name);
       refetchSearch();
       toast.success("Order found successfully");
-      navigate(`/orders/all?search=${name}`);
+      navigate(`orders/all?search=${name}`);
     } catch (error) {
       console.error(error);
       toast.error("Failed to find order");
@@ -231,15 +231,21 @@ const Header = () => {
           </div>
 
           <div className="flex">
-            <a className="btn border-0 bg-base-100 text-xl normal-case hover:bg-base-100">
+            <Link
+              to="/inventory/overview"
+              className="btn border-0 bg-base-100 text-xl normal-case hover:bg-base-100"
+            >
               <img className="h-10 w-full object-cover" src={logo} alt="" />
-            </a>
+            </Link>
           </div>
         </div>
         <div className="hidden md:flex md:flex-1">
-          <a className="btn border-0 bg-base-100 text-xl normal-case hover:bg-base-100">
+          <Link
+            to="/inventory/overview"
+            className="btn border-0 bg-base-100 text-xl normal-case hover:bg-base-100"
+          >
             <img className="h-10 w-full object-cover" src={logo} alt="" />
-          </a>
+          </Link>
         </div>
         <div className="flex items-center">
           <form

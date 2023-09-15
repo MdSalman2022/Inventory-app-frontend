@@ -157,7 +157,7 @@ const CustomerProfile = () => {
       <div className="relative flex flex-col items-center gap-2 rounded-lg bg-base-100 p-5 text-center">
         <div className="right-5 top-5 flex gap-3 md:absolute">
           {selectedOrders?.length > 0 && (
-            <Link to="/invoice-generator">
+            <Link to="/inventory/invoice-generator">
               <button className="btn-primary btn-outline btn w-full md:w-52">
                 Print Selected
               </button>

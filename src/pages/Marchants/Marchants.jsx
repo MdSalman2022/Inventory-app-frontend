@@ -154,7 +154,7 @@ const Marchants = () => {
 
                   <td>
                     <Link
-                      to={`/seller/profile/${user?._id}`}
+                      to={`seller/profile/${user?._id}`}
                       className="text-blue-600"
                     >
                       {user?.username}

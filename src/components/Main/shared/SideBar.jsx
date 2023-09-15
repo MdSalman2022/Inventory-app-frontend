@@ -25,62 +25,62 @@ const SideBar = ({ children }) => {
     {
       name: "dashboard",
       icon: <RxDashboard />,
-      route: "/",
+      route: "overview",
     },
     {
       name: "customers",
       icon: <BsPeopleFill />,
-      route: "/customers",
+      route: "customers",
     },
     {
       name: "Create order",
       icon: <AiOutlineShoppingCart />,
-      route: "/start-order",
+      route: "start-order",
     },
     {
       name: "orders-processing",
       icon: <AiOutlineOrderedList />,
-      route: "/orders-processing",
+      route: "orders-processing",
     },
     {
       name: "all-ready-orders",
       icon: <LiaFileInvoiceSolid />,
-      route: "/all-ready-orders",
+      route: "all-ready-orders",
     },
     ...activeCouriers.map((courier) => ({
       name: courier?.name,
       icon: <CiDeliveryTruck />,
-      route: `/couriers/${courier?.name}`,
+      route: `couriers/${courier?.name}`,
     })),
     {
       name: "completed-orders",
       icon: <PiCrownSimpleBold />,
-      route: "/completed-orders",
+      route: "completed-orders",
     },
     {
       name: "returned-orders",
       icon: <GiReturnArrow />,
-      route: "/returned-orders",
+      route: "returned-orders",
     },
     {
       name: "cancelled-orders",
       icon: <RiDeleteBin5Line />,
-      route: "/cancelled-orders",
+      route: "cancelled-orders",
     },
     {
       name: "products",
       icon: <CgDatabase />,
-      route: "/products",
+      route: "products",
     },
     {
       name: "loss-profit",
       icon: <BsFillBarChartFill />,
-      route: "/loss-profit",
+      route: "loss-profit",
     },
     {
       name: "transactions",
       icon: <FaExchangeAlt />,
-      route: "/transactions",
+      route: "transactions",
     },
   ];
 

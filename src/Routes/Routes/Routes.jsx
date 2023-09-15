@@ -44,24 +44,27 @@ export const router = createBrowserRouter([
         path: "/",
         element: <LandingPage />,
       },
+      {
+        path: "/register",
+        element: <Register />,
+      },
+      {
+        path: "/login",
+        element: <Login />,
+      },
     ],
   },
   {
     path: "/inventory/",
-    element: <Main></Main>,
+    element: (
+      <PrivateRoute>
+        <Main></Main>
+      </PrivateRoute>
+    ),
     errorElement: <ErrorPage />,
     children: [
       {
-        path: "/inventory/register",
-        element: <Register />,
-      },
-      {
-        path: "/inventory/login",
-        element: <Login />,
-      },
-
-      {
-        path: "/inventory/",
+        path: "/inventory/overview",
         element: (
           <PrivateRoute>
             <Dashboard></Dashboard>
@@ -77,11 +80,11 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: "/inventory/customer/profile/:id",
+        path: "/inventory/customers/profile/:id",
         element: <CustomerProfile />,
       },
       {
-        path: "/inventory/seller/profile/:id",
+        path: "/inventory/marchants/seller/profile/:id",
         element: <SellerProfile />,
       },
       {

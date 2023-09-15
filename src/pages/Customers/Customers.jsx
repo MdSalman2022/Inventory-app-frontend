@@ -492,7 +492,7 @@ const Customers = () => {
                         <div className="flex items-center space-x-3">
                           <div>
                             <Link
-                              to={`/customer/profile/${customer?._id}`}
+                              to={`profile/${customer?._id}`}
                               className="font-bold text-info"
                             >
                               {customer?.customer_details?.name}
@@ -580,7 +580,7 @@ const Customers = () => {
                         <div className="flex items-center space-x-3">
                           <div>
                             <Link
-                              to={`/customer/profile/${customer?._id}`}
+                              to={`profile/${customer?._id}`}
                               className="font-bold text-info"
                             >
                               {customer?.customer_details?.name}

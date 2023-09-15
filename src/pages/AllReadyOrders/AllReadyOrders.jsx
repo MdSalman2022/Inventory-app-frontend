@@ -344,7 +344,7 @@ const AllReadyOrders = () => {
         </div>
         <div className="mt-3 flex w-full flex-col gap-3 md:mt-0 md:w-auto md:flex-row md:gap-5">
           {selectedOrders?.length > 0 && (
-            <Link to="/invoice-generator">
+            <Link to="/inventory/invoice-generator">
               <button className="btn-primary btn-outline btn">
                 Print Selected
               </button>
