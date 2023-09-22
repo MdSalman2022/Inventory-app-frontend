@@ -19,6 +19,7 @@ import { EditUserLog } from "@/utils/fetchApi";
 import { FaMinus } from "react-icons/fa";
 import { GrPowerReset } from "react-icons/gr";
 import { RxCross2 } from "react-icons/rx";
+import { CgLayoutGrid } from "react-icons/cg";
 
 const StartOrder = () => {
   const { userInfo, couriers } = useContext(StateContext);
@@ -39,6 +40,7 @@ const StartOrder = () => {
   const [discount, setDiscount] = useState(0);
   const [deliveryCharge, setDeliveryCharge] = useState(0);
   const [inputDeliveryCharge, setInputDeliveryCharge] = useState(0);
+  const [discountType, setDiscountType] = useState("Fixed");
   const [newCustomerId, setNewCustomerId] = useState("");
   const [district, setDistrict] = useState(
     selectedCustomer?.customer_details?.location ?? ""
@@ -46,6 +48,7 @@ const StartOrder = () => {
   const [courier, setCourier] = useState("");
   const [store, setStore] = useState({});
   const [discountOnAll, setDiscountOnAll] = useState(0);
+  const [discountAmount, setDiscountAmount] = useState(0);
   const [salesDate, setSalesDate] = useState("");
   const [referenceNo, setReferenceNo] = useState("");
   const [paymentType, setPaymentType] = useState("");
@@ -156,6 +159,18 @@ const StartOrder = () => {
     couriers?.filter((courier) => courier?.status === true) ?? [];
   console.log(activeCouriers);
 
+  console.log("discount type", discountType);
+  useEffect(() => {
+    if (discountType === "Fixed") {
+      setDiscountOnAll(discountAmount);
+    } else if (discountType === "Percentage") {
+      const value = (subTotal * discountAmount) / 100;
+      setDiscountOnAll((subTotal * discountAmount) / 100);
+    }
+
+    console.log("discount on all", discountOnAll);
+  }, [discountAmount, discountType, subTotal]);
+
   useEffect(() => {
     if (district && courier) {
       const courierInfo = activeCouriers.find((c) => c?.name === courier);
@@ -263,7 +278,7 @@ const StartOrder = () => {
       const customerInfo = {
         id: selectedCustomer?._id,
         image: selectedCustomer?.image || "",
-        name,
+        name: selectedCustomer?.customer_details?.name,
         phone: selectedCustomer?.customer_details?.phone,
         address: selectedCustomer?.customer_details?.address,
         location: district,
@@ -303,12 +318,13 @@ const StartOrder = () => {
     })
       .then((res) => res.json())
       .then((result) => {
-        console.log("added order info", result);
+        // console.log("added order info", result);
 
         if (result.success) {
           const allProducts = order.products;
 
-          toast.success(`${order.name} is added successfully`);
+          // console.log("my order", order);
+
           EditUserLog(
             userInfo?._id,
             "Created an order",
@@ -370,10 +386,10 @@ const StartOrder = () => {
     )
       .then((res) => res.json())
       .then((result) => {
-        console.log(result);
-        console.log(customer);
+        // console.log(result);
+        // console.log("my customer", customer);
         if (result.success) {
-          toast.success(`${customer.name} is updated successfully`);
+          toast.success(`${customer?.name} is updated successfully`);
           setIsModalOpen(false);
         } else {
           toast.error("Something went wrong");
@@ -767,12 +783,19 @@ const StartOrder = () => {
                         <input
                           type="text"
                           placeholder="Discount Amount"
-                          onChange={(e) => setDiscountOnAll(e.target.value)}
+                          onChange={(e) => setDiscountAmount(e.target.value)}
                           className="border-r-none input-primary input rounded-r-none border border-gray-300 bg-white focus-within:outline-none md:w-[238px]"
                         />
-                        <select className="join-item cursor-pointer rounded-lg rounded-l-none border px-3.5 outline-none focus-within:outline-none">
-                          <option className="">Fixed</option>
-                          <option className="">Per %</option>
+                        <select
+                          onChange={(e) => setDiscountType(e.target.value)}
+                          className="join-item cursor-pointer rounded-lg rounded-l-none border px-3.5 outline-none focus-within:outline-none"
+                        >
+                          <option className="" value="Fixed">
+                            Fixed
+                          </option>
+                          <option className="" value="Percentage">
+                            Per %
+                          </option>
                         </select>
                       </div>
                     </div>
@@ -826,17 +849,15 @@ const StartOrder = () => {
                 </div>
                 <div className="flex flex-col gap-2 md:flex-row md:items-center">
                   <p>Delivery Charge: </p>
-                  <div className="flex">
-                    <input
-                      type="number"
-                      placeholder="Delivery Charge"
-                      defaultValue={deliveryCharge}
-                      onChange={(e) =>
-                        setInputDeliveryCharge(parseFloat(e.target.value))
-                      }
-                      className="border-r-none input-primary input border border-gray-300 bg-white focus-within:outline-none md:w-[325px]"
-                    />
-                  </div>
+                  <input
+                    type="number"
+                    placeholder="Delivery Charge"
+                    defaultValue={deliveryCharge}
+                    onChange={(e) =>
+                      setInputDeliveryCharge(parseFloat(e.target.value))
+                    }
+                    className="border-r-none input-primary input border border-gray-300 bg-white focus-within:outline-none md:w-[325px]"
+                  />
                 </div>
               </div>
             </div>
