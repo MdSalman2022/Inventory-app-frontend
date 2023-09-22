@@ -38,6 +38,7 @@ const StartOrder = () => {
   const [advance, setAdvance] = useState(0);
   const [discount, setDiscount] = useState(0);
   const [deliveryCharge, setDeliveryCharge] = useState(0);
+  const [inputDeliveryCharge, setInputDeliveryCharge] = useState(0);
   const [newCustomerId, setNewCustomerId] = useState("");
   const [district, setDistrict] = useState(
     selectedCustomer?.customer_details?.location ?? ""
@@ -148,6 +149,9 @@ const StartOrder = () => {
 
   const formRef = useRef(null);
 
+  console.log("deliveryCharge", deliveryCharge);
+  console.log("inputDeliveryCharge", typeof inputDeliveryCharge);
+
   const activeCouriers =
     couriers?.filter((courier) => courier?.status === true) ?? [];
   console.log(activeCouriers);
@@ -156,14 +160,19 @@ const StartOrder = () => {
     if (district && courier) {
       const courierInfo = activeCouriers.find((c) => c?.name === courier);
       console.log("courier info ", courierInfo);
-      setDeliveryCharge(
-        district === "Dhaka"
-          ? courierInfo?.chargeInDhaka
-          : courierInfo?.chargeOutsideDhaka
-      );
+      if (inputDeliveryCharge) {
+        setDeliveryCharge(inputDeliveryCharge);
+      } else {
+        setDeliveryCharge(
+          district === "Dhaka"
+            ? courierInfo?.chargeInDhaka
+            : courierInfo?.chargeOutsideDhaka
+        );
+      }
+
       console.log(deliveryCharge);
     }
-  }, [district, courier, deliveryCharge, activeCouriers]);
+  }, [district, courier, deliveryCharge, activeCouriers, inputDeliveryCharge]);
 
   useEffect(() => {
     setIsModalOpen(isStartNewOrderOpen);
@@ -464,14 +473,26 @@ const StartOrder = () => {
     if (selectedCustomer?.customer_details?.location && courier) {
       const courierInfo = activeCouriers.find((c) => c?.name === courier);
       console.log("courier info ", courierInfo);
-      setDeliveryCharge(
-        selectedCustomer?.customer_details?.location === "Dhaka"
-          ? courierInfo?.chargeInDhaka
-          : courierInfo?.chargeOutsideDhaka
-      );
+      if (inputDeliveryCharge) {
+        setDeliveryCharge(inputDeliveryCharge);
+      } else {
+        setDeliveryCharge(
+          selectedCustomer?.customer_details?.location === "Dhaka"
+            ? courierInfo?.chargeInDhaka
+            : courierInfo?.chargeOutsideDhaka
+        );
+      }
+
       console.log(deliveryCharge);
     }
-  }, [district, courier, deliveryCharge, activeCouriers, selectedCustomer]);
+  }, [
+    district,
+    courier,
+    deliveryCharge,
+    activeCouriers,
+    selectedCustomer,
+    inputDeliveryCharge,
+  ]);
 
   const inputRef = useRef();
 
@@ -737,6 +758,7 @@ const StartOrder = () => {
                 <div className="flex p-1">
                   <p className="md:w-60">Quantity: {productList?.length}</p>
                 </div>
+
                 <div className="flex flex-col">
                   <div className="flex items-center gap-3">
                     <div className="flex flex-col gap-3 md:flex-row md:items-center">
@@ -800,6 +822,20 @@ const StartOrder = () => {
                         ))}
                       </select>
                     </div>
+                  </div>
+                </div>
+                <div className="flex flex-col gap-2 md:flex-row md:items-center">
+                  <p>Delivery Charge: </p>
+                  <div className="flex">
+                    <input
+                      type="number"
+                      placeholder="Delivery Charge"
+                      defaultValue={deliveryCharge}
+                      onChange={(e) =>
+                        setInputDeliveryCharge(parseFloat(e.target.value))
+                      }
+                      className="border-r-none input-primary input border border-gray-300 bg-white focus-within:outline-none md:w-[325px]"
+                    />
                   </div>
                 </div>
               </div>
