@@ -277,6 +277,20 @@ const Customers = () => {
 
   const inputBox = "input-bordered input focus-within:outline-none";
 
+  function formatTimestamp(timestamp) {
+    const options = {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+    };
+
+    const date = new Date(timestamp);
+    return date.toLocaleString("en-US", options);
+  }
+
   return (
     <div className="w-screen space-y-3 px-3 md:w-full">
       <EditCustomerModal
@@ -541,10 +555,10 @@ const Customers = () => {
                       </td>
                       <td>
                         <div>Total: {customer?.purchase?.total}</div>
-                        {customer?.purchase?.last_purchase?.name ? (
+                        {customer?.purchase?.last_purchase ? (
                           <div>
                             Last purchase:{" "}
-                            {customer?.purchase?.last_purchase?.name}
+                            {formatTimestamp(customer?.purchase?.last_purchase)}
                           </div>
                         ) : (
                           <></>
@@ -599,7 +613,7 @@ const Customers = () => {
                         {customer?.purchase?.last_purchase ? (
                           <div>
                             Last purchase:{" "}
-                            {customer?.purchase?.last_purchase?.name}
+                            {formatTimestamp(customer?.purchase?.last_purchase)}
                           </div>
                         ) : (
                           <></>

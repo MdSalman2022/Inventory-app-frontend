@@ -70,7 +70,7 @@ const SingleInvoiceGenerator = ({ order }) => {
           <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
             {userInfo?.image && (
               <img
-                style={{ height: "50px", width: "100px", objectFit: "cover" }}
+                style={{ height: "113px", width: "200px", objectFit: "cover" }}
                 src={userInfo?.image}
                 alt=""
               />

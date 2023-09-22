@@ -213,13 +213,13 @@ const Settings = () => {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-10">
             {!userInfo?.image && !previewImage && (
-              <div className="flex h-[50px] w-[100px] flex-col items-center justify-center border border-gray-500 bg-gray-200">
+              <div className="flex h-[113px] w-[200px] flex-col items-center justify-center border border-gray-500 bg-gray-200">
                 <BiImageAlt className="text-3xl" />
               </div>
             )}
             {userInfo?.image && (
               <img
-                className="h-[50px] w-[100px] object-cover"
+                className="h-[113px] w-[200px] object-cover"
                 src={userInfo?.image}
                 alt=""
               />
@@ -227,7 +227,7 @@ const Settings = () => {
             {previewImage && (
               <div className="flex flex-col items-center gap-2">
                 <img
-                  className="h-[50px] w-[100px] object-cover"
+                  className="h-[113px] w-[200px] object-cover"
                   src={previewImage}
                   alt=""
                 />
@@ -242,7 +242,7 @@ const Settings = () => {
               className="file-input-bordered file-input w-full max-w-xs"
               onChange={handleImageChange} // Add this event handler
             />
-            <span className="text-xs">Max File Size 50 x 100 pixels</span>
+            <span className="text-xs">Max File Size 113 x 200 pixels</span>
           </div>
         </div>
         <button type="submit" className="btn-primary btn">
