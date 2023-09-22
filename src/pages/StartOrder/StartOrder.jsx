@@ -856,6 +856,7 @@ const StartOrder = () => {
                     onChange={(e) =>
                       setInputDeliveryCharge(parseFloat(e.target.value))
                     }
+                    disabled={!courier}
                     className="border-r-none input-primary input border border-gray-300 bg-white focus-within:outline-none md:w-[325px]"
                   />
                 </div>

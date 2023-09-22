@@ -186,11 +186,23 @@ const AllReadyOrders = () => {
 
   const sendToCourier = async (order) => {
     try {
+      let recipientAddress = order.address;
+
+      if (order.thana) {
+        recipientAddress += ", " + order.thana;
+      }
+
+      if (order.district) {
+        recipientAddress += ", " + order.district;
+      }
+
+      console.log("recipientAddress", recipientAddress);
+
       const courier_info = {
         invoice: order?.orderId,
         recipient_name: order.name,
         recipient_phone: order.phone,
-        recipient_address: order.address,
+        recipient_address: recipientAddress,
         cod_amount: order.cash,
         note: order.instruction,
       };
