@@ -213,13 +213,13 @@ const Settings = () => {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-10">
             {!userInfo?.image && !previewImage && (
-              <div className="flex h-[113px] w-[200px] flex-col items-center justify-center border border-gray-500 bg-gray-200">
+              <div className="flex h-[50px] w-[200px] flex-col items-center justify-center border border-gray-500 bg-gray-200">
                 <BiImageAlt className="text-3xl" />
               </div>
             )}
             {userInfo?.image && (
               <img
-                className="h-[113px] w-[200px] object-cover"
+                className="h-[50px] w-[200px] object-contain"
                 src={userInfo?.image}
                 alt=""
               />
@@ -227,7 +227,7 @@ const Settings = () => {
             {previewImage && (
               <div className="flex flex-col items-center gap-2">
                 <img
-                  className="h-[113px] w-[200px] object-cover"
+                  className="h-[50px] w-[200px] object-contain"
                   src={previewImage}
                   alt=""
                 />

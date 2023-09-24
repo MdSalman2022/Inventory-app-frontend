@@ -320,6 +320,7 @@ const inputArray = [
       "Lakhai",
       "Madhabpur",
       "Nabiganj",
+      "Shayestaganj",
     ],
   },
   {
@@ -792,7 +793,11 @@ const inputArray = [
       "Sakhipur",
       "Dhanbari",
       "Tangail Sadar",
-      "Narsingdi",
+    ],
+  },
+  {
+    City: "Narsingdi",
+    Area: [
       "Narsingdi Sadar",
       "Belabo",
       "Monohardi",

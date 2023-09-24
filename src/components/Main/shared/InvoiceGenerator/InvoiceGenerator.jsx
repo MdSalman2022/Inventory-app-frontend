@@ -70,9 +70,9 @@ const InvoiceGenerator = () => {
                 {userInfo?.image && (
                   <img
                     style={{
-                      height: "113px",
+                      height: "50px",
                       width: "200px",
-                      objectFit: "cover",
+                      objectFit: "contain",
                     }}
                     src={userInfo?.image}
                     alt=""

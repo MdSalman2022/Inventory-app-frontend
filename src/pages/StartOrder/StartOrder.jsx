@@ -51,7 +51,7 @@ const StartOrder = () => {
   const [discountAmount, setDiscountAmount] = useState(0);
   const [salesDate, setSalesDate] = useState("");
   const [referenceNo, setReferenceNo] = useState("");
-  const [paymentType, setPaymentType] = useState("");
+  const [paymentType, setPaymentType] = useState("COD");
 
   console.log("salesDate", salesDate);
   console.log("reference", referenceNo);
