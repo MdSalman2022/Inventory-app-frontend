@@ -19,7 +19,7 @@ const EditOrderModal = ({
   selectedOrder,
   refetch,
 }) => {
-  const { products, refetchProducts, couriers, userInfo } =
+  const { products, refetchProducts, couriers, userInfo, allCities } =
     useContext(StateContext);
   const [productList, setProductList] = useState(selectedOrder?.products);
   const [totalPrice, setTotalPrice] = useState(selectedOrder?.total);
@@ -29,9 +29,54 @@ const EditOrderModal = ({
   const [deliveryCharge, setDeliveryCharge] = useState(
     selectedOrder?.deliveryCharge
   );
+
   const [district, setDistrict] = useState(setSelectedOrder?.district ?? "");
 
   const [courier, setCourier] = useState(selectedOrder?.courier);
+  const [selectedCity, setSelectedCity] = useState("");
+  const [selectedAreas, setSelectedAreas] = useState([]);
+  const [selectedArea, setSelectedArea] = useState([]);
+
+  console.log("selected order", selectedOrder);
+  console.log("selectedCity", selectedCity);
+  // Function to handle city selection
+  console.log("selected city", selectedCity);
+
+  useEffect(() => {
+    if (selectedOrder) {
+      setSelectedCity(selectedOrder?.district);
+      setSelectedArea(selectedOrder?.thana);
+
+      const cityObject = allCities.find(
+        (city) => city.City === selectedOrder?.district
+      );
+
+      if (cityObject && selectedOrder?.thana) {
+        setSelectedAreas(cityObject.Area);
+        setSelectedArea(selectedOrder?.thana);
+      } else if (cityObject && !selectedOrder?.thana) {
+        setSelectedAreas(cityObject.Area);
+      } else {
+        setSelectedAreas([]);
+      }
+    }
+  }, [selectedOrder, allCities]);
+
+  const handleCityChange = (e) => {
+    const selectedCityName = e.target.value;
+    setSelectedCity(selectedCityName);
+
+    const cityObject = allCities.find((city) => city.City === selectedCityName);
+
+    if (cityObject) {
+      setSelectedAreas(cityObject.Area);
+    } else {
+      setSelectedAreas([]);
+    }
+  };
+
+  console.log("selectedCity", selectedCity);
+  console.log("selectedArea", selectedArea);
 
   const formRef = useRef(null);
 
@@ -114,6 +159,7 @@ const EditOrderModal = ({
     const phone = form.phone.value;
     const address = form.address.value;
     const district = form.district.value;
+    const thana = form.thana.value;
     const courier = form.courier.value;
     const deliveryCharge = parseInt(form.deliveryCharge.value);
     const discount = parseInt(form.discount.value);
@@ -127,6 +173,7 @@ const EditOrderModal = ({
       phone,
       address,
       district,
+      thana,
       products: productList,
       quantity: productList.length,
       courier,
@@ -142,13 +189,14 @@ const EditOrderModal = ({
       timestamp: new Date().toISOString(),
     };
 
-    console.log(orderUpdate);
+    console.log("orderUpdate", orderUpdate);
 
     const selectedOrderFields = [
       "name",
       "phone",
       "address",
       "district",
+      "thana",
       "products",
       "courier",
       "deliveryCharge",
@@ -261,7 +309,44 @@ const EditOrderModal = ({
               defaultValue={selectedOrder?.address || ""}
               required
             />
-            <select
+            <label className="flex w-full flex-col items-start gap-3">
+              <select
+                className="select-primary select select-sm h-10 w-[270px] max-w-xs focus-within:outline-none md:w-full"
+                name="district"
+                onChange={handleCityChange}
+                // value={selectedCity}
+                defaultValue={selectedOrder?.district || ""}
+              >
+                <option value="" disabled>
+                  Select an District
+                </option>
+                {allCities.map((city, index) => (
+                  <option key={index} value={city.City}>
+                    {city.City}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="flex w-full flex-col items-start gap-3">
+              <select
+                className="select-primary select select-sm h-10 w-[270px] max-w-xs focus-within:outline-none md:w-full"
+                name="thana"
+                value={selectedArea}
+                defaultValue={selectedOrder?.thana || ""}
+                onChange={(e) => setSelectedArea(e.target.value)}
+                disabled={!selectedOrder?.district}
+              >
+                <option value="" disabled>
+                  Select an Thana
+                </option>
+                {selectedAreas.map((area, index) => (
+                  <option key={index} value={area}>
+                    {area}
+                  </option>
+                ))}
+              </select>
+            </label>
+            {/* <select
               name="district"
               id="district"
               className="input-bordered input col-span-2"
@@ -280,7 +365,7 @@ const EditOrderModal = ({
               <option value="Sylhet">Sylhet</option>
               <option value="Rangpur">Rangpur</option>
               <option value="Mymensingh">Mymensingh</option>
-            </select>
+            </select> */}
             <div className="col-span-2 flex h-full w-fit flex-col gap-3 rounded bg-gray-100 p-5">
               <p className="text-xl font-semibold">Products</p>
               <DropdownMenu className="w-full">

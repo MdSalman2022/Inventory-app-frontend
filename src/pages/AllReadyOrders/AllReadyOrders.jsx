@@ -227,6 +227,9 @@ const AllReadyOrders = () => {
           console.log(order);
           toast.success("Order sent to courier successfully");
           saveToDb(order, resultFromCourier);
+        } else if (resultFromCourier.status !== 200) {
+          toast.error(resultFromCourier?.errors?.recipient_phone[0]);
+          toast.error("Failed to send order to courier");
         }
       } else {
         toast.error("Failed to send order to courier");

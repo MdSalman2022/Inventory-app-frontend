@@ -11,6 +11,7 @@ import avatarIcon from "../../assets/shared/avatar.png";
 import { StateContext } from "@/contexts/StateProvider/StateProvider";
 import SingleInvoiceGenerator from "@/components/Main/shared/InvoiceGenerator/SingleInvoiceGenerator";
 import { BsThreeDots } from "react-icons/bs";
+import DeleteOrderModal from "@/components/Main/Orders/DeleteOrderModal";
 const CourierPage = () => {
   const { userInfo, selectedOrders, setSelectedOrders } =
     useContext(StateContext);
@@ -210,6 +211,12 @@ const CourierPage = () => {
 
   return (
     <div className="w-screen space-y-3 p-3 md:w-full">
+      <DeleteOrderModal
+        setIsDeleteModalOpen={setIsDeleteModalOpen}
+        isDeleteModalOpen={isDeleteModalOpen}
+        selectedOrder={selectedOrder}
+        refetch={refetch}
+      />
       <div className="mt-3 flex flex-col items-start justify-between border-b md:flex-row">
         <ModalBox isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen}>
           <div>
@@ -428,10 +435,7 @@ const CourierPage = () => {
                           }}
                           className="flex w-full cursor-pointer justify-center rounded-lg bg-red-100"
                         >
-                          <div
-                            className="tooltip flex cursor-pointer justify-center"
-                            data-tip={`Send to ${order?.courier} `}
-                          >
+                          <div className="tooltip flex cursor-pointer justify-center">
                             <RiDeleteBin6Line className="text-xl text-success " />
                           </div>
                         </li>
