@@ -276,7 +276,7 @@ const EditOrderModal = ({
         isModalOpen={isEditModalOpen}
         setIsModalOpen={setIsEditModalOpen}
       >
-        <div className="flex flex-col ">
+        <div className="flex max-h-[90vh] flex-col">
           <p className="border-b p-5 text-xl font-semibold">
             Order Information
           </p>
@@ -309,12 +309,13 @@ const EditOrderModal = ({
               defaultValue={selectedOrder?.address || ""}
               required
             />
-            <label className="flex w-full flex-col items-start gap-3">
+            <label className="col-span-2 flex w-full flex-col items-start gap-3 md:col-span-1">
               <select
-                className="select-primary select select-sm h-10 w-[270px] max-w-xs focus-within:outline-none md:w-full"
+                className="select-primary select select-sm h-10 w-[270px] max-w-xs overflow-scroll focus-within:outline-none md:w-full"
                 name="district"
                 onChange={handleCityChange}
                 // value={selectedCity}
+
                 defaultValue={selectedOrder?.district || ""}
               >
                 <option value="" disabled>
@@ -327,7 +328,7 @@ const EditOrderModal = ({
                 ))}
               </select>
             </label>
-            <label className="flex w-full flex-col items-start gap-3">
+            <label className="col-span-2 flex  w-full flex-col items-start gap-3 md:col-span-1">
               <select
                 className="select-primary select select-sm h-10 w-[270px] max-w-xs focus-within:outline-none md:w-full"
                 name="thana"
