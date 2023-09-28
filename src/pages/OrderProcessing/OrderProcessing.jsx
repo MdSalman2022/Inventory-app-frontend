@@ -53,8 +53,10 @@ const OrderProcessing = () => {
     if (!response.ok) {
       throw new Error("Failed to fetch customers");
     }
+    const data = await response.json();
+    const reversedOrders = data.orders.reverse(); // Reverse the order of the orders
 
-    return response.json().then((data) => data.orders);
+    return reversedOrders;
   });
 
   console.log(orders);

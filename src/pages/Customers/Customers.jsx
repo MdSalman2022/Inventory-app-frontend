@@ -44,7 +44,7 @@ const Customers = () => {
   const navigate = useNavigate();
 
   if (userInfo?.role !== "Admin") {
-    navigate("/start-order");
+    navigate("/inventory/start-order");
   }
 
   console.log(userInfo?.role === "Admin" ? userInfo?._id : userInfo?.sellerId);
@@ -70,7 +70,11 @@ const Customers = () => {
     if (!response.ok) {
       throw new Error("Failed to fetch customers");
     }
-    return response.json().then((data) => data.customers);
+    // return response.json().then((data) => data.customers);
+    const data = await response.json();
+    const reversedOrders = data.customers.reverse(); // Reverse the order of the orders
+
+    return reversedOrders;
   });
 
   console.log(customers);

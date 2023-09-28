@@ -56,6 +56,18 @@ const StartOrder = () => {
   console.log("salesDate", salesDate);
   console.log("reference", referenceNo);
 
+  const discountRef = useRef(null);
+  const deliveryRef = useRef(null);
+  const advanceRef = useRef(null);
+  const productDiscountRef = useRef(null);
+  const searchProductRef = useRef(null);
+  const quantityRef = useRef(null);
+  const referenceRef = useRef(null);
+  const totalBillRef = useRef(null);
+  const searchCustomerRef = useRef();
+
+  console.log("discountRef", discountRef?.current?.value);
+
   useEffect(() => {
     // Get today's date and format it as "YYYY-MM-DD"
     const today = new Date();
@@ -391,6 +403,18 @@ const StartOrder = () => {
         if (result.success) {
           toast.success(`${customer?.name} is updated successfully`);
           setIsModalOpen(false);
+          discountRef.current.value = "";
+          deliveryRef.current.value = "";
+          advanceRef.current.value = "";
+          productDiscountRef.current.value = "";
+          searchProductRef.current.value = "";
+          quantityRef.current.value = "";
+          referenceRef.current.value = "";
+          totalBillRef.current.value = "";
+          setSelectedCustomer({});
+          searchCustomerRef.current.value = "";
+          searchCustomerRef.current.focus();
+          setProductList([]);
         } else {
           toast.error("Something went wrong");
         }
@@ -510,8 +534,6 @@ const StartOrder = () => {
     inputDeliveryCharge,
   ]);
 
-  const inputRef = useRef();
-
   return (
     <div className="flex w-screen flex-col px-4 py-6 md:w-full md:px-2">
       <EditCustomerModal
@@ -549,16 +571,16 @@ const StartOrder = () => {
                       placeholder="Name Or Phone Number (any one)"
                       name="searchCustomer"
                       value={selectedCustomer?.customer_details?.name}
-                      ref={inputRef}
+                      ref={searchCustomerRef}
                       required
                     />
                     {(selectedCustomer?.customer_details?.name ||
-                      inputRef?.current?.value) && (
+                      searchCustomerRef?.current?.value) && (
                       <RxCross2
                         onClick={() => {
                           setSelectedCustomer({});
-                          inputRef.current.value = "";
-                          inputRef.current.focus();
+                          searchCustomerRef.current.value = "";
+                          searchCustomerRef.current.focus();
                         }}
                         className="absolute right-[42%] top-3.5 cursor-pointer rounded-full bg-base-200 p-1 text-2xl"
                       />
@@ -627,6 +649,7 @@ const StartOrder = () => {
               </div>
             </div>
             <input
+              ref={referenceRef}
               type="text"
               className="input-bordered input join-item focus-within:outline-none"
               placeholder="Reference No."
@@ -646,6 +669,7 @@ const StartOrder = () => {
                 className="relative flex w-full flex-col"
               >
                 <input
+                  ref={searchProductRef}
                   type="text"
                   className="input-bordered input-primary input join-item w-full border-gray-300 focus-within:outline-none"
                   placeholder="Item name / Barcode / Item code"
@@ -699,6 +723,7 @@ const StartOrder = () => {
                     {/* quantity */}
                     <td className="w-full text-center">
                       <input
+                        ref={quantityRef}
                         type="number"
                         className="input-bordered input input-sm w-60"
                         placeholder="Quantity"
@@ -727,6 +752,7 @@ const StartOrder = () => {
                     {/* discount */}
                     <td className="w-full text-center">
                       <input
+                        ref={productDiscountRef}
                         type="number"
                         className="input-bordered input input-sm"
                         placeholder="Discount"
@@ -740,6 +766,7 @@ const StartOrder = () => {
                     {/* total */}
                     <td className="w-full text-center">
                       <input
+                        ref={totalBillRef}
                         type="number"
                         className="input-bordered input input-sm"
                         placeholder="Total Bill"
@@ -781,6 +808,7 @@ const StartOrder = () => {
                       <p>Discount on all: </p>
                       <div className="flex">
                         <input
+                          ref={discountRef}
                           type="text"
                           placeholder="Discount Amount"
                           onChange={(e) => setDiscountAmount(e.target.value)}
@@ -806,6 +834,7 @@ const StartOrder = () => {
                     <p>Payment Type: </p>
                     <div className="flex">
                       <input
+                        ref={advanceRef}
                         type="text"
                         placeholder="Advance Amount"
                         onChange={(e) => setAdvance(e.target.value)}
@@ -850,6 +879,7 @@ const StartOrder = () => {
                 <div className="flex flex-col gap-2 md:flex-row md:items-center">
                   <p>Delivery Charge: </p>
                   <input
+                    ref={deliveryRef}
                     type="number"
                     placeholder="Delivery Charge"
                     defaultValue={deliveryCharge}
