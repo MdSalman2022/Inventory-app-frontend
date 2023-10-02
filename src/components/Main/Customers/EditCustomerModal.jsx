@@ -10,8 +10,53 @@ const EditCustomerModal = ({
   selectedCustomer,
   refetch,
 }) => {
-  const { userInfo } = useContext(StateContext);
+  const { userInfo, allCities } = useContext(StateContext);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const [selectedCity, setSelectedCity] = useState("");
+  const [selectedAreas, setSelectedAreas] = useState([]);
+  const [selectedArea, setSelectedArea] = useState([]);
+
+  console.log("selectedCity", selectedCity);
+  // Function to handle city selection
+  console.log("selected city", selectedCity);
+
+  useEffect(() => {
+    if (selectedCustomer) {
+      setSelectedCity(selectedCustomer?.customer_details?.location);
+      setSelectedArea(selectedCustomer?.customer_details?.thana);
+
+      const cityObject = allCities.find(
+        (city) => city.City === selectedCustomer?.customer_details?.location
+      );
+
+      if (cityObject && selectedCustomer?.customer_details?.thana) {
+        setSelectedAreas(cityObject.Area);
+        setSelectedArea(selectedCustomer?.customer_details?.thana);
+      } else if (cityObject && !selectedCustomer?.customer_details?.thana) {
+        setSelectedAreas(cityObject.Area);
+      } else {
+        setSelectedAreas([]);
+      }
+    }
+  }, [selectedCustomer, allCities]);
+
+  const handleCityChange = (e) => {
+    const selectedCityName = e.target.value;
+    setSelectedCity(selectedCityName);
+
+    const cityObject = allCities.find((city) => city.City === selectedCityName);
+
+    if (cityObject) {
+      setSelectedAreas(cityObject.Area);
+    } else {
+      setSelectedAreas([]);
+    }
+  };
+
+  console.log("selectedCity", selectedCity);
+  console.log("selectedArea", selectedArea);
+  console.log("selected customer", selectedCustomer);
 
   const handleEditCustomer = (event) => {
     event.preventDefault();
@@ -20,7 +65,6 @@ const EditCustomerModal = ({
     const form = event.target;
     const name = form.name.value;
     const phone = form.phone.value;
-    const district = form.district.value;
     const address = form.address.value;
     const link = form.link.value;
     const image = form?.image?.files[0];
@@ -62,8 +106,9 @@ const EditCustomerModal = ({
         image: selectedCustomer?.image,
         name,
         phone,
-        district,
         address,
+        location: selectedCity,
+        thana: selectedArea,
         link,
       };
 
@@ -152,38 +197,41 @@ const EditCustomerModal = ({
                 defaultValue={selectedCustomer?.customer_details?.address}
               />
 
-              <div className="flex items-end gap-3">
-                <select
-                  name="district"
-                  id="district"
-                  className="input-bordered input w-full"
-                  defaultValue={selectedCustomer?.customer_details?.location}
-                >
-                  <option value="" disabled>
-                    Select Location
+              <select
+                className="select-primary select select-sm h-10 w-[270px] max-w-xs overflow-scroll focus-within:outline-none md:w-full"
+                name="district"
+                onChange={handleCityChange}
+                // value={selectedCity}
+
+                defaultValue={
+                  selectedCustomer?.customer_details?.location || ""
+                }
+              >
+                <option value="" disabled>
+                  Select an District
+                </option>
+                {allCities.map((city, index) => (
+                  <option key={index} value={city.City}>
+                    {city.City}
                   </option>
-                  <option value="Dhaka">Dhaka</option>
-                  <option value="Chittagong">Chittagong</option>
-                  <option value="Rajshahi">Rajshahi</option>
-                  <option value="Khulna">Khulna</option>
-                  <option value="Barishal">Barishal</option>
-                  <option value="Sylhet">Sylhet</option>
-                  <option value="Rangpur">Rangpur</option>
-                  <option value="Mymensingh">Mymensingh</option>
-                </select>
-                {/* <div className="flex items-center gap-3">
-                  <img
-                    className="h-12 w-12 rounded object-cover"
-                    src={selectedCustomer?.customer_details?.image}
-                    alt=""
-                  />{" "}
-                  <input
-                    type="file"
-                    name="image"
-                    className="file-input-bordered file-input-primary file-input w-full max-w-xs"
-                  />
-                </div> */}
-              </div>
+                ))}
+              </select>
+              <select
+                className="select-primary select select-sm h-10 w-[270px] max-w-xs focus-within:outline-none md:w-full"
+                name="thana"
+                value={selectedArea}
+                defaultValue={selectedCustomer?.customer_details?.thana || ""}
+                onChange={(e) => setSelectedArea(e.target.value)}
+              >
+                <option value="" disabled>
+                  Select an Thana
+                </option>
+                {selectedAreas.map((area, index) => (
+                  <option key={index} value={area}>
+                    {area}
+                  </option>
+                ))}
+              </select>
               <input
                 className="input-bordered input "
                 type="text"

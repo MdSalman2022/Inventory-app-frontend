@@ -516,6 +516,7 @@ const Customers = () => {
                               {customer?.customer_details?.name}
                             </Link>
                             <div className="text-sm opacity-50">
+                              {customer?.customer_details?.thana},{" "}
                               {customer?.customer_details?.location}
                             </div>
                             <div className="text-sm opacity-50">
@@ -604,6 +605,7 @@ const Customers = () => {
                               {customer?.customer_details?.name}
                             </Link>
                             <div className="text-sm opacity-50">
+                              {customer?.customer_details?.thana},{" "}
                               {customer?.customer_details?.location}
                             </div>
                             <div className="text-sm opacity-50">
