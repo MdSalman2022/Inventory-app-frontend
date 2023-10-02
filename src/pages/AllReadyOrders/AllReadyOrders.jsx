@@ -74,12 +74,15 @@ const AllReadyOrders = () => {
       throw new Error("Failed to fetch customers");
     }
     const data = await response.json();
-    const reversedOrders = data.orders.reverse(); // Reverse the order of the orders
+    const filteredOrders = data?.orders?.filter(
+      (order) => order.courierStatus !== "sent"
+    );
+    const reversedOrders = filteredOrders?.reverse(); // Reverse the order of the orders
 
     return reversedOrders;
   });
 
-  console.log(orders);
+  console.log("orders", orders);
 
   const handleExportClick = () => {
     fetch(`${import.meta.env.VITE_SERVER_URL}/api/customer-export`, {

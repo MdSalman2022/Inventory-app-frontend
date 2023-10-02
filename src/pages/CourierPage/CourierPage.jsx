@@ -280,7 +280,7 @@ const CourierPage = () => {
         </form>
       </div>
       <div>
-        <div className="overflow-x-auto">
+        <div className="h-[70vh] overflow-auto">
           <table className="table-pin-rows table-pin-cols table ">
             {/* head */}
             <thead className="">
@@ -409,7 +409,8 @@ const CourierPage = () => {
                             setIsModalOpen(!isModalOpen);
                             setSelectedOrder(order);
                           }}
-                          className="flex w-full cursor-pointer justify-center rounded-lg bg-green-100  "
+                          className="tooltip flex w-full cursor-pointer justify-center rounded-lg bg-green-100"
+                          data-tip="Invoice"
                         >
                           <span className="flex cursor-pointer justify-center">
                             <TbFileInvoice className="text-xl text-success " />
@@ -423,9 +424,22 @@ const CourierPage = () => {
                         >
                           <div
                             className="tooltip flex cursor-pointer justify-center"
-                            data-tip="Complete"
+                            data-tip="Back to Processing"
                           >
                             <RiArrowGoBackLine className="text-lg text-success " />
+                          </div>
+                        </li>
+                        <li
+                          onClick={() => {
+                            handleOrderStatus(order._id, "completed");
+                          }}
+                          className="flex w-full cursor-pointer justify-center rounded-lg  bg-blue-100 "
+                        >
+                          <div
+                            className="tooltip flex cursor-pointer justify-center"
+                            data-tip="Complete"
+                          >
+                            <FaCheck className="text-lg text-success " />
                           </div>
                         </li>
                         <li
@@ -435,7 +449,10 @@ const CourierPage = () => {
                           }}
                           className="flex w-full cursor-pointer justify-center rounded-lg bg-red-100"
                         >
-                          <div className="tooltip flex cursor-pointer justify-center">
+                          <div
+                            className="tooltip flex cursor-pointer justify-center"
+                            data-tip="Delete"
+                          >
                             <RiDeleteBin6Line className="text-xl text-success " />
                           </div>
                         </li>

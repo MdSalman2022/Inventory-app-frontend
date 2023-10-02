@@ -59,7 +59,7 @@ const OrderProcessing = () => {
     return reversedOrders;
   });
 
-  console.log(orders);
+  console.log("orders", orders);
 
   const handleExportClick = () => {
     fetch(`${import.meta.env.VITE_SERVER_URL}/order/order-export`, {
