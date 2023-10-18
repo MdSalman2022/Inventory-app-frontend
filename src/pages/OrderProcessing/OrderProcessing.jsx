@@ -434,17 +434,17 @@ const OrderProcessing = () => {
         selectedOrder={selectedOrder}
         refetch={refetch}
       />
-      <div className="flex flex-col items-start justify-between border-b md:flex-row">
-        <div>
+      <div className="flex flex-col items-start justify-between md:flex-row">
+        {/*  <div>
           <p className="text-xl font-semibold">Order Processing</p>
           <p>Total Parcels: 0</p>
           <p>Total Sales: ৳0.00</p>
           <p>Total DC: ৳0.00</p>
           <p>Total COD: ৳0.00</p>
           <p>Total Advance: ৳0.00</p>
-        </div>
+        </div> */}
         <div className="mt-3 flex w-full flex-col gap-3 md:mt-0 md:w-auto md:flex-row md:gap-5">
-          {selectedOrders?.length > 0 && (
+          {/* {selectedOrders?.length > 0 && (
             <Link to="/inventory/invoice-generator">
               <button className="btn-primary btn-outline btn w-full md:w-52">
                 Print Selected
@@ -465,7 +465,7 @@ const OrderProcessing = () => {
             className="btn-primary btn-outline btn w-full md:w-52"
           >
             Export Orders
-          </button>
+          </button> */}
           {/* Open the modal using ID.showModal() method */}
 
           {/* The button to open modal */}
