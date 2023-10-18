@@ -42,11 +42,11 @@ const SideBar = ({ children }) => {
       icon: <AiOutlineOrderedList />,
       route: "orders-processing",
     },
-    {
+    /*    {
       name: "all-ready-orders",
       icon: <LiaFileInvoiceSolid />,
       route: "all-ready-orders",
-    },
+    }, */
     ...activeCouriers.map((courier) => ({
       name: courier?.name,
       icon: <CiDeliveryTruck />,

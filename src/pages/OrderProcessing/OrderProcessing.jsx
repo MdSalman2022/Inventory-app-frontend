@@ -1,13 +1,17 @@
 import React, { useContext, useEffect, useState } from "react";
 import { AiOutlineEdit, AiOutlineShoppingCart } from "react-icons/ai";
-import { RiArrowGoBackLine, RiDeleteBin6Line } from "react-icons/ri";
+import {
+  RiArrowGoBackLine,
+  RiDeleteBin4Fill,
+  RiDeleteBin6Line,
+} from "react-icons/ri";
 import ModalBox from "../../components/Main/shared/Modals/ModalBox";
 import { toast } from "react-hot-toast";
 import EditCustomerModal from "../../components/Main/Customers/EditCustomerModal";
 import avatarIcon from "../../assets/shared/avatar.png";
 import DeleteCustomerModal from "../../components/Main/Customers/DeleteCustomerModal";
 import { useQuery } from "react-query";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { TbFileInvoice } from "react-icons/tb";
 import { FaCheck, FaSearch } from "react-icons/fa";
 import DeleteOrderModal from "../../components/Main/Orders/DeleteOrderModal";
@@ -15,7 +19,13 @@ import InvoiceGenerator from "../../components/Main/shared/InvoiceGenerator/Invo
 import { StateContext } from "@/contexts/StateProvider/StateProvider";
 import SingleInvoiceGenerator from "@/components/Main/shared/InvoiceGenerator/SingleInvoiceGenerator";
 import EditOrderModal from "@/components/Main/Orders/EditOrderModal";
-import { BsThreeDots } from "react-icons/bs";
+import { BsThreeDots, BsThreeDotsVertical } from "react-icons/bs";
+import { GrDeliver } from "react-icons/gr";
+import { FaBagShopping } from "react-icons/fa6";
+import { FaEdit } from "react-icons/fa";
+import { FiCheckCircle, FiTruck } from "react-icons/fi";
+import { FiPrinter } from "react-icons/fi";
+import { IoIosCloseCircleOutline } from "react-icons/io";
 
 const OrderProcessing = () => {
   const { userInfo, selectedOrders, setSelectedOrders } =
@@ -98,7 +108,7 @@ const OrderProcessing = () => {
 
   const [newOrderId, setNewOrderId] = useState("");
 
-  const handleOrderStatus = (order) => {
+  const handleOrderStatus = (order, status) => {
     if (order?.courierStatus === "returned") {
       console.log("returned order");
       fetch(`${import.meta.env.VITE_SERVER_URL}/order/get-new-orderid`)
@@ -154,11 +164,11 @@ const OrderProcessing = () => {
         });
     } else {
       const payload = {
-        orderStatus: "ready",
+        orderStatus: status,
         updatedBy: userInfo?.username,
         updatedById: userInfo?._id,
         update: {
-          orderStatus: "ready",
+          orderStatus: status,
         },
       };
 
@@ -267,6 +277,143 @@ const OrderProcessing = () => {
   console.log("search result", searchResult);
   console.log("orders ", orders);
 
+  const fetchCouriers = async () => {
+    const res = await fetch(
+      `${import.meta.env.VITE_SERVER_URL}/courier/get-couriers?sellerId=${
+        userInfo?.role === "Admin" ? userInfo?._id : userInfo?.sellerId
+      }`
+    );
+    const data = await res.json();
+    return data.couriers;
+  };
+
+  const { data: couriers } = useQuery("couriers", fetchCouriers);
+
+  const steadFastCourier = couriers?.find((courier) =>
+    /steadfast/i.test(courier.name)
+  );
+
+  console.log("steadfast ", steadFastCourier);
+
+  const sendToCourier = async (order) => {
+    try {
+      let recipientAddress = order.address;
+
+      if (order.thana) {
+        recipientAddress += ", " + order.thana;
+      }
+
+      if (order.district) {
+        recipientAddress += ", " + order.district;
+      }
+
+      console.log("recipientAddress", recipientAddress);
+
+      const courier_info = {
+        invoice: order?.orderId,
+        recipient_name: order.name,
+        recipient_phone: order.phone,
+        recipient_address: recipientAddress,
+        cod_amount: order.cash,
+        note: order.instruction,
+      };
+
+      const response = await fetch(
+        `${import.meta.env.VITE_STEADFAST_BASE_URL}/create_order`,
+        {
+          method: "POST",
+          headers: {
+            "Api-Key": steadFastCourier?.api,
+            "Secret-Key": steadFastCourier?.secret,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(courier_info),
+        }
+      );
+      console.log(response);
+      if (response.ok) {
+        const resultFromCourier = await response.json();
+        console.log("courier info", resultFromCourier);
+        if (resultFromCourier.status === 200) {
+          console.log(order);
+          toast.success("Order sent to courier successfully");
+          saveToDb(order, resultFromCourier);
+        } else if (resultFromCourier.status !== 200) {
+          toast.error(resultFromCourier?.errors?.recipient_phone[0]);
+          toast.error("Failed to send order to courier");
+        }
+      } else {
+        toast.error("Failed to send order to courier");
+        throw new Error("Failed to send order to courier");
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to send order to courier");
+    }
+  };
+
+  const saveToDb = async (order, resultFromCourier) => {
+    console.log(order, resultFromCourier);
+    const payload = {
+      courierStatus: "sent",
+      courierInfo: resultFromCourier,
+      updatedBy: userInfo?.username,
+      updatedById: userInfo?._id,
+      update: {
+        courierStatus: "sent",
+        courierInfo: resultFromCourier,
+      },
+    };
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_SERVER_URL}/order/edit-order-info?id=${
+          order._id
+        }`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        }
+      );
+
+      if (response.ok) {
+        const resultFromDB = await response.json();
+        console.log("order info", resultFromDB);
+        toast.success("Courier data saved successfully");
+        refetch();
+      } else {
+        toast.error("Failed to save courier data");
+        throw new Error("Failed to save courier data");
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to save courier data");
+    }
+  };
+
+  const formatTimestamp = (timestamp) => {
+    const date = new Date(timestamp);
+
+    const formattedDate = new Intl.DateTimeFormat("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    }).format(date);
+
+    const formattedTime = new Intl.DateTimeFormat("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: true,
+    }).format(date);
+
+    return { date: formattedDate, time: formattedTime };
+  };
+
+  const navigate = useNavigate();
+
   return (
     <div className="w-screen space-y-3 p-3 md:w-full">
       <EditOrderModal
@@ -334,18 +481,112 @@ const OrderProcessing = () => {
             <option value="100">100</option>
           </select>
         </div>
-        <form
-          onSubmit={SearchOrderById}
-          className="hidden items-center gap-2 md:flex"
-        >
-          <p>Search</p>
-          <input
-            type="text"
-            name="orderId"
-            placeholder="Order Id"
-            className="input-bordered input"
-          />
-        </form>
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-8 bg-[#14BF7D] p-1 px-5 text-2xl">
+            <FiPrinter
+              onClick={() => {
+                if (selectedOrders?.length > 0) {
+                  navigate("/inventory/invoice-generator");
+                } else {
+                  toast.error("Please select an order");
+                }
+              }}
+              className={`cursor-pointer ${
+                selectedOrders?.length > 0
+                  ? ""
+                  : "cursor-not-allowed text-[#11111125]"
+              }`}
+            />
+            <button disabled className="cursor-not-allowed">
+              <FaBagShopping className="text-[#11111125] " />
+            </button>
+            <FaEdit
+              onClick={() => {
+                if (selectedOrders?.length === 1) {
+                  setSelectedOrder(selectedOrders[0]);
+                  setIsEditModalOpen(!isEditModalOpen);
+                } else {
+                  toast.error("Please select an order");
+                }
+              }}
+              className={`cursor-pointer ${
+                selectedOrders?.length === 1
+                  ? ""
+                  : "cursor-not-allowed text-[#11111125]"
+              }`}
+            />
+            <FiTruck
+              onClick={() => {
+                if (selectedOrders?.length === 1) {
+                  handleOrderStatus(selectedOrders[0], "ready");
+                  sendToCourier(selectedOrders[0]);
+                } else {
+                  toast.error("Please select an order");
+                }
+              }}
+              className={`cursor-pointer ${
+                selectedOrders?.length === 1
+                  ? ""
+                  : "cursor-not-allowed text-[#11111125]"
+              }`}
+            />
+            <IoIosCloseCircleOutline
+              onClick={() => {
+                if (selectedOrders?.length === 1) {
+                  handleOrderStatus(selectedOrders[0], "cancelled");
+                } else {
+                  toast.error("Please select an order");
+                }
+              }}
+              className={`cursor-pointer ${
+                selectedOrders?.length === 1
+                  ? ""
+                  : "cursor-not-allowed text-[#11111125]"
+              }`}
+            />
+            <RiDeleteBin4Fill
+              onClick={() => {
+                if (selectedOrders?.length === 1) {
+                  setSelectedOrder(selectedOrders[0]);
+                  setIsDeleteModalOpen(true);
+                } else {
+                  toast.error("Please select an order");
+                }
+              }}
+              className={`cursor-pointer ${
+                selectedOrders?.length === 1
+                  ? ""
+                  : "cursor-not-allowed text-[#11111125]"
+              }`}
+            />
+            <FiCheckCircle
+              onClick={() => {
+                if (selectedOrders?.length === 1) {
+                  handleOrderStatus(selectedOrders[0], "completed");
+                } else {
+                  toast.error("Please select an order");
+                }
+              }}
+              className={`cursor-pointer ${
+                selectedOrders?.length === 1
+                  ? ""
+                  : "cursor-not-allowed text-[#11111125]"
+              }`}
+            />
+          </div>
+          <form
+            onSubmit={SearchOrderById}
+            className="hidden items-center gap-2 md:flex"
+          >
+            <p>Search</p>
+            <input
+              type="text"
+              name="orderId"
+              placeholder="Id / Name / Number"
+              className="input-bordered input h-8 border-black"
+            />
+          </form>
+        </div>
         <div className="my-2 flex items-center md:hidden">
           <button
             className="btn-primary btn-outline btn"
@@ -385,11 +626,11 @@ const OrderProcessing = () => {
 
       <div>
         <div className="h-[70vh] overflow-auto">
-          <table className="table-pin-rows table-pin-cols table">
+          <table className="table-pin-rows table-pin-cols table bg-[#F1F1F1]">
             {/* head */}
-            <thead className="bg-primary text-white">
+            <thead className="">
               <tr>
-                <td className="w-5 bg-primary text-white">
+                <td className="w-5 bg-white text-black">
                   <input
                     type="checkbox"
                     defaultChecked={false}
@@ -404,12 +645,14 @@ const OrderProcessing = () => {
                     className="checkbox border border-white"
                   />
                 </td>
-                <th className="bg-primary text-white">#</th>
-                <th className="bg-primary text-white">Invoice</th>
-                <th className="bg-primary text-white">Name</th>
+                <th className="bg-white text-black">Order ID</th>
+                <th className="bg-white text-center text-black">Date</th>
+                <th className="bg-white text-black">Customer</th>
+                <th className="bg-white text-black">Total</th>
                 {/* <th>Prods/Pics</th> */}
-                <th className="w-96 bg-primary text-white">Price</th>
-                <th className="w-96 bg-primary text-white">Action</th>
+                <th className="bg-white text-black">Payment Status</th>
+                <th className="bg-white text-black">Delivery Method</th>
+                <th className="w-96 bg-white text-black">Action</th>
               </tr>
             </thead>
             <tbody className="bg-white">
@@ -436,8 +679,12 @@ const OrderProcessing = () => {
                         className="checkbox border border-black"
                       />
                     </td>
-                    <td>{index + 1}</td>
-                    <td className="">
+                    <td className="w-5">#{order?.orderId}</td>
+                    <td className="flex  flex-col text-center">
+                      <span>{formatTimestamp(order?.timestamp).date}</span>
+                      <span>{formatTimestamp(order?.timestamp).time}</span>
+                    </td>
+                    {/*  <td className="">
                       <span
                         onClick={() => {
                           setIsModalOpen(!isModalOpen);
@@ -447,7 +694,7 @@ const OrderProcessing = () => {
                       >
                         <TbFileInvoice />
                       </span>
-                    </td>
+                    </td> */}
                     <td className="">
                       <div className="flex items-center space-x-3">
                         {/* <div className="avatar">
@@ -460,14 +707,17 @@ const OrderProcessing = () => {
                         </div>
                       </div> */}
                         <div>
-                          <div className="font-bold">{order.name}</div>
-                          <div className="text-sm opacity-50">
+                          <div className="">{order.name}</div>
+                          {/* <div className="text-sm opacity-50">
                             {order.address}
-                          </div>
+                          </div> */}
                         </div>
                       </div>
                     </td>
-                    <td className="">
+                    <td> ৳ {order?.total}</td>
+                    <td className="font-semibold">{order?.paymentType}</td>
+                    <td className="font-semibold">{order?.courier}</td>
+                    {/* <td className="">
                       <div className="flex w-32 flex-col">
                         <p className="badge badge-info">
                           {order?.courier}: {order?.deliveryCharge}
@@ -482,28 +732,41 @@ const OrderProcessing = () => {
                         <p className="">Advance: {order?.advance}</p>
                         <p className="">COD: {order?.cash}</p>
                       </div>
-                    </td>
+                    </td> */}
                     <td>
                       <div className="dropdown-left dropdown">
-                        <label tabIndex={0} className="btn-sm btn m-1">
-                          <BsThreeDots size={18} />
+                        <label tabIndex={0} className="cursor-pointer">
+                          <BsThreeDotsVertical size={18} />
                         </label>
                         <ul
                           tabIndex={0}
-                          className="dropdown-content menu rounded-box z-[1] w-40 gap-1  bg-base-100 shadow"
+                          className="dropdown-content menu rounded-box z-[1] w-48 gap-1  bg-base-100 shadow"
                         >
+                          <li
+                            onClick={() => {
+                              setSelectedOrders([order]);
+                              navigate("/inventory/invoice-generator");
+                            }}
+                            className="flex w-full cursor-pointer justify-center rounded-lg bg-white "
+                          >
+                            <span className="flex cursor-pointer justify-center">
+                              <FiPrinter className="text-xl" />
+                              <span>Print</span>
+                            </span>
+                          </li>
                           <li
                             onClick={() => {
                               setSelectedOrder(order);
                               setIsEditModalOpen(!isEditModalOpen);
                             }}
-                            className="flex w-full cursor-pointer justify-center rounded-lg bg-green-100  "
+                            className="flex w-full cursor-pointer justify-center rounded-lg bg-white "
                           >
                             <span className="flex cursor-pointer justify-center">
-                              <AiOutlineEdit className="text-xl text-success " />
+                              <AiOutlineEdit className="text-xl" />
+                              <span>Edit</span>
                             </span>
                           </li>
-                          <li
+                          {/* <li
                             onClick={() => {
                               handleOrderStatus(order);
                             }}
@@ -515,19 +778,34 @@ const OrderProcessing = () => {
                             >
                               <FaCheck className="text-lg text-success " />
                             </div>
+                          </li> */}
+                          <li
+                            onClick={() => {
+                              handleOrderStatus(order);
+                              sendToCourier(order);
+                            }}
+                            className="flex w-full cursor-pointer justify-center rounded-lg bg-white"
+                          >
+                            <div
+                              className="tooltip flex cursor-pointer justify-center"
+                              data-tip={`Send to ${order?.courier} `}
+                            >
+                              <GrDeliver className="text-xl text-success " />
+                              <p>Send to {order?.courier}</p>
+                            </div>
                           </li>
                           <li
                             onClick={() => {
-                              setIsDeleteModalOpen(true);
-                              setSelectedOrder(order);
+                              handleOrderStatus(order, "cancelled");
                             }}
-                            className="flex w-full cursor-pointer justify-center rounded-lg bg-red-100"
+                            className="flex w-full cursor-pointer justify-center rounded-lg bg-white"
                           >
                             <div
                               className="tooltip flex cursor-pointer justify-center"
                               data-tip="Delete order"
                             >
-                              <RiDeleteBin6Line className="text-xl text-success " />
+                              <IoIosCloseCircleOutline className="text-xl" />
+                              Cancelled
                             </div>
                           </li>
                         </ul>

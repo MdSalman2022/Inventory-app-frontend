@@ -249,7 +249,7 @@ const CompletedOrders = () => {
                 <th>Name</th>
                 {/* <th>Prods/Pics</th> */}
                 <th>Price</th>
-                <th className="w-96 bg-primary text-white">Action</th>
+                {/* <th className="w-96 bg-primary text-white">Action</th> */}
               </tr>
             </thead>
             <tbody className="bg-white">
@@ -315,7 +315,7 @@ const CompletedOrders = () => {
                       <p className="">COD: {order?.cash} Tk</p>
                     </div>
                   </td>
-                  <td>
+                  {/*  <td>
                     <div className="dropdown-left dropdown">
                       <label tabIndex={0} className="btn-sm btn m-1">
                         <BsThreeDots size={18} />
@@ -337,7 +337,7 @@ const CompletedOrders = () => {
                         </li>
                       </ul>
                     </div>
-                  </td>
+                  </td> */}
                 </tr>
               ))}
             </tbody>

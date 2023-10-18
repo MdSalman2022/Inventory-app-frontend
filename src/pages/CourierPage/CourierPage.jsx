@@ -12,6 +12,8 @@ import { StateContext } from "@/contexts/StateProvider/StateProvider";
 import SingleInvoiceGenerator from "@/components/Main/shared/InvoiceGenerator/SingleInvoiceGenerator";
 import { BsThreeDots } from "react-icons/bs";
 import DeleteOrderModal from "@/components/Main/Orders/DeleteOrderModal";
+import { FcCancel } from "react-icons/fc";
+import { GiReturnArrow } from "react-icons/gi";
 const CourierPage = () => {
   const { userInfo, selectedOrders, setSelectedOrders } =
     useContext(StateContext);
@@ -53,6 +55,8 @@ const CourierPage = () => {
 
     return response.json().then((data) => data.orders);
   });
+
+  console.log("orders courier", orders);
 
   const allOrdersInvoice = orders?.map((order) => order.orderId);
   console.log("all orders invoice ", allOrdersInvoice);
@@ -102,7 +106,7 @@ const CourierPage = () => {
     ["ordersStatus", orders],
     async () => {
       // Create an array of promises for each orderId in allOrdersInvoice
-      const fetchPromises = allOrdersInvoice.map((orderId) =>
+      const fetchPromises = allOrdersInvoice?.map((orderId) =>
         fetchOrderStatusByInvoice(orderId)
       );
 
@@ -444,6 +448,30 @@ const CourierPage = () => {
                         </li>
                         <li
                           onClick={() => {
+                            handleOrderStatus(order._id, "cancelled");
+                          }}
+                          className="flex w-full cursor-pointer justify-center rounded-lg bg-red-100"
+                        >
+                          <div
+                            className="tooltip flex cursor-pointer justify-center"
+                            data-tip="Cancel Order"
+                          >
+                            <FcCancel className="text-xl text-success " />
+                          </div>
+                        </li>
+                        <li
+                          onClick={() => {
+                            handleOrderStatus(order._id, "returned");
+                          }}
+                          className="tooltip flex w-full cursor-pointer justify-center rounded-lg bg-green-100  "
+                          data-tip="Order Return"
+                        >
+                          <span className="flex cursor-pointer justify-center">
+                            <GiReturnArrow className="text-xl text-success " />
+                          </span>
+                        </li>
+                        {/*   <li
+                          onClick={() => {
                             setIsDeleteModalOpen(true);
                             setSelectedOrder(order);
                           }}
@@ -455,7 +483,7 @@ const CourierPage = () => {
                           >
                             <RiDeleteBin6Line className="text-xl text-success " />
                           </div>
-                        </li>
+                        </li> */}
                       </ul>
                     </div>
                   </td>
