@@ -625,7 +625,7 @@ const OrderProcessing = () => {
       </div>
 
       <div>
-        <div className="h-[70vh] overflow-auto">
+        <div className="h-[80vh] overflow-auto">
           <table className="table-pin-rows table-pin-cols table bg-[#F1F1F1]">
             {/* head */}
             <thead className="">
