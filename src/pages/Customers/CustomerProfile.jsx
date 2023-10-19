@@ -172,7 +172,7 @@ const CustomerProfile = () => {
         </div>
         <div className="flex w-full flex-col items-center">
           <p className="text-xl">
-            <span className="font-semibold">Store Name:</span>{" "}
+            <span className="font-semibold">Customer Name:</span>{" "}
             {customer?.customer_details?.name}
           </p>
           <p className="text-lg">

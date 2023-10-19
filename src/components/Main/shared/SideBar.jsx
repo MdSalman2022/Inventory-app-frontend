@@ -58,15 +58,16 @@ const SideBar = ({ children }) => {
       route: "completed-orders",
     },
     {
-      name: "returned-orders",
-      icon: <GiReturnArrow />,
-      route: "returned-orders",
-    },
-    {
       name: "cancelled-orders",
       icon: <RiDeleteBin5Line />,
       route: "cancelled-orders",
     },
+    {
+      name: "returned-orders",
+      icon: <GiReturnArrow />,
+      route: "returned-orders",
+    },
+
     {
       name: "products",
       icon: <CgDatabase />,

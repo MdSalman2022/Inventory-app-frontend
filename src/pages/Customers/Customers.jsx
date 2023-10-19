@@ -23,7 +23,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import StartOrderModal from "@/components/Main/StartOrder/StartOrderModal";
-import { BsThreeDots } from "react-icons/bs";
+import { BsThreeDots, BsThreeDotsVertical } from "react-icons/bs";
 
 const Customers = () => {
   const { userInfo, couriers, allCities } = useContext(StateContext);
@@ -71,10 +71,17 @@ const Customers = () => {
       throw new Error("Failed to fetch customers");
     }
     // return response.json().then((data) => data.customers);
-    const data = await response.json();
-    const reversedOrders = data.customers.reverse(); // Reverse the order of the orders
-
-    return reversedOrders;
+    // const data = await response.json();
+    // const reversedOrders = data.customers.reverse(); // Reverse the order of the orders
+    return response.json().then((data) => {
+      const sortedByCreatedDate = data.customers.sort((a, b) => {
+        return (
+          new Date(b.purchase?.last_purchase) -
+          new Date(a.purchase?.last_purchase)
+        );
+      });
+      return sortedByCreatedDate;
+    });
   });
 
   console.log(customers);
@@ -494,11 +501,12 @@ const Customers = () => {
             {/* head */}
             <thead className=" text-white">
               <tr>
-                <th className="rounded-tl-lg bg-primary">#</th>
-                <th className=" bg-primary">Customer Details</th>
-                <th className="bg-primary">Purchase</th>
-                <th className="bg-primary">Orders</th>
-                <th className="rounded-tr-lg bg-primary">Action</th>
+                <th className="rounded-tl-lg bg-white text-black">#</th>
+                <th className=" bg-white text-black">Name</th>
+                <th className=" bg-white text-black">Address</th>
+                <th className="bg-white text-black">Last Purchase</th>
+                {/* <th className="bg-white text-black">Orders</th> */}
+                <th className="rounded-tr-lg bg-white text-black">Action</th>
               </tr>
             </thead>
             <tbody className="bg-white">
@@ -507,103 +515,16 @@ const Customers = () => {
                     <tr key={index}>
                       <td>{index + 1}</td>
                       <td className="flex flex-col gap-1">
-                        <div className="flex items-center space-x-3">
-                          <div>
-                            <Link
-                              to={`profile/${customer?._id}`}
-                              className="font-bold text-info"
-                            >
-                              {customer?.customer_details?.name}
-                            </Link>
-                            <div className="text-sm opacity-50">
-                              {customer?.customer_details?.thana},{" "}
-                              {customer?.customer_details?.location}
-                            </div>
-                            <div className="text-sm opacity-50">
-                              {customer?.customer_details?.address}
-                            </div>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <span
-                            onClick={() => {
-                              if (couriers && couriers.length > 0) {
-                                setSelectedCustomer(customer);
-                                setIsStartNewOrderOpen(true);
-                              } else {
-                                toast.error("Please add a courier first!!");
-                              }
-                            }}
-                            className="cursor-pointer rounded-full border border-gray-500 p-1 text-2xl text-success"
-                          >
-                            <AiOutlineShoppingCart />
-                          </span>
-                          <span
-                            onClick={() => {
-                              setIsEditModalOpen(true);
-                              setSelectedCustomer(customer);
-                            }}
-                            className="cursor-pointer rounded-full border border-gray-500 p-1 text-2xl text-info"
-                          >
-                            <AiOutlineEdit />
-                          </span>
-                          <span
-                            onClick={() => {
-                              setIsDeleteModalOpen(true);
-                              setSelectedCustomer(customer);
-                            }}
-                            className="cursor-pointer rounded-full border border-gray-500 p-1 text-2xl text-error"
-                          >
-                            <RiDeleteBin6Line />
-                          </span>
-                        </div>
+                        <Link
+                          to={`profile/${customer?._id}`}
+                          className="font-bold text-info"
+                        >
+                          {customer?.customer_details?.name}
+                        </Link>
                       </td>
                       <td>
-                        <div>Total: {customer?.purchase?.total}</div>
-                        {customer?.purchase?.last_purchase ? (
-                          <div>
-                            Last purchase:{" "}
-                            {formatTimestamp(customer?.purchase?.last_purchase)}
-                          </div>
-                        ) : (
-                          <></>
-                        )}
-                      </td>
-                      <td>
-                        <div>
-                          <p>Processing: {customer?.orders?.processing}</p>
-                          {customer?.orders?.ready ? (
-                            <p>Ready: {customer?.orders?.ready}</p>
-                          ) : (
-                            <p>Ready: 0</p>
-                          )}
-
-                          {customer?.orders?.completed ? (
-                            <p>Completed: {customer?.orders?.completed}</p>
-                          ) : (
-                            <p>Completed: 0</p>
-                          )}
-                          {customer?.orders?.returned ? (
-                            <p>Returned: {customer?.orders?.returned}</p>
-                          ) : (
-                            <p>Returned: 0</p>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                  ))
-                : customers?.map((customer, index) => (
-                    <tr key={index}>
-                      <td>{index + 1}</td>
-                      <td className="flex flex-col gap-1">
                         <div className="flex items-center space-x-3">
                           <div>
-                            <Link
-                              to={`profile/${customer?._id}`}
-                              className="font-bold text-info"
-                            >
-                              {customer?.customer_details?.name}
-                            </Link>
                             <div className="text-sm opacity-50">
                               {customer?.customer_details?.thana},{" "}
                               {customer?.customer_details?.location}
@@ -625,7 +546,7 @@ const Customers = () => {
                           <></>
                         )}
                       </td>
-                      <td>
+                      {/* <td>
                         <div>
                           <p>Processing: {customer?.orders?.processing}</p>
                           {customer?.orders?.ready ? (
@@ -645,7 +566,7 @@ const Customers = () => {
                             <p>Returned: 0</p>
                           )}
                         </div>
-                      </td>
+                      </td> */}
                       <td>
                         <div className="dropdown-bottom dropdown">
                           <label tabIndex={0} className="btn-sm btn m-1">
@@ -690,6 +611,116 @@ const Customers = () => {
                             >
                               <span className="flex justify-center">
                                 <RiDeleteBin6Line className="text-2xl text-error  " />
+                              </span>
+                            </li>
+                          </ul>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                : customers?.map((customer, index) => (
+                    <tr key={index}>
+                      <td>{index + 1}</td>
+                      <td className="flex flex-col gap-1">
+                        <Link
+                          to={`profile/${customer?._id}`}
+                          className="font-bold text-info"
+                        >
+                          {customer?.customer_details?.name}
+                        </Link>
+                      </td>
+                      <td>
+                        <div className="flex items-center space-x-3">
+                          <div>
+                            <div className="text-sm opacity-50">
+                              {customer?.customer_details?.thana},{" "}
+                              {customer?.customer_details?.location}
+                            </div>
+                            <div className="text-sm opacity-50">
+                              {customer?.customer_details?.address}
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+                      <td>
+                        <div>Total: {customer?.purchase?.total}</div>
+                        {customer?.purchase?.last_purchase ? (
+                          <div>
+                            Last purchase:{" "}
+                            {formatTimestamp(customer?.purchase?.last_purchase)}
+                          </div>
+                        ) : (
+                          <></>
+                        )}
+                      </td>
+                      {/* <td>
+                        <div>
+                          <p>Processing: {customer?.orders?.processing}</p>
+                          {customer?.orders?.ready ? (
+                            <p>Ready: {customer?.orders?.ready}</p>
+                          ) : (
+                            <p>Ready: 0</p>
+                          )}
+
+                          {customer.orders?.completed ? (
+                            <p>Completed: {customer?.orders?.completed}</p>
+                          ) : (
+                            <p>Completed: 0</p>
+                          )}
+                          {customer?.orders?.returned ? (
+                            <p>Returned: {customer?.orders?.returned}</p>
+                          ) : (
+                            <p>Returned: 0</p>
+                          )}
+                        </div>
+                      </td> */}
+                      <td>
+                        <div className="dropdown-left dropdown">
+                          <label tabIndex={0} className="cursor-pointer">
+                            <BsThreeDotsVertical size={18} />
+                          </label>
+                          <ul
+                            tabIndex={0}
+                            className="dropdown-content menu rounded-box z-[1] w-40 gap-1  bg-base-100 shadow"
+                          >
+                            <li
+                              onClick={() => {
+                                if (couriers && couriers.length > 0) {
+                                  setSelectedCustomer(customer);
+                                  setIsStartNewOrderOpen(true);
+                                } else {
+                                  toast.error("Please add a courier first!!");
+                                }
+                              }}
+                              className="flex w-full cursor-pointer justify-start rounded-lg bg-white "
+                            >
+                              <span className="flex justify-start">
+                                <AiOutlineShoppingCart className="text-2xl text-black " />
+                                <span>Place Order</span>
+                              </span>
+                            </li>
+                            <li
+                              onClick={() => {
+                                setIsEditModalOpen(true);
+                                setSelectedCustomer(customer);
+                              }}
+                              className="flex w-full cursor-pointer justify-start rounded-lg bg-white "
+                            >
+                              <span className="flex justify-start">
+                                <AiOutlineEdit className="text-2xl text-black " />
+                                <span>Edit</span>
+                              </span>
+                            </li>
+                            <li
+                              onClick={() => {
+                                setIsDeleteModalOpen(true);
+                                setSelectedCustomer(customer);
+                              }}
+                              className="flex w-full cursor-pointer justify-start rounded-lg bg-white"
+                            >
+                              <span className="flex justify-start">
+                                <RiDeleteBin6Line className="text-2xl text-black  " />
+                                <span>Delete</span>
                               </span>
                             </li>
                           </ul>

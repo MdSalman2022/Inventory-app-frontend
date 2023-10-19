@@ -45,3 +45,53 @@ export const EditUserLog = (id, logType, logMessage) => {
       console.error(err);
     });
 };
+
+export const searchOrderByIdUniFunc = async (orderId, userInfo) => {
+  try {
+    const response = await fetch(
+      `${
+        import.meta.env.VITE_SERVER_URL
+      }/order/search-order?orderId=${orderId}&sellerId=${
+        userInfo?.role === "Admin" ? userInfo?._id : userInfo?.sellerId
+      }`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    if (response.ok) {
+      const resultFromDB = await response.json();
+      if (resultFromDB.success) {
+        return resultFromDB.orders;
+      } else {
+        throw new Error("Failed to find order");
+      }
+    } else {
+      throw new Error("Failed to find order");
+    }
+  } catch (error) {
+    console.error(error);
+    throw new Error("Failed to find order");
+  }
+};
+
+export const formatTimestamp = (timestamp) => {
+  const date = new Date(timestamp);
+
+  const formattedDate = new Intl.DateTimeFormat("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  }).format(date);
+
+  const formattedTime = new Intl.DateTimeFormat("en-US", {
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: true,
+  }).format(date);
+
+  return { date: formattedDate, time: formattedTime };
+};

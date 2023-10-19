@@ -1,7 +1,11 @@
 import React, { useContext, useEffect, useState } from "react";
-import { FaCheck } from "react-icons/fa";
-import { RiArrowGoBackLine, RiDeleteBin6Line } from "react-icons/ri";
-import { Link, useParams } from "react-router-dom";
+import { FaCheck, FaEdit, FaSearch } from "react-icons/fa";
+import {
+  RiArrowGoBackLine,
+  RiDeleteBin4Fill,
+  RiDeleteBin6Line,
+} from "react-icons/ri";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import InvoiceGenerator from "../../components/Main/shared/InvoiceGenerator/InvoiceGenerator";
 import ModalBox from "../../components/Main/shared/Modals/ModalBox";
 import { useQuery } from "react-query";
@@ -10,10 +14,15 @@ import { toast } from "react-hot-toast";
 import avatarIcon from "../../assets/shared/avatar.png";
 import { StateContext } from "@/contexts/StateProvider/StateProvider";
 import SingleInvoiceGenerator from "@/components/Main/shared/InvoiceGenerator/SingleInvoiceGenerator";
-import { BsThreeDots } from "react-icons/bs";
+import { BsThreeDots, BsThreeDotsVertical } from "react-icons/bs";
 import DeleteOrderModal from "@/components/Main/Orders/DeleteOrderModal";
 import { FcCancel } from "react-icons/fc";
 import { GiReturnArrow } from "react-icons/gi";
+import { FiCheckCircle, FiPrinter, FiTruck } from "react-icons/fi";
+import { FaBagShopping } from "react-icons/fa6";
+import { IoIosCloseCircleOutline } from "react-icons/io";
+import { GrDeliver } from "react-icons/gr";
+import { searchOrderByIdUniFunc } from "@/utils/fetchApi";
 const CourierPage = () => {
   const { userInfo, selectedOrders, setSelectedOrders } =
     useContext(StateContext);
@@ -53,7 +62,15 @@ const CourierPage = () => {
       throw new Error("Failed to fetch orders");
     }
 
-    return response.json().then((data) => data.orders);
+    return response.json().then((data) => {
+      const sortedByCreatedDate = data.orders.sort((a, b) => {
+        return (
+          new Date(b.courierInfo?.consignment?.created_at) -
+          new Date(a.courierInfo?.consignment?.created_at)
+        );
+      });
+      return sortedByCreatedDate;
+    });
   });
 
   console.log("orders courier", orders);
@@ -175,6 +192,28 @@ const CourierPage = () => {
       });
   };
 
+  const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
+
+  const [searchResult, setSearchResult] = useState([]);
+
+  const SearchOrderById = async (event) => {
+    event.preventDefault();
+    const form = event.target;
+    const orderId = form.orderId.value;
+
+    console.log("orderId ", orderId);
+
+    try {
+      const orders = await searchOrderByIdUniFunc(orderId, userInfo);
+      console.log("order info", orders);
+      toast.success("Order found successfully");
+      setSearchResult(orders);
+    } catch (error) {
+      toast.error("Failed to find order");
+    }
+  };
+
+  console.log("searchResult courier", searchResult);
   const handleOrderStatus = async (id, status) => {
     try {
       const response = await fetch(
@@ -205,13 +244,98 @@ const CourierPage = () => {
     }
   };
 
-  function formatDate(timestamp) {
-    const date = new Date(timestamp);
-    const formattedDate = date.toLocaleDateString("en-GB");
-    return formattedDate;
+  function getStatusColorDiv(status) {
+    let backgroundColor = "";
+
+    // Define background colors for each status
+    switch (status) {
+      case "pending":
+        backgroundColor = "#ECB409"; // You can choose the desired color
+        break;
+      case "delivered_approval_pending":
+      case "partial_delivered_approval_pending":
+      case "cancelled_approval_pending":
+      case "unknown_approval_pending":
+        backgroundColor = "orange"; // Choose appropriate color
+        break;
+
+      case "delivered":
+      case "partial_delivered":
+        backgroundColor = "#14BF7D"; // Choose appropriate color
+        break;
+      case "cancelled":
+        backgroundColor = "red"; // Choose appropriate color
+        break;
+
+      case "hold":
+      case "unknown":
+        backgroundColor = "#ccc"; // Choose appropriate color
+        break;
+
+      case "in_review":
+        backgroundColor = "#14BF7D"; // Choose appropriate color
+        break;
+      default:
+        backgroundColor = "gray"; // Default color for unknown status
+        break;
+    }
+
+    return (
+      <div
+        className="w-fit rounded-full px-3 text-black"
+        style={{ backgroundColor }}
+      >
+        {status === "delivered_approval_pending"
+          ? "delivered approval pending"
+          : status === "partial_delivered_approval_pending"
+          ? "partial delivered approval pending"
+          : status === "cancelled_approval_pending"
+          ? "cancelled approval pending"
+          : status === "unknown_approval_pending"
+          ? "unknown approval pending"
+          : status === "partial_delivered"
+          ? "partial delivered"
+          : status === "delivered"
+          ? "Delivered"
+          : status === "cancelled"
+          ? "Cancelled"
+          : status === "hold"
+          ? "Hold"
+          : status === "unknown"
+          ? "Unknown"
+          : status === "in_review"
+          ? "In Review"
+          : status === "pending"
+          ? "Pending"
+          : "unknown"}
+      </div>
+    );
   }
 
   console.log(selectedOrder);
+
+  const formatTimestamp = (timestamp) => {
+    const date = new Date(timestamp);
+
+    const formattedDate = new Intl.DateTimeFormat("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    }).format(date);
+
+    const formattedTime = new Intl.DateTimeFormat("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: true,
+    }).format(date);
+
+    return { date: formattedDate, time: formattedTime };
+  };
+
+  console.log("selectedOrders courier", selectedOrders);
+
+  const navigate = useNavigate();
 
   return (
     <div className="w-screen space-y-3 p-3 md:w-full">
@@ -221,21 +345,21 @@ const CourierPage = () => {
         selectedOrder={selectedOrder}
         refetch={refetch}
       />
-      <div className="mt-3 flex flex-col items-start justify-between border-b md:flex-row">
+      <div className="mt-3 flex flex-col items-start justify-between md:flex-row">
         <ModalBox isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen}>
           <div>
             <SingleInvoiceGenerator order={selectedOrder} />
           </div>
         </ModalBox>
-        <div>
-          <p className="text-xl font-semibold">{name} Ready Orders</p>
+        <p className="text-xl font-semibold">{name} Orders</p>
+        {/* <div>
           <p>Total Parcels: {orders?.length || 0.0}</p>
           <p>Total Sales: ৳{SumOfTotalPrice || 0.0}</p>
           <p>Total DC: ৳{SumOfTotalDC || 0.0}</p>
           <p>Total COD: ৳{SumOfTotalCOD || 0.0}</p>
           <p>Total Advance: ৳{SumOfTotalAdvance || 0.0}</p>
-        </div>
-        <div className="mt-3 flex w-full flex-col gap-3 md:mt-0 md:w-auto md:flex-row md:gap-5">
+        </div> */}
+        {/* <div className="mt-3 flex w-full flex-col gap-3 md:mt-0 md:w-auto md:flex-row md:gap-5">
           {selectedOrders?.length > 0 && (
             <Link to="/inventory/invoice-generator">
               <button className="btn-primary btn-outline btn">
@@ -254,14 +378,11 @@ const CourierPage = () => {
             className="btn-primary btn-outline btn"
           >
             Export Orders
-          </button>
-          {/* Open the modal using ID.showModal() method */}
-
-          {/* The button to open modal */}
-        </div>
+          </button> 
+        </div> */}
       </div>
       <div className="flex justify-between">
-        <div className="my-2 flex items-center gap-2">
+        <div className="my-2 flex items-center gap-2 md:my-0">
           <p>Show</p>
           <select name="page" id="page" className="input-bordered input p-2">
             <option value="10">10</option>
@@ -270,18 +391,152 @@ const CourierPage = () => {
             <option value="100">100</option>
           </select>
         </div>
-        <form
-          // onSubmit={SearchOrderById}
-          className="hidden items-center gap-2 md:flex"
-        >
-          <p>Search</p>
-          <input
-            type="text"
-            name="orderId"
-            placeholder="Order Id"
-            className="input-bordered input"
-          />
-        </form>
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-8 bg-[#14BF7D] p-1 px-5 text-2xl">
+            <span className="tooltip" data-tip="Print Invoice">
+              <FiPrinter
+                onClick={() => {
+                  if (selectedOrders?.length > 0) {
+                    navigate("/inventory/invoice-generator");
+                  } else {
+                    toast.error("Please select an order");
+                  }
+                }}
+                className={`cursor-pointer ${
+                  selectedOrders?.length > 0
+                    ? ""
+                    : "cursor-not-allowed text-[#11111125]"
+                }`}
+              />
+            </span>
+
+            <button disabled className="cursor-not-allowed">
+              <FaBagShopping className="text-[#11111125] " />
+            </button>
+            <FaEdit
+              /*  onClick={() => {
+                if (selectedOrders?.length === 1) {
+                  setSelectedOrder(selectedOrders[0]);
+                  setIsEditModalOpen(!isEditModalOpen);
+                } else {
+                  toast.error("Please select an order");
+                }
+              }} */
+              className={`tooltip cursor-not-allowed ${
+                selectedOrders?.length === 1
+                  ? "text-[#11111125]"
+                  : " text-[#11111125]"
+              }`}
+              data-tip="Edit Order"
+            />
+            <span className="tooltip" data-tip="Deliver Order">
+              <FiTruck
+                className={`cursor-not-allowed ${
+                  selectedOrders?.length === 1
+                    ? "text-[#11111125]"
+                    : " text-[#11111125]"
+                }`}
+              />
+            </span>
+            <span className="tooltip" data-tip="Cancel Order">
+              <IoIosCloseCircleOutline
+                onClick={() => {
+                  if (selectedOrders?.length === 1) {
+                    handleOrderStatus(selectedOrders[0]?._id, "cancelled");
+                  } else {
+                    toast.error("Please select an order");
+                  }
+                }}
+                className={` cursor-pointer ${
+                  selectedOrders?.length === 1
+                    ? ""
+                    : " cursor-not-allowed text-[#11111125]"
+                }`}
+              />
+            </span>
+
+            <span className="tooltip" data-tip="Delete Order">
+              <RiDeleteBin4Fill
+                onClick={() => {
+                  if (selectedOrders?.length === 1) {
+                    setSelectedOrder(selectedOrders[0]);
+                    setIsDeleteModalOpen(true);
+                  } else {
+                    toast.error("Please select an order");
+                  }
+                }}
+                className={`cursor-pointer ${
+                  selectedOrders?.length === 1
+                    ? ""
+                    : "cursor-not-allowed text-[#11111125]"
+                }`}
+              />
+            </span>
+            <span className="tooltip" data-tip="Complete Order">
+              <FiCheckCircle
+                onClick={() => {
+                  if (selectedOrders?.length === 1) {
+                    handleOrderStatus(selectedOrders[0]?._id, "completed");
+                  } else {
+                    toast.error("Please select an order");
+                  }
+                }}
+                className={` ${
+                  selectedOrders?.length === 1
+                    ? ""
+                    : " cursor-not-allowed text-[#11111125]"
+                }`}
+              />
+            </span>
+          </div>
+          <form
+            onSubmit={SearchOrderById}
+            className="hidden items-center gap-2 md:flex"
+          >
+            <p>Search</p>
+            <input
+              type="text"
+              name="orderId"
+              placeholder="Id / Name / Number"
+              className="input-bordered input h-8 border-black"
+            />
+          </form>
+        </div>
+        <div className="my-2 flex items-center md:hidden">
+          <button
+            className="btn-primary btn-outline btn"
+            onClick={() => setIsSearchModalOpen(!isSearchModalOpen)}
+          >
+            <FaSearch className="text-xl" />
+          </button>
+          {isSearchModalOpen && (
+            <ModalBox
+              setIsModalOpen={setIsSearchModalOpen}
+              isModalOpen={isSearchModalOpen}
+            >
+              <div className="flex h-40 w-full flex-col items-center justify-center gap-5 bg-base-100 p-5">
+                <p className="text-2xl font-bold">Search Customer</p>
+                <form onSubmit={SearchOrderById} className="w-full">
+                  <div className="flex w-full items-center justify-between gap-3">
+                    <input
+                      name="orderId"
+                      placeholder="Order Id"
+                      type="text"
+                      className="input-box h-12 w-full rounded-full border border-primary px-2"
+                    />
+                    <button
+                      type="submit"
+                      className="btn-primary btn-md btn rounded-full"
+                    >
+                      {" "}
+                      <FaSearch />
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </ModalBox>
+          )}
+        </div>
       </div>
       <div>
         <div className="h-[70vh] overflow-auto">
@@ -289,7 +544,7 @@ const CourierPage = () => {
             {/* head */}
             <thead className="">
               <tr>
-                <td className="w-5 bg-primary text-white">
+                <td className="w-5 bg-white text-black">
                   <input
                     type="checkbox"
                     defaultChecked={false}
@@ -301,15 +556,26 @@ const CourierPage = () => {
                       }
                     }}
                     checked={selectedOrders?.length === orders?.length}
-                    className="checkbox border border-white"
+                    className="checkbox border border-black"
                   />
                 </td>
-                <th className="w-10 bg-primary text-white">#</th>
-                <th className="w-10 bg-primary text-white">Invoice</th>
-                <th className="w-96 bg-primary text-white">Name</th>
-                <th className="w-10 bg-primary text-white">Status</th>
-                <th className="w-96 bg-primary text-white">Price</th>
-                <th className="w-96 bg-primary text-white">Action</th>
+                <th className="bg-white text-black">Order ID</th>
+                <th className="bg-white text-center text-black md:w-60">
+                  Date
+                </th>
+                <th className="bg-white text-center text-black">Customer</th>
+                <th className="bg-white text-black ">Total</th>
+                {/* <th>Prods/Pics</th> */}
+                <th className="w-40 bg-white text-center text-black">
+                  Payment Status
+                </th>
+                <th className="w-40 bg-white text-center text-black">
+                  Delivery Method
+                </th>
+                <th className="w-40 bg-white text-center text-black">
+                  Courier ID
+                </th>
+                <th className="w-40 bg-white text-center text-black">Action</th>
               </tr>
             </thead>
             <tbody className="bg-white">
@@ -334,8 +600,37 @@ const CourierPage = () => {
                       className="checkbox border border-black"
                     />
                   </td>
-                  <td className="w-10">{index + 1}</td>
-                  <td>
+                  <td className="w-20">#{order?.orderId}</td>
+                  <td className="flex flex-col text-center font-medium md:w-60">
+                    <span>{formatTimestamp(order?.timestamp).date}</span>
+                    <span>{formatTimestamp(order?.timestamp).time}</span>
+                  </td>
+                  <td className="w-60 font-medium">
+                    <div className="flex justify-center text-center">
+                      {order.name}
+                    </div>
+                  </td>
+                  <td className="w-40 font-semibold"> ৳ {order?.total}</td>
+                  <td className="w-40 text-center font-semibold">
+                    {order?.paymentType}
+                  </td>
+                  <td className="w-60 text-center font-semibold">
+                    <div className="flex flex-col items-center gap-1">
+                      <span>{order?.courier}</span>
+                      {isStatusLoading
+                        ? "...Loading"
+                        : getStatusColorDiv(
+                            ordersStatus[index]?.delivery_status
+                          )}
+                    </div>
+                  </td>
+                  <td className="">
+                    <span className="flex justify-center font-bold">
+                      {order?.courierInfo?.consignment?.consignment_id}
+                    </span>
+                  </td>
+
+                  {/*     <td>
                     <span
                       onClick={() => {
                         setIsModalOpen(!isModalOpen);
@@ -350,18 +645,10 @@ const CourierPage = () => {
                         Created By {userInfo?.username} ({userInfo?.role})
                       </p>
                     </span>
-                  </td>
-                  <td className="flex flex-col gap-1">
+                  </td> */}
+
+                  {/*        <td className="flex flex-col gap-1">
                     <div className="flex items-center space-x-3">
-                      {/* <div className="avatar">
-                        <div className="mask mask-squircle h-12 w-12">
-                          <img
-                            src={order?.image || avatarIcon}
-                            alt="image"
-                            className="rounded-full border-2 border-primary p-1"
-                          />
-                        </div>
-                      </div> */}
                       <div>
                         <div className="font-bold">{order.name}</div>
                         <div className="text-sm opacity-50">{order?.phone}</div>
@@ -377,13 +664,15 @@ const CourierPage = () => {
                         </div>
                       </div>
                     </div>
-                  </td>
-                  <td>
+                  </td> */}
+
+                  {/* <td>
                     {isStatusLoading
                       ? "...Loading"
                       : ordersStatus[index]?.delivery_status}
-                  </td>
-                  <td>
+                  </td> */}
+
+                  {/*  <td>
                     <div className="flex w-32 flex-col">
                       <p className="badge badge-info">
                         {order?.courier}: {order?.deliveryCharge}
@@ -398,11 +687,11 @@ const CourierPage = () => {
                       <p className="">Advance: {order?.advance}</p>
                       <p className="">COD: {order?.cash}</p>
                     </div>
-                  </td>
+                  </td> */}
                   <td>
                     <div className="dropdown-left dropdown">
-                      <label tabIndex={0} className="btn-sm btn m-1">
-                        <BsThreeDots size={18} />
+                      <label tabIndex={0} className="cursor-pointer">
+                        <BsThreeDotsVertical size={18} />
                       </label>
                       <ul
                         tabIndex={0}

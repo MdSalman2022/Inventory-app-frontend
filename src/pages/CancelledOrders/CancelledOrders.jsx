@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useContext } from "react";
 import { AiOutlineEdit, AiOutlineShoppingCart } from "react-icons/ai";
-import { RiDeleteBin6Line } from "react-icons/ri";
+import { RiDeleteBin4Fill, RiDeleteBin6Line } from "react-icons/ri";
 import ModalBox from "../../components/Main/shared/Modals/ModalBox";
 import { toast } from "react-hot-toast";
 import EditCustomerModal from "../../components/Main/Customers/EditCustomerModal";
@@ -12,6 +12,11 @@ import { TbFileInvoice } from "react-icons/tb";
 import InvoiceGenerator from "../../components/Main/shared/InvoiceGenerator/InvoiceGenerator";
 import { StateContext } from "@/contexts/StateProvider/StateProvider";
 import SingleInvoiceGenerator from "@/components/Main/shared/InvoiceGenerator/SingleInvoiceGenerator";
+import { formatTimestamp, searchOrderByIdUniFunc } from "@/utils/fetchApi";
+import { FiCheckCircle, FiPrinter, FiTruck } from "react-icons/fi";
+import { IoIosCloseCircleOutline } from "react-icons/io";
+import { FaBagShopping } from "react-icons/fa6";
+import { FaEdit } from "react-icons/fa";
 
 const CancelledOrders = () => {
   const { userInfo, selectedOrders, setSelectedOrders } =
@@ -89,7 +94,24 @@ const CancelledOrders = () => {
       });
   };
 
-  // console.log(isModalOpen);
+  const [searchResult, setSearchResult] = useState([]);
+
+  const SearchOrderById = async (event) => {
+    event.preventDefault();
+    const form = event.target;
+    const orderId = form.orderId.value;
+
+    console.log("orderId ", orderId);
+
+    try {
+      const orders = await searchOrderByIdUniFunc(orderId, userInfo);
+      console.log("order info", orders);
+      toast.success("Order found successfully");
+      setSearchResult(orders);
+    } catch (error) {
+      toast.error("Failed to find order");
+    }
+  };
 
   return (
     <div className="w-screen p-3 md:w-full md:space-y-3">
@@ -105,15 +127,15 @@ const CancelledOrders = () => {
         refetch={refetch}
       />
       <div className="flex flex-col items-start justify-between border-b md:flex-row">
-        <div>
-          <p className="text-xl font-semibold">Cancelled Orders</p>
+        <p className="text-xl font-semibold">Cancelled Orders</p>
+        {/* <div>
           <p>Total Parcels: 1</p>
           <p>Total Sales: ৳0.00</p>
           <p>Total DC: ৳0.00</p>
           <p>Total COD: ৳0.00</p>
           <p>Total Advance: ৳0.00</p>
-        </div>
-        <div className="mt-3 flex w-full flex-col gap-3 md:mt-0 md:w-auto md:flex-row md:gap-5">
+        </div> */}
+        {/* <div className="mt-3 flex w-full flex-col gap-3 md:mt-0 md:w-auto md:flex-row md:gap-5">
           {selectedOrders?.length > 0 && (
             <Link to="/inventory/invoice-generator">
               <button className="btn-primary btn-outline btn">
@@ -135,11 +157,8 @@ const CancelledOrders = () => {
             className="btn-primary btn-outline btn"
           >
             Export Orders
-          </button>
-          {/* Open the modal using ID.showModal() method */}
-
-          {/* The button to open modal */}
-        </div>
+          </button> 
+        </div> */}
       </div>
       <div className="flex justify-between">
         <div className="my-2 flex items-center gap-2 md:my-0">
@@ -151,25 +170,105 @@ const CancelledOrders = () => {
             <option value="100">100</option>
           </select>
         </div>
-        <form
-          // onSubmit={SearchOrderById}
-          className="hidden items-center gap-2 md:flex"
-        >
-          <p>Search</p>
-          <input
-            type="text"
-            name="orderId"
-            placeholder="Order Id"
-            className="input-bordered input"
-          />
-        </form>
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-8 bg-[#14BF7D] p-1 px-5 text-2xl">
+            <span className="tooltip" data-tip="Print Invoice">
+              <FiPrinter
+                onClick={() => {
+                  if (selectedOrders?.length > 0) {
+                    navigate("/inventory/invoice-generator");
+                  } else {
+                    toast.error("Please select an order");
+                  }
+                }}
+                className={`tooltip cursor-pointer ${
+                  selectedOrders?.length > 0
+                    ? ""
+                    : "cursor-not-allowed text-[#11111125]"
+                }`}
+                data-tip="Edit order"
+              />
+            </span>
+            <span className="tooltip" data-tip="Bag">
+              <button disabled className="cursor-not-allowed">
+                <FaBagShopping className="text-[#11111125] " />
+              </button>
+            </span>
+            <span className="tooltip" data-tip="Edit Order">
+              <FaEdit
+                className={`tooltip cursor-not-allowed text-[#11111125]`}
+                data-tip="Edit order"
+              />
+            </span>
+            <span className="tooltip" data-tip="Deliver Order">
+              <FiTruck
+                className={`tooltip cursor-not-allowed text-[#11111125]`}
+                data-tip="Deliver order"
+              />
+            </span>
+            <span className="tooltip" data-tip="Cancel Order">
+              <IoIosCloseCircleOutline
+                /*    onClick={() => {
+                if (selectedOrders?.length === 1) {
+                  handleOrderStatus(selectedOrders[0], "cancelled");
+                } else {
+                  toast.error("Please select an order");
+                }
+              }} */
+                className={`cursor-not-allowed text-[#11111125]`}
+              />
+            </span>
+            <span className="tooltip" data-tip="Delete Order">
+              <RiDeleteBin4Fill
+                onClick={() => {
+                  if (selectedOrders?.length === 1) {
+                    setSelectedOrder(selectedOrders[0]);
+                    setIsDeleteModalOpen(true);
+                  } else {
+                    toast.error("Please select an order");
+                  }
+                }}
+                className={`tooltip cursor-pointer ${
+                  selectedOrders?.length === 1
+                    ? ""
+                    : "cursor-not-allowed text-[#11111125]"
+                }`}
+              />
+            </span>
+            <span className="tooltip" data-tip="Complete Order">
+              <FiCheckCircle
+                // onClick={() => {
+                //   if (selectedOrders?.length === 1) {
+                //     handleOrderStatus(selectedOrders[0], "completed");
+                //   } else {
+                //     toast.error("Please select an order");
+                //   }
+                // }}
+                className={`tooltip cursor-not-allowed text-[#11111125]`}
+                data-tip="Complete order"
+              />
+            </span>
+          </div>
+          <form
+            onSubmit={SearchOrderById}
+            className="hidden items-center gap-2 md:flex"
+          >
+            <p>Search</p>
+            <input
+              type="text"
+              name="orderId"
+              placeholder="Id / Name / Number"
+              className="input-bordered input h-8 border-black"
+            />
+          </form>
+        </div>
       </div>
 
       <div>
         <div className="overflow-x-auto">
           <table className="table">
             {/* head */}
-            <thead className="bg-primary text-white">
+            <thead className="bg-white text-black">
               <tr>
                 <td className="w-5">
                   <input
@@ -183,14 +282,25 @@ const CancelledOrders = () => {
                       }
                     }}
                     checked={selectedOrders?.length === orders?.length}
-                    className="checkbox border border-white"
+                    className="checkbox border border-black"
                   />
                 </td>
-                <th>#</th>
-                <th>Invoice</th>
-                <th>Name</th>
+                <th className="bg-white text-black">Order ID</th>
+                <th className="bg-white text-center text-black md:w-60">
+                  Date
+                </th>
+                <th className="bg-white text-center text-black">Customer</th>
+                <th className="bg-white text-black ">Total</th>
                 {/* <th>Prods/Pics</th> */}
-                <th>Price</th>
+                <th className="w-40 bg-white text-center text-black">
+                  Payment Status
+                </th>
+                <th className="w-40 bg-white text-center text-black">
+                  Delivery Method
+                </th>
+                <th className="w-40 bg-white text-center text-black">
+                  Courier ID
+                </th>
               </tr>
             </thead>
             <tbody className="bg-white">
@@ -215,8 +325,12 @@ const CancelledOrders = () => {
                       className="checkbox border border-black"
                     />
                   </td>
-                  <td>{index + 1}</td>
-                  <td>
+                  <td className="w-20 font-medium">#{order?.orderId}</td>
+                  <td className="flex flex-col text-center font-medium md:w-60">
+                    <span>{formatTimestamp(order?.timestamp).date}</span>
+                    <span>{formatTimestamp(order?.timestamp).time}</span>
+                  </td>{" "}
+                  {/*              <td>
                     <span
                       onClick={() => {
                         setIsModalOpen(!isModalOpen);
@@ -226,18 +340,37 @@ const CancelledOrders = () => {
                     >
                       <TbFileInvoice />
                     </span>
-                  </td>
+                  </td> */}
                   <td className="">
-                    <div className="flex items-center space-x-3">
+                    <div className="flex justify-center text-center font-semibold">
+                      {order.name}
+                    </div>
+                    {/* <div className="flex items-center space-x-3">
                       <div>
                         <div className="font-bold">{order.name}</div>
                         <div className="text-sm opacity-50">
                           {order.address}
                         </div>
                       </div>
-                    </div>
+                    </div> */}
                   </td>
-                  <td>
+                  <td className="w-40 font-semibold"> ৳ {order?.total}</td>
+                  <td className="w-20 text-center font-semibold">
+                    {order?.paymentType}
+                  </td>
+                  <td className=" flex flex-col items-center gap-1 text-center font-semibold">
+                    {order?.courier}
+                    <span className="w-fit rounded-full bg-[#FA6969] px-3 text-xs font-bold text-black">
+                      CANCELLED
+                    </span>
+                  </td>
+                  <td className="">
+                    <span className="flex justify-center font-bold">
+                      {order?.courierInfo?.consignment?.consignment_id ||
+                        "No Consignment Id"}
+                    </span>
+                  </td>
+                  {/* <td>
                     <div className="flex w-32 flex-col">
                       <p className="badge badge-info">
                         {order?.courier}: {order?.deliveryCharge}
@@ -255,7 +388,7 @@ const CancelledOrders = () => {
                       <p className="">Advance: {order?.advance} Tk</p>
                       <p className="">COD: {order?.cash} Tk</p>
                     </div>
-                  </td>
+                  </td> */}
                 </tr>
               ))}
             </tbody>

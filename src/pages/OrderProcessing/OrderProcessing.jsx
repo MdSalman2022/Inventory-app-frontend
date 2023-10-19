@@ -435,8 +435,8 @@ const OrderProcessing = () => {
         refetch={refetch}
       />
       <div className="flex flex-col items-start justify-between md:flex-row">
+        <p className="text-xl font-semibold">Order Processing</p>
         {/*  <div>
-          <p className="text-xl font-semibold">Order Processing</p>
           <p>Total Parcels: 0</p>
           <p>Total Sales: ৳0.00</p>
           <p>Total DC: ৳0.00</p>
@@ -560,17 +560,17 @@ const OrderProcessing = () => {
               }`}
             />
             <FiCheckCircle
-              onClick={() => {
-                if (selectedOrders?.length === 1) {
-                  handleOrderStatus(selectedOrders[0], "completed");
-                } else {
-                  toast.error("Please select an order");
-                }
-              }}
-              className={`cursor-pointer ${
+              // onClick={() => {
+              //   if (selectedOrders?.length === 1) {
+              //     handleOrderStatus(selectedOrders[0], "completed");
+              //   } else {
+              //     toast.error("Please select an order");
+              //   }
+              // }}
+              className={`cursor-not-allowed ${
                 selectedOrders?.length === 1
-                  ? ""
-                  : "cursor-not-allowed text-[#11111125]"
+                  ? " text-[#11111125]"
+                  : " text-[#11111125]"
               }`}
             />
           </div>
@@ -588,13 +588,13 @@ const OrderProcessing = () => {
           </form>
         </div>
         <div className="my-2 flex items-center md:hidden">
-          <button
+          {/*           <button
             className="btn-primary btn-outline btn"
             onClick={() => setIsSearchModalOpen(!isSearchModalOpen)}
           >
             <FaSearch className="text-xl" />
-          </button>
-          {isSearchModalOpen && (
+          </button> */}
+          {/* {isSearchModalOpen && (
             <ModalBox
               setIsModalOpen={setIsSearchModalOpen}
               isModalOpen={isSearchModalOpen}
@@ -620,7 +620,7 @@ const OrderProcessing = () => {
                 </form>
               </div>
             </ModalBox>
-          )}
+          )} */}
         </div>
       </div>
 
@@ -642,17 +642,26 @@ const OrderProcessing = () => {
                       }
                     }}
                     checked={selectedOrders?.length === orders?.length}
-                    className="checkbox border border-white"
+                    className="checkbox border border-black"
                   />
                 </td>
                 <th className="bg-white text-black">Order ID</th>
-                <th className="bg-white text-center text-black">Date</th>
-                <th className="bg-white text-black">Customer</th>
-                <th className="bg-white text-black">Total</th>
+                <th className="bg-white text-center text-black md:w-60">
+                  Date
+                </th>
+                <th className="bg-white text-center text-black">Customer</th>
+                <th className="bg-white text-black ">Total</th>
                 {/* <th>Prods/Pics</th> */}
-                <th className="bg-white text-black">Payment Status</th>
-                <th className="bg-white text-black">Delivery Method</th>
-                <th className="w-96 bg-white text-black">Action</th>
+                <th className="w-40 bg-white text-center text-black">
+                  Payment Status
+                </th>
+                <th className="w-40 bg-white text-center text-black">
+                  Delivery Method
+                </th>
+                <th className="w-40 bg-white text-center text-black">
+                  Courier ID
+                </th>
+                <th className="w-40 bg-white text-center text-black">Action</th>
               </tr>
             </thead>
             <tbody className="bg-white">
@@ -679,8 +688,8 @@ const OrderProcessing = () => {
                         className="checkbox border border-black"
                       />
                     </td>
-                    <td className="w-5">#{order?.orderId}</td>
-                    <td className="flex  flex-col text-center">
+                    <td className="w-20">#{order?.orderId}</td>
+                    <td className="flex flex-col text-center md:w-60">
                       <span>{formatTimestamp(order?.timestamp).date}</span>
                       <span>{formatTimestamp(order?.timestamp).time}</span>
                     </td>
@@ -695,28 +704,43 @@ const OrderProcessing = () => {
                         <TbFileInvoice />
                       </span>
                     </td> */}
-                    <td className="">
-                      <div className="flex items-center space-x-3">
-                        {/* <div className="avatar">
-                        <div className="mask mask-squircle h-12 w-12">
-                          <img
-                            src={order?.image || avatarIcon}
-                            alt="image"
-                            className="rounded-full border-2 border-primary p-1"
-                          />
+                    <td className="w-60">
+                      <div className="flex justify-center text-center">
+                        {order.name}
+                      </div>
+                      {/* <div className="flex items-center space-x-3">
+                        <div>
+                          <div className="flex justify-center text-center">
+                            {order.name}
+                          </div>
+                          <div className="text-sm opacity-50">
+                            {order.address}
+                          </div>
                         </div>
                       </div> */}
-                        <div>
-                          <div className="">{order.name}</div>
-                          {/* <div className="text-sm opacity-50">
-                            {order.address}
-                          </div> */}
-                        </div>
-                      </div>
                     </td>
-                    <td> ৳ {order?.total}</td>
-                    <td className="font-semibold">{order?.paymentType}</td>
-                    <td className="font-semibold">{order?.courier}</td>
+                    <td className="w-40"> ৳ {order?.total}</td>
+                    <td className="w-20 text-center font-semibold">
+                      {order?.paymentType}
+                    </td>
+                    <td className=" text-center font-semibold">
+                      {order?.courier}
+                    </td>
+
+                    <td className="text-center">
+                      <span
+                        className="tooltip flex cursor-pointer justify-center text-center text-xl"
+                        data-tip={`Send to ${order?.courier} `}
+                      >
+                        <GrDeliver
+                          onClick={() => {
+                            handleOrderStatus(order, "ready");
+                            sendToCourier(order);
+                          }}
+                        />
+                      </span>
+                    </td>
+
                     {/* <td className="">
                       <div className="flex w-32 flex-col">
                         <p className="badge badge-info">
@@ -733,7 +757,7 @@ const OrderProcessing = () => {
                         <p className="">COD: {order?.cash}</p>
                       </div>
                     </td> */}
-                    <td>
+                    <td className="flex w-40 justify-center text-center font-semibold">
                       <div className="dropdown-left dropdown">
                         <label tabIndex={0} className="cursor-pointer">
                           <BsThreeDotsVertical size={18} />
