@@ -568,13 +568,13 @@ const Customers = () => {
                         </div>
                       </td> */}
                       <td>
-                        <div className="dropdown-bottom dropdown">
-                          <label tabIndex={0} className="btn-sm btn m-1">
-                            <BsThreeDots size={18} />
+                        <div className="dropdown-left dropdown">
+                          <label tabIndex={0} className="cursor-pointer">
+                            <BsThreeDotsVertical size={18} />
                           </label>
                           <ul
                             tabIndex={0}
-                            className="dropdown-content rounded-box z-[1] flex w-full items-center justify-center gap-1 bg-base-100  p-1 shadow"
+                            className="dropdown-content menu rounded-box z-[1] w-40 gap-1  bg-base-100 shadow"
                           >
                             <li
                               onClick={() => {
@@ -585,10 +585,11 @@ const Customers = () => {
                                   toast.error("Please add a courier first!!");
                                 }
                               }}
-                              className="flex w-full cursor-pointer justify-center rounded-lg bg-green-100 px-3 "
+                              className="flex w-full cursor-pointer justify-start rounded-lg bg-white "
                             >
-                              <span className="flex justify-center">
-                                <AiOutlineShoppingCart className="text-2xl text-success " />
+                              <span className="flex justify-start">
+                                <AiOutlineShoppingCart className="text-2xl text-black " />
+                                <span>Place Order</span>
                               </span>
                             </li>
                             <li
@@ -596,10 +597,11 @@ const Customers = () => {
                                 setIsEditModalOpen(true);
                                 setSelectedCustomer(customer);
                               }}
-                              className="flex w-full cursor-pointer justify-center rounded-lg bg-yellow-100  px-3"
+                              className="flex w-full cursor-pointer justify-start rounded-lg bg-white "
                             >
-                              <span className="flex justify-center">
-                                <AiOutlineEdit className="text-2xl text-warning " />
+                              <span className="flex justify-start">
+                                <AiOutlineEdit className="text-2xl text-black " />
+                                <span>Edit</span>
                               </span>
                             </li>
                             <li
@@ -607,10 +609,11 @@ const Customers = () => {
                                 setIsDeleteModalOpen(true);
                                 setSelectedCustomer(customer);
                               }}
-                              className="flex w-full cursor-pointer justify-center rounded-lg bg-red-100 px-3"
+                              className="flex w-full cursor-pointer justify-start rounded-lg bg-white"
                             >
-                              <span className="flex justify-center">
-                                <RiDeleteBin6Line className="text-2xl text-error  " />
+                              <span className="flex justify-start">
+                                <RiDeleteBin6Line className="text-2xl text-black  " />
+                                <span>Delete</span>
                               </span>
                             </li>
                           </ul>
