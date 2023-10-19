@@ -699,7 +699,7 @@ const Customers = () => {
                             >
                               <span className="flex justify-start">
                                 <AiOutlineShoppingCart className="text-2xl text-black " />
-                                <span>Place Order</span>
+                                <span>New Order</span>
                               </span>
                             </li>
                             <li

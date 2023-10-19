@@ -26,6 +26,7 @@ import { FaEdit } from "react-icons/fa";
 import { FiCheckCircle, FiTruck } from "react-icons/fi";
 import { FiPrinter } from "react-icons/fi";
 import { IoIosCloseCircleOutline } from "react-icons/io";
+import { Pagination } from "@/components/Main/shared/Pagination";
 
 const OrderProcessing = () => {
   const { userInfo, selectedOrders, setSelectedOrders } =
@@ -41,17 +42,20 @@ const OrderProcessing = () => {
     setSelectedOrders([]);
   }, []);
 
+  const [currentPage, setCurrentPage] = useState(1); // Initialize with page 1
+  const PAGE_SIZE = 10; // Set the page size, which should match the backend's page size
+
   const {
-    data: orders,
+    data: { orders = [], totalPages, thisPage } = {},
     isLoading,
     isError,
     error,
     refetch,
-  } = useQuery(["orders", userInfo], async () => {
+  } = useQuery(["orders", userInfo, currentPage], async () => {
     const response = await fetch(
       `${import.meta.env.VITE_SERVER_URL}/order/get-orders?sellerId=${
         userInfo?.role === "Admin" ? userInfo?._id : userInfo?.sellerId
-      }&filter=processing`,
+      }&filter=processing&page=${currentPage}&limit=${PAGE_SIZE}`,
       {
         method: "GET",
         headers: {
@@ -63,13 +67,18 @@ const OrderProcessing = () => {
     if (!response.ok) {
       throw new Error("Failed to fetch customers");
     }
-    const data = await response.json();
-    const reversedOrders = data.orders.reverse(); // Reverse the order of the orders
+    const responseData = await response.json();
 
-    return reversedOrders;
+    console.log("responseData", responseData);
+
+    return {
+      orders: responseData.orders,
+      totalPages: responseData.totalPages,
+      currentPage: responseData.currentPage,
+    };
   });
 
-  console.log("orders", orders);
+  console.log("orders processing", orders);
 
   const handleExportClick = () => {
     fetch(`${import.meta.env.VITE_SERVER_URL}/order/order-export`, {
@@ -624,8 +633,8 @@ const OrderProcessing = () => {
         </div>
       </div>
 
-      <div>
-        <div className="h-[80vh] overflow-auto">
+      <div className="flex flex-col gap-4">
+        <div className="h-fit max-h-[73vh] ">
           <table className="table-pin-rows table-pin-cols table bg-[#F1F1F1]">
             {/* head */}
             <thead className="">
@@ -757,7 +766,7 @@ const OrderProcessing = () => {
                         <p className="">COD: {order?.cash}</p>
                       </div>
                     </td> */}
-                    <td className="flex w-40 justify-center text-center font-semibold">
+                    <td className="w-40 text-center font-semibold">
                       <div className="dropdown-left dropdown">
                         <label tabIndex={0} className="cursor-pointer">
                           <BsThreeDotsVertical size={18} />
@@ -840,6 +849,13 @@ const OrderProcessing = () => {
               )}
             </tbody>
           </table>
+        </div>
+        <div className="flex justify-center">
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages} // Calculate total pages
+            onPageChange={(page) => setCurrentPage(page)} // Update currentPage
+          />
         </div>
       </div>
     </div>

@@ -22,6 +22,7 @@ import { FiCheckCircle, FiPrinter, FiTruck } from "react-icons/fi";
 import { IoIosCloseCircleOutline } from "react-icons/io";
 import { FaBagShopping } from "react-icons/fa6";
 import DeleteOrderModal from "@/components/Main/Orders/DeleteOrderModal";
+import { Pagination } from "@/components/Main/shared/Pagination";
 
 const CompletedOrders = () => {
   const { userInfo, selectedOrders, setSelectedOrders } =
@@ -34,17 +35,20 @@ const CompletedOrders = () => {
     setSelectedOrders([]);
   }, []);
 
+  const [currentPage, setCurrentPage] = useState(1); // Initialize with page 1
+  const PAGE_SIZE = 10; // Set the page size, which should match the backend's page size
+
   const {
-    data: orders,
+    data: { orders = [], totalPages = 0, thisPage = 0 } = {},
     isLoading,
     isError,
     error,
     refetch,
-  } = useQuery(["orders", userInfo], async () => {
+  } = useQuery(["orders", userInfo, currentPage], async () => {
     const response = await fetch(
       `${import.meta.env.VITE_SERVER_URL}/order/get-orders?sellerId=${
         userInfo?.role === "Admin" ? userInfo?._id : userInfo?.sellerId
-      }&filter=completed`,
+      }&filter=completed&page=${currentPage}&limit=${PAGE_SIZE}`,
       {
         method: "GET",
         headers: {
@@ -56,9 +60,12 @@ const CompletedOrders = () => {
       throw new Error("Failed to fetch customers");
     }
     const data = await response.json();
-    const reversedOrders = data.orders.reverse(); // Reverse the order of the orders
 
-    return reversedOrders;
+    return {
+      orders: data.orders,
+      totalPages: data.totalPages,
+      currentPage: data.currentPage,
+    };
   });
 
   console.log(orders);
@@ -335,8 +342,8 @@ const CompletedOrders = () => {
         </div>
       </div>
 
-      <div>
-        <div className="overflow-x-auto">
+      <div className="flex flex-col gap-4">
+        <div className="h-[73vh] ">
           <table className="table">
             {/* head */}
             <thead className="bg-white text-black">
@@ -466,6 +473,18 @@ const CompletedOrders = () => {
                       >
                         <li
                           onClick={() => {
+                            setIsModalOpen(!isModalOpen);
+                            setSelectedOrder(order);
+                          }}
+                          className="tooltip flex w-full cursor-pointer justify-center rounded-lg bg-green-100"
+                          data-tip="Invoice"
+                        >
+                          <span className="flex cursor-pointer justify-center">
+                            <TbFileInvoice className="text-xl text-success " />
+                          </span>
+                        </li>
+                        <li
+                          onClick={() => {
                             setIsDeleteModalOpen(true);
                             setSelectedOrder(order);
                           }}
@@ -496,6 +515,13 @@ const CompletedOrders = () => {
               ))}
             </tbody>
           </table>
+        </div>
+        <div className="flex justify-center">
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages} // Calculate total pages
+            onPageChange={(page) => setCurrentPage(page)} // Update currentPage
+          />
         </div>
       </div>
     </div>

@@ -474,10 +474,15 @@ const StartOrder = () => {
   };
 
   const handleQuantityChange = (productId, quantity, price) => {
-    const totalPrice = parseInt(quantity) * parseInt(price);
+    const parsedQuantity = parseInt(quantity);
+    const totalPrice = parsedQuantity * parseInt(price);
+
     const updatedProductList = productList.map((product) =>
-      product._id === productId ? { ...product, quantity, totalPrice } : product
+      product._id === productId
+        ? { ...product, quantity: parsedQuantity, totalPrice }
+        : product
     );
+
     setProductList(updatedProductList);
   };
 

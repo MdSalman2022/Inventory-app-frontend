@@ -18,6 +18,7 @@ import { FiCheckCircle, FiPrinter, FiTruck } from "react-icons/fi";
 import { IoIosCloseCircleOutline } from "react-icons/io";
 import { FaBagShopping } from "react-icons/fa6";
 import { FaEdit } from "react-icons/fa";
+import { Pagination } from "@/components/Main/shared/Pagination";
 
 const ReturnedOrders = () => {
   const { userInfo, selectedOrders, setSelectedOrders } =
@@ -29,17 +30,20 @@ const ReturnedOrders = () => {
     setSelectedOrders([]);
   }, []);
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const PAGE_SIZE = 10;
+
   const {
-    data: orders,
+    data: { orders = [], totalPages, thisPage } = {},
     isLoading,
     isError,
     error,
     refetch,
-  } = useQuery(["orders", userInfo], async () => {
+  } = useQuery(["orders", userInfo, currentPage], async () => {
     const response = await fetch(
       `${import.meta.env.VITE_SERVER_URL}/order/get-orders?sellerId=${
         userInfo?.role === "Admin" ? userInfo?._id : userInfo?.sellerId
-      }&filter=returned`,
+      }&filter=returned&page=${currentPage}&limit=${PAGE_SIZE}`,
       {
         method: "GET",
         headers: {
@@ -50,10 +54,15 @@ const ReturnedOrders = () => {
     if (!response.ok) {
       throw new Error("Failed to fetch customers");
     }
-    const data = await response.json();
-    const reversedOrders = data.orders.reverse(); // Reverse the order of the orders
+    const responseData = await response.json();
 
-    return reversedOrders;
+    console.log("responseData", responseData);
+
+    return {
+      orders: responseData.orders,
+      totalPages: responseData.totalPages,
+      currentPage: responseData.currentPage,
+    };
   });
 
   console.log(orders);
@@ -258,7 +267,7 @@ const ReturnedOrders = () => {
         </div>
       </div>
 
-      <div>
+      <div className="flex flex-col gap-4">
         <div className="overflow-x-auto">
           <table className="table">
             {/* head */}
@@ -390,6 +399,13 @@ const ReturnedOrders = () => {
               ))}
             </tbody>
           </table>
+        </div>
+        <div className="flex justify-center">
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages} // Calculate total pages
+            onPageChange={(page) => setCurrentPage(page)} // Update currentPage
+          />
         </div>
       </div>
     </div>

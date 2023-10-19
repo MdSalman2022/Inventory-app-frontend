@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useRef, useState } from "react";
 import ModalBox from "../shared/Modals/ModalBox";
 import { StateContext } from "../../../contexts/StateProvider/StateProvider";
 import { toast } from "react-hot-toast";
-import { RiDeleteBin6Line } from "react-icons/ri";
+import { RiBarcodeLine, RiDeleteBin6Line } from "react-icons/ri";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -270,6 +270,44 @@ const EditOrderModal = ({
 
   console.log("selected order ", selectedOrder);
 
+  const [searchProductsResults, setSearchProductsResults] = useState([]);
+
+  const searchProductRef = useRef(null);
+
+  const handleSearchProduct = (e) => {
+    const customerSearchKey = searchProductRef?.current?.value;
+
+    console.log("customerSearchKey", customerSearchKey);
+
+    console.log(customerSearchKey);
+
+    let url = `${
+      import.meta.env.VITE_SERVER_URL
+    }/product/search-product?sellerId=${
+      userInfo?.role === "Admin" ? userInfo?._id : userInfo?.sellerId
+    }&`;
+
+    url += `name=${customerSearchKey}`;
+    console.log(url);
+
+    fetch(url)
+      .then((res) => res.json())
+      .then((data) => {
+        console.log(data);
+        if (data.success) {
+          toast.success("Products Found!!");
+          setSearchProductsResults(data.products);
+        } else {
+          toast.error("Customer Not Found!!");
+          setSearchProductsResults([]);
+        }
+      })
+      .catch((error) => {
+        console.error("Error searching for customers:", error);
+        setSearchProductsResults([]);
+      });
+  };
+
   return (
     <div>
       <ModalBox
@@ -347,29 +385,85 @@ const EditOrderModal = ({
                 ))}
               </select>
             </label>
-            {/* <select
-              name="district"
-              id="district"
-              className="input-bordered input col-span-2"
-              defaultValue={selectedOrder?.district || ""}
-              onChange={(e) => setDistrict(e.target.value)}
-              required
-            >
-              <option value="" disabled selected>
-                Select Location
-              </option>
-              <option value="Dhaka">Dhaka</option>
-              <option value="Chittagong">Chittagong</option>
-              <option value="Rajshahi">Rajshahi</option>
-              <option value="Khulna">Khulna</option>
-              <option value="Barishal">Barishal</option>
-              <option value="Sylhet">Sylhet</option>
-              <option value="Rangpur">Rangpur</option>
-              <option value="Mymensingh">Mymensingh</option>
-            </select> */}
             <div className="col-span-2 flex h-full w-fit flex-col gap-3 rounded bg-gray-100 p-5">
               <p className="text-xl font-semibold">Products</p>
-              <DropdownMenu className="w-full">
+              <div className="col-span-3 flex flex-col">
+                <label htmlFor="">Product Name</label>
+                <div className="join w-full">
+                  <button className="join-item btn rounded">
+                    <RiBarcodeLine className="text-3xl" />
+                  </button>
+                  <div className="relative flex w-full flex-col">
+                    <div className="flex gap-2">
+                      <input
+                        ref={searchProductRef}
+                        type="text"
+                        className="input-bordered input-primary input join-item w-full border-gray-300 focus-within:outline-none"
+                        placeholder="Item name / Barcode / Item code"
+                        name="search-key"
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") {
+                            e.preventDefault(); // Prevent form submission
+                            handleSearchProduct(); // Call your search function
+                          }
+                        }}
+                      />
+                      <button
+                        onClick={() => handleSearchProduct()}
+                        name="search"
+                        id="search"
+                        className="btn-primary btn"
+                        form="search"
+                      >
+                        Search
+                      </button>
+                    </div>
+                    {searchProductsResults.length > 0 && (
+                      <div className="absolute top-12 z-50 flex w-full flex-col rounded-lg border border-primary bg-white p-3 py-0">
+                        {searchProductsResults?.map((product) => {
+                          const quantityOfProduct = productList?.find(
+                            (p) => p._id === product._id
+                          )?.quantity;
+
+                          const formattedQuantity = parseInt(quantityOfProduct);
+
+                          return (
+                            <div
+                              key={product?._id}
+                              onClick={() => {
+                                console.log("product", product);
+                                console.log("productList", productList);
+                                console.log(
+                                  "searchProductsResults",
+                                  searchProductsResults
+                                );
+
+                                if (product.availableQty > 0) {
+                                  ``;
+                                  handleSelectedProductList(product);
+                                  setSearchProductsResults([]);
+                                } else {
+                                  toast.error("Product is out of stock");
+                                }
+                              }}
+                              disabled={
+                                formattedQuantity === product.availableQty
+                              }
+                              className="cursor-pointer border-b px-3 py-1 transition-all duration-300 hover:bg-base-100"
+                            >
+                              <p>
+                                {product?.name} - {product?.salePrice}Tk -{" "}
+                                {product?.availableQty} Piece
+                              </p>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+              {/*  <DropdownMenu className="w-full">
                 <DropdownMenuTrigger className="btn m-1 w-full bg-primary text-white">
                   {" "}
                   Select Product
@@ -379,7 +473,7 @@ const EditOrderModal = ({
                     <DropdownMenuItem
                       className="w-full cursor-pointer"
                       onClick={() => {
-                        if (product.availableQty > 0) {
+                        if (product.availableQty > 0) {``
                           handleSelectedProductList(product);
                         } else {
                           toast.error("Product is out of stock");
@@ -398,7 +492,7 @@ const EditOrderModal = ({
                     </DropdownMenuItem>
                   ))}
                 </DropdownMenuContent>
-              </DropdownMenu>
+              </DropdownMenu> */}
               {/* selected products  */}
               <div className="flex flex-col gap-3">
                 <table>

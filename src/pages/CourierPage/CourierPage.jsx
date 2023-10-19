@@ -23,6 +23,7 @@ import { FaBagShopping } from "react-icons/fa6";
 import { IoIosCloseCircleOutline } from "react-icons/io";
 import { GrDeliver } from "react-icons/gr";
 import { searchOrderByIdUniFunc } from "@/utils/fetchApi";
+import { Pagination } from "@/components/Main/shared/Pagination";
 const CourierPage = () => {
   const { userInfo, selectedOrders, setSelectedOrders } =
     useContext(StateContext);
@@ -36,20 +37,23 @@ const CourierPage = () => {
     setSelectedOrders([]);
   }, []);
 
+  const [currentPage, setCurrentPage] = useState(1); // Initialize with page 1
+  const PAGE_SIZE = 10; // Set the page size, which should match the backend's page size
+
   const {
-    data: orders,
+    data: { orders = [], totalPages, thisPage } = {},
     isLoading,
     isError,
     error,
     refetch,
-  } = useQuery(["orders", userInfo, name], async () => {
+  } = useQuery(["orders", userInfo, name, currentPage], async () => {
     // Fetch data based on the updated name
     const response = await fetch(
       `${
         import.meta.env.VITE_SERVER_URL
       }/order/get-orders?courier=${name}&sellerId=${
         userInfo?.role === "Admin" ? userInfo?._id : userInfo?.sellerId
-      }&filter=ready&courierStatus=sent`,
+      }&filter=ready&courierStatus=sent&page=${currentPage}&limit=${PAGE_SIZE}`,
       {
         method: "GET",
         headers: {
@@ -62,15 +66,15 @@ const CourierPage = () => {
       throw new Error("Failed to fetch orders");
     }
 
-    return response.json().then((data) => {
-      const sortedByCreatedDate = data.orders.sort((a, b) => {
-        return (
-          new Date(b.courierInfo?.consignment?.created_at) -
-          new Date(a.courierInfo?.consignment?.created_at)
-        );
-      });
-      return sortedByCreatedDate;
-    });
+    const responseData = await response.json();
+
+    console.log("responseData", responseData);
+
+    return {
+      orders: responseData.orders,
+      totalPages: responseData.totalPages,
+      currentPage: responseData.currentPage,
+    };
   });
 
   console.log("orders courier", orders);
@@ -538,8 +542,8 @@ const CourierPage = () => {
           )}
         </div>
       </div>
-      <div>
-        <div className="h-[70vh] overflow-auto">
+      <div className="flex flex-col gap-4">
+        <div className="h-[73vh] ">
           <table className="table-pin-rows table-pin-cols table ">
             {/* head */}
             <thead className="">
@@ -564,7 +568,7 @@ const CourierPage = () => {
                   Date
                 </th>
                 <th className="bg-white text-center text-black">Customer</th>
-                <th className="bg-white text-black ">Total</th>
+                <th className="w-40 bg-white text-center text-black">Total</th>
                 {/* <th>Prods/Pics</th> */}
                 <th className="w-40 bg-white text-center text-black">
                   Payment Status
@@ -600,21 +604,24 @@ const CourierPage = () => {
                       className="checkbox border border-black"
                     />
                   </td>
-                  <td className="w-20">#{order?.orderId}</td>
-                  <td className="flex flex-col text-center font-medium md:w-60">
+                  <td className="w-80">#{order?.orderId}</td>
+                  <td className="flex flex-col text-center font-medium ">
                     <span>{formatTimestamp(order?.timestamp).date}</span>
                     <span>{formatTimestamp(order?.timestamp).time}</span>
                   </td>
-                  <td className="w-60 font-medium">
+                  <td className=" font-medium">
                     <div className="flex justify-center text-center">
                       {order.name}
                     </div>
                   </td>
-                  <td className="w-40 font-semibold"> ৳ {order?.total}</td>
-                  <td className="w-40 text-center font-semibold">
+                  <td className="flex w-40 justify-center font-semibold">
+                    {" "}
+                    ৳ {order?.total}
+                  </td>
+                  <td className=" text-center font-semibold">
                     {order?.paymentType}
                   </td>
-                  <td className="w-60 text-center font-semibold">
+                  <td className=" text-center font-semibold">
                     <div className="flex flex-col items-center gap-1">
                       <span>{order?.courier}</span>
                       {isStatusLoading
@@ -688,7 +695,7 @@ const CourierPage = () => {
                       <p className="">COD: {order?.cash}</p>
                     </div>
                   </td> */}
-                  <td>
+                  <td className="flex w-40 justify-center text-center font-semibold">
                     <div className="dropdown-left dropdown">
                       <label tabIndex={0} className="cursor-pointer">
                         <BsThreeDotsVertical size={18} />
@@ -709,7 +716,7 @@ const CourierPage = () => {
                             <TbFileInvoice className="text-xl text-success " />
                           </span>
                         </li>
-                        <li
+                        {/* <li
                           onClick={() => {
                             handleOrderStatus(order._id, "processing");
                           }}
@@ -721,7 +728,7 @@ const CourierPage = () => {
                           >
                             <RiArrowGoBackLine className="text-lg text-success " />
                           </div>
-                        </li>
+                        </li> */}
                         <li
                           onClick={() => {
                             handleOrderStatus(order._id, "completed");
@@ -748,7 +755,7 @@ const CourierPage = () => {
                             <FcCancel className="text-xl text-success " />
                           </div>
                         </li>
-                        <li
+                        {/*          <li
                           onClick={() => {
                             handleOrderStatus(order._id, "returned");
                           }}
@@ -758,7 +765,7 @@ const CourierPage = () => {
                           <span className="flex cursor-pointer justify-center">
                             <GiReturnArrow className="text-xl text-success " />
                           </span>
-                        </li>
+                        </li> */}
                         {/*   <li
                           onClick={() => {
                             setIsDeleteModalOpen(true);
@@ -780,6 +787,13 @@ const CourierPage = () => {
               ))}
             </tbody>
           </table>
+        </div>
+        <div className="flex justify-center">
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages} // Calculate total pages
+            onPageChange={(page) => setCurrentPage(page)} // Update currentPage
+          />
         </div>
       </div>
     </div>
