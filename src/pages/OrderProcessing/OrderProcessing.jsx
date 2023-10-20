@@ -814,7 +814,7 @@ const OrderProcessing = () => {
                           </li> */}
                           <li
                             onClick={() => {
-                              handleOrderStatus(order);
+                              handleOrderStatus(order, "ready");
                               sendToCourier(order);
                             }}
                             className="flex w-full cursor-pointer justify-center rounded-lg bg-white"
@@ -831,11 +831,11 @@ const OrderProcessing = () => {
                             onClick={() => {
                               handleOrderStatus(order, "cancelled");
                             }}
-                            className="flex w-full cursor-pointer justify-center rounded-lg bg-white"
+                            className="tooltip flex w-full cursor-pointer justify-center rounded-lg bg-white"
+                            data-tip="Delete order"
                           >
                             <div
-                              className="tooltip flex cursor-pointer justify-center"
-                              data-tip="Delete order"
+                              className="flex cursor-pointer justify-center"
                             >
                               <IoIosCloseCircleOutline className="text-xl" />
                               Cancelled

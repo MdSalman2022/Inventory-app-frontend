@@ -7,7 +7,7 @@ import EditCustomerModal from "../../components/Main/Customers/EditCustomerModal
 import avatarIcon from "../../assets/shared/avatar.png";
 import DeleteCustomerModal from "../../components/Main/Customers/DeleteCustomerModal";
 import { useQuery } from "react-query";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { TbFileInvoice } from "react-icons/tb";
 import InvoiceGenerator from "../../components/Main/shared/InvoiceGenerator/InvoiceGenerator";
 import { StateContext } from "@/contexts/StateProvider/StateProvider";
@@ -18,6 +18,8 @@ import { IoIosCloseCircleOutline } from "react-icons/io";
 import { FaBagShopping } from "react-icons/fa6";
 import { FaEdit } from "react-icons/fa";
 import { Pagination } from "@/components/Main/shared/Pagination";
+import { BsThreeDotsVertical } from "react-icons/bs";
+import { GiReturnArrow } from "react-icons/gi";
 
 const CancelledOrders = () => {
   const { userInfo, selectedOrders, setSelectedOrders } =
@@ -118,6 +120,75 @@ const CancelledOrders = () => {
       toast.error("Failed to find order");
     }
   };
+
+  
+  const handleOrderStatus = (order, status) => {
+    const payload = {
+      orderStatus: status,
+      updatedBy: userInfo?.username,
+      updatedById: userInfo?._id,
+      update: {
+        orderStatus: status,
+      },
+    };
+
+    fetch(
+      `${import.meta.env.VITE_SERVER_URL}/order/edit-order-status?id=${
+        order._id
+      }`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      }
+    )
+      .then((res) => res.json())
+      .then((data) => {
+        console.log("status update ", data);
+        console.log("customer id ", order?.customerId);
+        updateCustomer(order?.customerId);
+        refetch();
+        toast.success("Order status updated successfully");
+      })
+      .catch((err) => {
+        console.log(err);
+        toast.error("Failed to update order status");
+      });
+  }
+
+  const updateCustomer = (id) => {
+    console.log("update customer ");
+    fetch(
+      `${import.meta.env.VITE_SERVER_URL}/customer/update-order-count?id=${id}`,
+      {
+        method: "PUT",
+        headers: {
+          "content-type": "application/json",
+        },
+        body: JSON.stringify({
+          readyCount: 1,
+        }),
+      }
+    )
+      .then((res) => res.json())
+      .then((result) => {
+        console.log(result);
+        if (result.success) {
+          console.log("customer updated successfully");
+        } else {
+          toast.error("Something went wrong");
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        toast.error("Something went wrong");
+      });
+  };
+
+  const navigate = useNavigate()
+
 
   return (
     <div className="w-screen p-3 md:w-full md:space-y-3">
@@ -307,6 +378,9 @@ const CancelledOrders = () => {
                 <th className="w-40 bg-white text-center text-black">
                   Courier ID
                 </th>
+                <th className="w-40 bg-white text-center text-black">
+                  Action
+                </th>
               </tr>
             </thead>
             <tbody className="bg-white">
@@ -376,6 +450,45 @@ const CancelledOrders = () => {
                         "No Consignment Id"}
                     </span>
                   </td>
+                  <td className="w-40 text-center font-semibold">
+                      <div className="dropdown-left dropdown">
+                        <label tabIndex={0} className="cursor-pointer">
+                          <BsThreeDotsVertical size={18} />
+                        </label>
+                        <ul
+                          tabIndex={0}
+                          className="dropdown-content menu rounded-box z-[1] w-48 gap-1  bg-base-100 shadow"
+                        >
+                          <li
+                            onClick={() => {
+                              setSelectedOrders([order]);
+                              navigate("/inventory/invoice-generator");
+                            }}
+                            className="flex w-full cursor-pointer justify-center rounded-lg bg-white "
+                          >
+                            <span className="flex cursor-pointer justify-center">
+                              <FiPrinter className="text-xl" />
+                              <span>Print</span>
+                            </span>
+                          </li>
+                          
+                          <li
+                            onClick={() => {
+                              handleOrderStatus(order, "returned"); 
+                            }}
+                            className="tooltip flex w-full cursor-pointer justify-center rounded-lg bg-white"
+                            data-tip={`Return`}
+                          >
+                            <div
+                              className=" flex cursor-pointer justify-center"
+                            >
+                              <GiReturnArrow className="text-xl text-black " />
+                              <p>Return</p>
+                            </div>
+                          </li> 
+                        </ul>
+                      </div>
+                    </td>
                   {/* <td>
                     <div className="flex w-32 flex-col">
                       <p className="badge badge-info">
