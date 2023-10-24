@@ -268,12 +268,12 @@ const ReturnedOrders = () => {
       </div>
 
       <div className="flex flex-col gap-4">
-        <div className="overflow-x-auto">
-          <table className="table">
+        <div className="overflow-y-auto md:h-[60vh] 2xl:h-[73vh] ">
+          <table className="table-pin-rows table-pin-cols table">
             {/* head */}
             <thead className="bg-white text-black">
               <tr>
-                <td className="w-5">
+                <td className="bg-white text-black w-5">
                   <input
                     type="checkbox"
                     defaultChecked={false}

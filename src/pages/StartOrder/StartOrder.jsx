@@ -278,6 +278,7 @@ const StartOrder = () => {
         courier,
         deliveryCharge,
         discount,
+        discountOnAll: discountOnAll,
         total: totalPrice,
         advance,
         cash: cashCollect,

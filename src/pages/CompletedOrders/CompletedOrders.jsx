@@ -343,12 +343,12 @@ const CompletedOrders = () => {
       </div>
 
       <div className="flex flex-col gap-4">
-        <div className="h-[73vh] ">
-          <table className="table">
+        <div className="overflow-y-scroll md:h-[60vh] 2xl:h-[73vh] ">
+          <table className="table table-sm table-pin-rows">
             {/* head */}
             <thead className="bg-white text-black">
               <tr>
-                <th className="w-5">
+                <th className="bg-white text-black w-5">
                   <input
                     type="checkbox"
                     defaultChecked={false}
@@ -423,7 +423,7 @@ const CompletedOrders = () => {
                       </div> */}
                   </td>
 
-                  <td className="w-40 font-semibold"> ৳ {order?.total}</td>
+                  <td className="w-40 font-semibold"> ৳ {order?.total - order?.discount - (order?.discountOnAll || 0)}</td>
                   <td className="w-20 text-center font-semibold">
                     {order?.paymentType}
                   </td>

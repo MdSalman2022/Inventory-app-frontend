@@ -339,6 +339,8 @@ const CourierPage = () => {
 
   console.log("selectedOrders courier", selectedOrders);
 
+  console.log("orders",orders)
+
   const navigate = useNavigate();
 
   return (
@@ -543,7 +545,7 @@ const CourierPage = () => {
         </div>
       </div>
       <div className="flex flex-col gap-4">
-        <div className="h-[73vh] ">
+        <div className="overflow-y-scroll md:h-[60vh] 2xl:h-[73vh] ">
           <table className="table-pin-rows table-pin-cols table ">
             {/* head */}
             <thead className="">
@@ -616,7 +618,7 @@ const CourierPage = () => {
                   </td>
                   <td className="flex w-40 justify-center font-semibold">
                     {" "}
-                    ৳ {order?.total}
+                    ৳ {order?.total - order?.discount - (order?.discountOnAll || 0)}
                   </td>
                   <td className=" text-center font-semibold">
                     {order?.paymentType}

@@ -323,7 +323,7 @@ const OrderProcessing = () => {
         recipient_name: order.name,
         recipient_phone: order.phone,
         recipient_address: recipientAddress,
-        cod_amount: order.cash,
+        cod_amount: order.cash - order?.deliveryCharge,
         note: order.instruction,
       };
 
@@ -422,6 +422,16 @@ const OrderProcessing = () => {
   };
 
   const navigate = useNavigate();
+
+  console.log("orders",orders)
+
+  function isOrderOlderThanSpecificTimestamp(orderTimestamp, specificTimestamp) {
+    const orderDate = new Date(orderTimestamp);
+    const specificDate = new Date(specificTimestamp);
+  
+    // Compare the timestamps
+    return orderDate < specificDate;
+  }
 
   return (
     <div className="w-screen space-y-3 p-3 md:w-full">
@@ -634,8 +644,8 @@ const OrderProcessing = () => {
       </div>
 
       <div className="flex flex-col gap-4">
-        <div className="h-fit max-h-[73vh] ">
-          <table className="table-pin-rows table-pin-cols table bg-[#F1F1F1]">
+        <div className="overflow-y-auto md:h-[60vh] 2xl:h-[73vh] ">
+          <table className="table-pin-rows table-pin-cols table">
             {/* head */}
             <thead className="">
               <tr>
@@ -728,7 +738,7 @@ const OrderProcessing = () => {
                         </div>
                       </div> */}
                     </td>
-                    <td className="w-40"> ৳ {order?.total}</td>
+                    <td className="w-40"> ৳ {order?.total - order?.discount - (order?.discountOnAll || 0)}</td>
                     <td className="w-20 text-center font-semibold">
                       {order?.paymentType}
                     </td>
