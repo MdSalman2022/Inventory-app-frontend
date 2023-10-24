@@ -387,7 +387,7 @@ const CourierPage = () => {
           </button> 
         </div> */}
       </div>
-      <div className="flex justify-between">
+      <div className="flex md:flex-row flex-col  justify-between">
         <div className="my-2 flex items-center gap-2 md:my-0">
           <p>Show</p>
           <select name="page" id="page" className="input-bordered input p-2">
@@ -397,8 +397,8 @@ const CourierPage = () => {
             <option value="100">100</option>
           </select>
         </div>
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-8 bg-[#14BF7D] p-1 px-5 text-2xl">
+        <div className="flex md:flex-row flex-col items-start gap-3">
+          <div className="flex items-center gap-5 md:gap-8 bg-[#14BF7D] p-1 px-5 text-2xl">
             <span className="tooltip" data-tip="Print Invoice">
               <FiPrinter
                 onClick={() => {
@@ -497,7 +497,7 @@ const CourierPage = () => {
           </div>
           <form
             onSubmit={SearchOrderById}
-            className="hidden items-center gap-2 md:flex"
+            className="items-center gap-2 flex"
           >
             <p>Search</p>
             <input
@@ -509,12 +509,12 @@ const CourierPage = () => {
           </form>
         </div>
         <div className="my-2 flex items-center md:hidden">
-          <button
+          {/* <button
             className="btn-primary btn-outline btn"
             onClick={() => setIsSearchModalOpen(!isSearchModalOpen)}
           >
             <FaSearch className="text-xl" />
-          </button>
+          </button> */}
           {isSearchModalOpen && (
             <ModalBox
               setIsModalOpen={setIsSearchModalOpen}
@@ -545,7 +545,7 @@ const CourierPage = () => {
         </div>
       </div>
       <div className="flex flex-col gap-4">
-        <div className="overflow-y-scroll md:h-[60vh] 2xl:h-[73vh] ">
+        <div className="overflow-y-scroll h-[60vh] 2xl:h-[73vh] ">
           <table className="table-pin-rows table-pin-cols table ">
             {/* head */}
             <thead className="">

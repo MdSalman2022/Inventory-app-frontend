@@ -490,7 +490,7 @@ const OrderProcessing = () => {
           {/* The button to open modal */}
         </div>
       </div>
-      <div className="flex justify-between">
+      <div className="flex md:flex-row flex-col  justify-between">
         <div className="my-2 flex items-center gap-2 md:my-0">
           <p>Show</p>
           <select name="page" id="page" className="input-bordered input p-2">
@@ -500,8 +500,8 @@ const OrderProcessing = () => {
             <option value="100">100</option>
           </select>
         </div>
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-8 bg-[#14BF7D] p-1 px-5 text-2xl">
+        <div className="flex md:flex-row flex-col items-start gap-3">
+          <div className="flex items-center gap-5 md:gap-8 bg-[#14BF7D] p-1 px-5 text-2xl">
             <FiPrinter
               onClick={() => {
                 if (selectedOrders?.length > 0) {
@@ -595,7 +595,7 @@ const OrderProcessing = () => {
           </div>
           <form
             onSubmit={SearchOrderById}
-            className="hidden items-center gap-2 md:flex"
+            className="items-center gap-2 flex"
           >
             <p>Search</p>
             <input
@@ -644,8 +644,8 @@ const OrderProcessing = () => {
       </div>
 
       <div className="flex flex-col gap-4">
-        <div className="overflow-y-auto md:h-[60vh] 2xl:h-[73vh] ">
-          <table className="table-pin-rows table-pin-cols table">
+        <div className="overflow-y-auto h-[60vh] 2xl:h-[73vh] ">
+          <table className="table-pin-rows table">
             {/* head */}
             <thead className="">
               <tr>
