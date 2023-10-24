@@ -188,8 +188,6 @@ const CancelledOrders = () => {
   };
 
   const navigate = useNavigate()
-
-
   return (
     <div className="w-screen p-3 md:w-full md:space-y-3">
       <ModalBox isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen}>

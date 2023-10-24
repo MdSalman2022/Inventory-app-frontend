@@ -185,8 +185,7 @@ const CompletedOrders = () => {
         toast.error("Something went wrong");
       });
   };
-
-  console.log(isModalOpen);
+ 
 
   const navigate = useNavigate();
 
