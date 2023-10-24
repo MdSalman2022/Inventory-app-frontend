@@ -124,7 +124,7 @@ const CourierPage = () => {
   };
 
   const { data = [], isLoading: isStatusLoading } = useQuery(
-    ["ordersStatus", orders],
+    ["ordersStatus", orders,steadFastCourier],
     async () => {
       // Create an array of promises for each orderId in allOrdersInvoice
       const fetchPromises = allOrdersInvoice?.map((orderId) =>
@@ -137,6 +137,7 @@ const CourierPage = () => {
         console.log("All order statuses: ", responseData);
         setOrdersStatus(responseData);
         // Do something with the responseData here
+        return responseData;
       } catch (error) {
         console.error("Error fetching orders: ", error);
       }
@@ -340,6 +341,7 @@ const CourierPage = () => {
   console.log("selectedOrders courier", selectedOrders);
 
   console.log("orders",orders)
+  console.log("ordersStatus",ordersStatus)
 
   const navigate = useNavigate();
 
@@ -544,9 +546,9 @@ const CourierPage = () => {
           )}
         </div>
       </div>
-      <div className="flex flex-col gap-4">
-        <div className="overflow-y-scroll h-[60vh] 2xl:h-[73vh] ">
-          <table className="table-pin-rows table-pin-cols table ">
+      <div className="flex flex-col gap-2">
+        <div className="h-fit">
+          <table className="table-pin-rows table-pin-cols table table-sm">
             {/* head */}
             <thead className="">
               <tr>
@@ -606,7 +608,7 @@ const CourierPage = () => {
                       className="checkbox border border-black"
                     />
                   </td>
-                  <td className="w-80">#{order?.orderId}</td>
+                  <td className="w-40">#{order?.orderId}</td>
                   <td className="flex flex-col text-center font-medium ">
                     <span>{formatTimestamp(order?.timestamp).date}</span>
                     <span>{formatTimestamp(order?.timestamp).time}</span>
@@ -623,7 +625,7 @@ const CourierPage = () => {
                   <td className=" text-center font-semibold">
                     {order?.paymentType}
                   </td>
-                  <td className=" text-center font-semibold">
+                  <td className="w-80 text-center font-semibold">
                     <div className="flex flex-col items-center gap-1">
                       <span>{order?.courier}</span>
                       {isStatusLoading
@@ -675,7 +677,8 @@ const CourierPage = () => {
                     </div>
                   </td> */}
 
-                  {/* <td>
+                  {/* 
+                  <td>
                     {isStatusLoading
                       ? "...Loading"
                       : ordersStatus[index]?.delivery_status}
@@ -697,14 +700,14 @@ const CourierPage = () => {
                       <p className="">COD: {order?.cash}</p>
                     </div>
                   </td> */}
-                  <td className="flex w-40 justify-center text-center font-semibold">
+                  <td className="w-40 h-full text-center font-semibold">
                     <div className="dropdown-left dropdown">
                       <label tabIndex={0} className="cursor-pointer">
                         <BsThreeDotsVertical size={18} />
                       </label>
                       <ul
                         tabIndex={0}
-                        className="dropdown-content menu rounded-box z-[1] w-40 gap-1  bg-base-100 shadow"
+                        className="dropdown-content menu rounded-box z-[1000] w-40 gap-1  bg-base-100 shadow"
                       >
                         <li
                           onClick={() => {

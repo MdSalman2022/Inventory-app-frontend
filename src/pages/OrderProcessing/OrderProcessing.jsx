@@ -644,7 +644,7 @@ const OrderProcessing = () => {
       </div>
 
       <div className="flex flex-col gap-4">
-        <div className="overflow-y-auto h-[60vh] 2xl:h-[73vh] ">
+        <div className="h-fit">
           <table className="table-pin-rows table">
             {/* head */}
             <thead className="">

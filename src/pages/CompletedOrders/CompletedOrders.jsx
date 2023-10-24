@@ -343,7 +343,7 @@ const CompletedOrders = () => {
       </div>
 
       <div className="flex flex-col gap-4">
-        <div className="overflow-y-scroll h-[60vh] 2xl:h-[73vh] ">
+        <div className="h-fit">
           <table className="table table-sm table-pin-rows">
             {/* head */}
             <thead className="bg-white text-black">
