@@ -59,7 +59,6 @@ module.exports = {
   },
   plugins: [
     require("daisyui"),
-    require("tailwindcss-animate"),
-    require("prettier-plugin-tailwindcss"),
+    require("tailwindcss-animate"), 
   ],
 };
